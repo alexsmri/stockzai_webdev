@@ -1,16 +1,21 @@
 <!doctype html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link rel="stylesheet" href="{% static 'stylesheet.css' %}">
 </head>
 <body>
-<h1>{{ company.symbol }}</h1>
-<h4>{{ company.name }}</h4>
-<p><strong>Financial Score: </strong>{{ company.financial_score }}</p>
-<p><strong>Valuation Score: </strong>{{ company.valuation_score }}</p>
+    <div class="wrapper direction-down">
+        <h5>{{ company.name }}</h5>
+        <h1><span class="span-gradient">{{ company.symbol }}</span></h1>
+        <h1><span class="span-gradient">AAPL</span></h1>
+        <p><strong>Financial Score: </strong>{{ company.financial_score }}</p>
+        <p><strong>Valuation Score: </strong>{{ company.valuation_score }}</p>
+    </div>
 </body>
 </html>
