@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}StockzAI{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'stylesheet.css' %}">
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-zinc-950 text-white font-sans min-h-screen flex flex-col">
+
+  {% include "navbar.html" %}
+
+  <main class="site-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

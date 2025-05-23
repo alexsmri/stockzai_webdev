@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="wrapper direction-down has-subtle-gradient">
+        <h6>{{ latest_entries.name }}</h6>
+        <h1><span class="span-gradient">{{ symbol }}</span></h1>
+    </div>
+    <div class="wrapper direction-down">
+        <h4>Scores</h4>
+        <div class="wrapper">
+            {% if latest_entries.financial_score %}
+            <svg class="svg-score-radial"width="9VW" height="9VW" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle id="val-financial_score" cx="50" cy="50" r="42" stroke="#00D26D" stroke-width="2%" fill="none"
+                            stroke-linecap="round"
+                            stroke-dasharray="234.667"
+                            stroke-dashoffset="{{ style_dict.financial_score }}"  
+                            transform="rotate(-70 50 50)">
+                </circle>
+                
+                <text class="scores-text" id="cha-financial_score" x="50%" y="53%" text-anchor="middle" fill="white">Financials</text>
+                
+                <g transform="translate(40.5, 0)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="20%" height="20%">
+                        <path id="pat-financial_score-0" fill="#00D26D" d="M9,105.1c0,7.9,7.1,14.2,15.8,14.2h94.5c8.7,0,15.8-6.3,15.8-14.2v-35.4H9v35.4Z"/>
+                        <path id="pat-financial_score-1" fill="#00D26D" d="M119.2,24.8H24.8c-8.7,0-15.8,7.1-15.8,15.7v15.8h126v-15.8c0-8.7-7.1-15.7-15.8-15.7Z"/>
+                    </svg>
+                </g>
+            </svg>
+            {% endif %}
+            {% if latest_entries.valuation_score %}
+            <svg class="svg-score-radial"width="9VW" height="9VW" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle id="val-valuation_score" cx="50" cy="50" r="42" stroke="#00D26D" stroke-width="2%" fill="none"
+                            stroke-linecap="round"
+                            stroke-dasharray="234.667"
+                            stroke-dashoffset="{{ style_dict.valuation_score }}"  
+                            transform="rotate(-70 50 50)">
+                
+                </circle>
+                
+                <text class="scores-text" id="cha-valuation_score" x="50%" y="53%">Valuation</text>
+                
+                <g transform="translate(40.5, 0)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="20%" height="20%">
+                        <path id="pat-valuation_score-0" fill="#00D26D" d="M102.5,8.5h-59.9c-2,0-4.8,1.4-5.4,3.4L13.2,49.3h119.2l-23.8-37.5c-1.4-2-3.4-3.4-5.4-3.4h-.7ZM67.7,132.4c2,2.7,6.1,2.7,8.9,0h0l57.9-69.5H9.8l57.9,69.5Z"/>
+                    </svg>
+                </g>
+            </svg>
+            {% endif %}
+        </div>
+    </div>
+    <div class="wrapper direction-down">
+        <h4>Basics</h4>
+        <div class="wrapper">
+            {% if latest_entries.sector %}
+            <div class="container">
+                <h6>Sector</h6>
+                <h6><strong>{{ latest_entries.sector }}</strong></h6>
+            </div>
+            {% endif %}
+            {% if latest_entries.industry %}
+            <div class="container">
+                <h6>Industry</h6>
+                <h6><strong>{{ latest_entries.industry }}</strong></h6>
+            </div>
+            {% endif %}
+            {% if latest_entries.country %}
+            <div class="container">
+                <h6>Country</h6>
+                <h6><strong>{{ latest_entries.country }}</strong></h6>
+            </div>
+            {% endif %}
+            {% if latest_entries.currency %}
+            <div class="container">
+                <h6>Currency</h6>
+                <h6><strong>{{ latest_entries.currency }}</strong></h6>
+            </div>
+            {% endif %}
+            {% if latest_entries.employees %}
+            <div class="container">
+                <h6>Employees</h6>
+                <h6><strong>{{ latest_entries.employees }}</strong></h6>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

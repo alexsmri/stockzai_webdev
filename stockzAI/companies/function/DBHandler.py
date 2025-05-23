@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
 import pandas as pd
 import os
+import logging
 
 
 class DBHandler:
@@ -27,10 +28,10 @@ class DBHandler:
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
 
-    def read_execute(self, query: str, table_name: str | None = None):
+    def read_execute(self, query: str, table_name: str | None = None, params: list | None = None):
 
         with self.engine.connect() as conn:
-            results = conn.execute(text(query)).fetchall()
+            results = conn.execute(text(query), parameters=params).fetchall()
 
         if table_name:
             columns = []
@@ -106,8 +107,8 @@ class DBHandler:
 
     def read(self,
              table_name: str,
-             column_name: str or bool = False,
-             conditions: dict or bool = False,
+             column_name: str | bool = False,
+             conditions: dict | bool = False,
              order_by: str | None = None,
              ascend: bool = False) \
             -> pd.DataFrame:
@@ -170,7 +171,7 @@ class DBHandler:
 
         return df
 
-    def selectcount(self, table_name: str, column_name: str or bool = False, conditions: dict or bool = False) -> int:
+    def selectcount(self, table_name: str, column_name: str | bool = False, conditions: dict | bool = False) -> int:
         # Base query with parameterized table and column names
         query = f"SELECT COUNT(*) FROM {self.database}.`{table_name}`"
         if column_name:
@@ -220,7 +221,7 @@ class DBHandler:
 
         return results
 
-    def selectdistinct(self, table_name, column_name: str or bool = False, conditions: dict or bool = False):
+    def selectdistinct(self, table_name, column_name: str | bool = False, conditions: dict | bool = False):
 
         query = f"SELECT DISTINCT FROM {self.database}.{table_name}"
 
@@ -336,9 +337,31 @@ class DBHandler:
                 if not company_kpis_df.empty:
                     latest_row = company_kpis_df.sort_values("date", ascending=False).iloc[0]
                     latest_entries[kpi_name] = latest_row["value"]
-                else:
-                    latest_entries[kpi_name] = None  # optional fallback
 
                 company_intel[kpi_name] = kpi_dictionary
 
         return {"company_intel": company_intel, "latest_entries": latest_entries}
+    
+    def search_company(self, search_request: str):
+        results = {}
+        sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
+                    "FROM basics b "
+                    "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request);")
+        
+        results_raw = self.read_execute(sql_query, params={"request": f"%{search_request}%"})
+        logging.debug(results_raw)
+        for idx, result in enumerate(results_raw):
+            if len(results_raw) > 1 and idx != len(results_raw) - 1:
+                if idx % 2 == 0:
+                    continue
+                entries = [result, results_raw[idx + 1]]
+            else:
+                entries = [result]
+            entry_res = {}
+            for entry in entries:
+                name, symbol = entry if len(entry) == 2 else [entry[0], ""]
+                entry_res[symbol] = name
+            
+            results[idx] = entry_res
+
+        return results
