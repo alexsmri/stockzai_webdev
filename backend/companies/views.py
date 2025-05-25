@@ -4,6 +4,7 @@ from .function.DBHandler import DBHandler
 from django.http import Http404
 import logging
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 fmt = getattr(settings, 'LOG_FORMAT', None)
 lvl = getattr(settings, 'LOG_LEVEL', logging.DEBUG)
@@ -16,7 +17,7 @@ db = DBHandler("companies")
 def list_view(request):
     return render(request, 'page.html')
 
-
+@login_required
 def page_view(request, symbol):
     intel = db.retrieve_company_data(symbol)
     latest_entries = intel["latest_entries"]

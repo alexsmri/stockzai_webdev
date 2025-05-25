@@ -6,7 +6,7 @@ from django.utils import timezone
 from .managers import UserManager
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_("username"), unique=True)
+    username = models.CharField(_("username"), max_length=30, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)

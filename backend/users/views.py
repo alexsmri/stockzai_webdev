@@ -16,7 +16,8 @@ def register_view(request):
         if form.is_valid():
             form.save()
             logging.debug("Successful registration")
-            return redirect(REDIRECT_URL)
+            next_url = request.GET.get("next") or request.POST.get("next")
+            return redirect(next_url or REDIRECT_URL)
         else:
             logging.debug(form.errors)
     else:
@@ -28,7 +29,8 @@ def login_view(request):
         form = C_AuthenticationForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
-            return redirect(REDIRECT_URL)
+            next_url = request.GET.get("next") or request.POST.get("next")
+            return redirect(next_url or REDIRECT_URL)
     else:
         logging.debug("Login attempt")
         form = C_AuthenticationForm()
@@ -37,7 +39,8 @@ def login_view(request):
 def logout_view(request):
     if request.method == "POST":
         logout(request)
-        return redirect(REDIRECT_URL)
+        next_url = request.GET.get("next") or request.POST.get("next")
+        return redirect(next_url or REDIRECT_URL)
     return redirect(REDIRECT_URL)
 
 @login_required
