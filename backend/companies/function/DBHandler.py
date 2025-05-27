@@ -331,7 +331,7 @@ class DBHandler:
 
                 # store each value by date
                 for _, row in company_kpis_df.iterrows():
-                    kpi_dictionary[row["date"]] = row["value"]
+                    kpi_dictionary[str(row["date"])] = row["value"]
 
                 # store latest entry (most recent date)
                 if not company_kpis_df.empty:
