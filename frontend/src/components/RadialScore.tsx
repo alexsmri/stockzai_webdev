@@ -1,4 +1,4 @@
-import { getColor, getDashOffset, getScoreText } from "../utils/functions";
+import { getColor, getDashOffset } from "../utils/functions";
 import ScoreIcon from "./ScoreIcon";
 
 interface RadialScoreProps {
@@ -6,10 +6,19 @@ interface RadialScoreProps {
   scoreKPI: "financial_score" | "valuation_score"; // Optional type for the score
 }
 
+function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
+  switch (scoreKPI) {
+    case "financial_score":
+      return "Financials";
+    case "valuation_score":
+      return "Valuation";
+  }
+}
+
 function RadialScore(props: RadialScoreProps) {
   const color = getColor(props.score);
   const offset = getDashOffset(props.score);
-  const text = getScoreText(props.scoreKPI);
+  const text = getScoreText(props.scoreKPI)
 
   return (
     <svg
@@ -33,12 +42,9 @@ function RadialScore(props: RadialScoreProps) {
       ></circle>
 
       <text
-        className="scores-text"
-        id="cha-financial_score"
         x="50%"
         y="53%"
         textAnchor="middle"
-        fill="white"
       >
         {text}
       </text>

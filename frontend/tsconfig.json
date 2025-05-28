@@ -16,6 +16,6 @@
       "@contexts/*": ["./src/contexts/*"],
     }
   },
-  "include": ["src", "src/types"],
+  "include": ["src", "src/**/*.d.ts"],
 
 }

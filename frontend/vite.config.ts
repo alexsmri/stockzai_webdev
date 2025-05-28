@@ -12,5 +12,8 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/components'),
     },
   },
-  plugins: [react(), svgr()]
+  plugins: [
+    react(), 
+    svgr()
+  ]
 })

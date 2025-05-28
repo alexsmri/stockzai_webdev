@@ -1,24 +1,27 @@
 interface ScoreIconProps {
   color: string; // Color for the icon
   scoreKPI: "financial_score" | "valuation_score"; // Type for the score
+  width?: string
+  height?: string
 }
 
-import FinancialScore from "../assets/react.svg?react";
-import ValuationScore from "../assets/react.svg?react";
+import FinancialScore from "@/assets/FinancialScoreIcon.svg?react";
+import ValuationScore from "@/assets/ValuationScoreIcon.svg?react";
 
 const icons = {
   financial_score: FinancialScore,
   valuation_score: ValuationScore,
 };
 
-function ScoreIcon(props: ScoreIconProps) {
-  const IconComponent = icons[props.scoreKPI];
-  const color = props.color;
+function ScoreIcon({color, scoreKPI, width = "20%", height = "20%"}: ScoreIconProps) {
+  const IconComponent = icons[scoreKPI];
   return (
     <IconComponent
       style={{
         color, // This will set the color of the SVG paths if they use currentColor
       }}
+      width={width}
+      height={height}
       // Clone each path element and override color
     >
       {/* If SVGs are well-structured, you could also style them via CSS */}

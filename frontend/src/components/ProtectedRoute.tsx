@@ -34,7 +34,7 @@ function ProtectedRoute(props: ProtectedRouteProps) {
             return;
         }
         try {
-            const res = await api.post('/api/users/token/refresh', {
+            const res = await api.post('/api/users/token/refresh/', {
                 refresh: refreshToken
             });
             if (res.status === 200) {
@@ -70,7 +70,7 @@ function ProtectedRoute(props: ProtectedRouteProps) {
         return <div>Loading...</div>;
     };
 
-    return isAuthorized ? props.children : <Navigate to="/login" replace />;
+    return isAuthorized ? props.children : <Navigate to="/users/login/" replace />;
 }
 
 export default ProtectedRoute;

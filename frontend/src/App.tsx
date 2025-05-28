@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import CompaniesPage from "./pages/CompaniesPage"
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import Home from "./pages/Home";
@@ -28,20 +29,24 @@ function App() {
           }
       />
       <Route
-        path="/login"
+        path="/users/login"
         element = {<UserLogin />}
       />
       <Route
-        path="/logout"
+        path="/users/logout"
         element = {<Logout />}
       />
       <Route
-        path="/register"
+        path="/users/register"
         element = {<CreateAndLogout />}
       />
       <Route
-      path="*"
-      element = {<NotFOund />}
+        path="/companies/:symbol"
+        element = {
+        <ProtectedRoute>
+          <CompaniesPage />
+          </ProtectedRoute>
+          }
       />
       
     </Routes>
