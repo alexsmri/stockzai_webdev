@@ -1,21 +1,19 @@
-import RadialScore from "./RadialScore"
-
 interface InfoSectionProps {
-    info_role: "scores" | "basics" | "financials" 
-    info: JSON
+  title: string;
+  subitle?: string;
+  children: React.ReactNode;
 }
 
 function InfoSection(props: InfoSectionProps) {
-    const info = props.info
-
-    return (
+  return (
     <>
-    <div>
-        <RadialScore score={8} scoreKPI="financial_score"/>
-        <RadialScore score={8} scoreKPI="valuation_score"/>
-    </div>
+      <div>
+        <h3>{props.title}</h3>
+        {props.subitle && <p>{props.subitle}</p>}
+        <div>{props.children}</div>
+      </div>
     </>
-    )
+  );
 }
 
 export default InfoSection;

@@ -1,5 +1,5 @@
 [project]
-name = "stockzai-django"
+name = "stockzai"
 version = "0.1.0"
 description = ""
 authors = [
@@ -13,7 +13,10 @@ dependencies = [
     "pymysql",
     "pandas",
     "cryptography",
-    "python-dotenv"
+    "python-dotenv",
+    "djangorestframework",
+    "djangorestframework-simplejwt",
+    "django-cors-headers",
 ]
 
 

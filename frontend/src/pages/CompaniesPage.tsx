@@ -1,28 +1,27 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import api from "../api"
 import InfoSection from "../components/InfoSection";
+import RadialScore from "../components/RadialScore";
+import { CompanyStoreProvider } from "../context/CompanyStoreProvider";
+import NotFound from "./NotFound";
 
-function CompaniesPage () {
-    const { symbol } = useParams<{ symbol: string }>();
-    
-    const [companyJSON, setcompanyJSON] = useState({})
+function CompaniesPage() {
+  const { symbol } = useParams<{ symbol: string }>();
 
-    const getCompany = async (symbol: string) => {
-      const company = await api.get(`/api/companies/${symbol}/`)
-      return company;
-    }
+  if (!symbol) {
+    return <NotFound />;
+  }
 
-    useEffect(() => {
-      (async () => {
-        if (!symbol) return;
-        const company = await getCompany(symbol);
-        setcompanyJSON(company.data)
-      })();
-    }, [symbol])
-    
-
-    return <InfoSection />
+  return (
+    <>
+      <CompanyStoreProvider symbol={symbol}>
+        <InfoSection title="Scores.">
+          <div>
+            <RadialScore scoreKPI="financial_score" score={8} />
+            <RadialScore scoreKPI="valuation_score" score={8} />
+          </div>
+        </InfoSection>
+      </CompanyStoreProvider>
+    </>
+  );
 }
-
 export default CompaniesPage;

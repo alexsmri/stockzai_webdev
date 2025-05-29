@@ -1,8 +1,8 @@
 interface ScoreIconProps {
   color: string; // Color for the icon
   scoreKPI: "financial_score" | "valuation_score"; // Type for the score
-  width?: string
-  height?: string
+  width?: string;
+  height?: string;
 }
 
 import FinancialScore from "@/assets/FinancialScoreIcon.svg?react";
@@ -13,20 +13,21 @@ const icons = {
   valuation_score: ValuationScore,
 };
 
-function ScoreIcon({color, scoreKPI, width = "20%", height = "20%"}: ScoreIconProps) {
+function ScoreIcon({
+  color,
+  scoreKPI,
+  width = "20%",
+  height = "20%",
+}: ScoreIconProps) {
   const IconComponent = icons[scoreKPI];
   return (
     <IconComponent
       style={{
-        color, // This will set the color of the SVG paths if they use currentColor
+        color,
       }}
       width={width}
       height={height}
-      // Clone each path element and override color
-    >
-      {/* If SVGs are well-structured, you could also style them via CSS */}
-      {/* OR use JS to map over children and override fill dynamically */}
-    </IconComponent>
+    ></IconComponent>
   );
 }
 
