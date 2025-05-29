@@ -1,9 +1,12 @@
 import { getColor, getDashOffset } from "../utils/functions";
 import ScoreIcon from "./ScoreIcon";
+import { useCompanyStoreSync } from "../hooks/hooks";
+import { useCompanyStore } from "../context/CompanyStoreProvider";
+import type { CompanyAPIResponse } from "../types/types";
+import { useState } from "react";
 
 interface RadialScoreProps {
-  score: number; // Score should be between 0 and 10
-  scoreKPI: "financial_score" | "valuation_score"; // Optional type for the score
+  KPI: "financial_score" | "valuation_score"; // Optional type for the score
 }
 
 function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
@@ -15,14 +18,19 @@ function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
   }
 }
 
-function RadialScore(props: RadialScoreProps) {
-  const color = getColor(props.score);
-  const offset = getDashOffset(props.score);
-  const text = getScoreText(props.scoreKPI)
+function RadialScore({ KPI }: RadialScoreProps) {
+  const store = useCompanyStore();
+  const [data, setData] = useState<CompanyAPIResponse | null>(null);
 
+  useCompanyStoreSync(store, setData);
+
+  if (!data || !data.latest_entries[KPI]) return null;
+  const score = data.latest_entries[KPI];
+  const color = getColor(score);
+  const offset = getDashOffset(score);
+  const text = getScoreText(KPI);
   return (
     <svg
-      className="svg-score-radial"
       width="9VW"
       height="9VW"
       viewBox="0 0 100 100"
@@ -41,16 +49,12 @@ function RadialScore(props: RadialScoreProps) {
         transform="rotate(-70 50 50)"
       ></circle>
 
-      <text
-        x="50%"
-        y="53%"
-        textAnchor="middle"
-      >
+      <text x="50%" y="53%" textAnchor="middle">
         {text}
       </text>
 
       <g transform="translate(40.5, 0)">
-        <ScoreIcon color={color} scoreKPI={props.scoreKPI} />
+        <ScoreIcon color={color} scoreKPI={KPI} />
       </g>
     </svg>
   );

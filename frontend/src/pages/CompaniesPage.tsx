@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
-import InfoSection from "../components/InfoSection";
-import RadialScore from "../components/RadialScore";
+import SectionInfo from "../components/SectionInfo";
+import RadialScore from "../components/ScoreInfo";
+import CardInfo from "../components/CardInfo";
 import { CompanyStoreProvider } from "../context/CompanyStoreProvider";
 import NotFound from "./NotFound";
 
@@ -14,12 +15,18 @@ function CompaniesPage() {
   return (
     <>
       <CompanyStoreProvider symbol={symbol}>
-        <InfoSection title="Scores.">
+        <SectionInfo title="Scores.">
           <div>
-            <RadialScore scoreKPI="financial_score" score={8} />
-            <RadialScore scoreKPI="valuation_score" score={8} />
+            <RadialScore KPI="financial_score" />
+            <RadialScore KPI="valuation_score" />
           </div>
-        </InfoSection>
+        </SectionInfo>
+        <SectionInfo title="Basics.">
+          <div>
+            <CardInfo KPI="industry" />
+            <CardInfo KPI="fullTimeEmployees" />
+          </div>
+        </SectionInfo>
       </CompanyStoreProvider>
     </>
   );
