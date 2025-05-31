@@ -3,6 +3,7 @@ from datetime import datetime, date
 import pandas as pd
 import os
 import logging
+import numpy
 
 
 class DBHandler:
@@ -286,6 +287,15 @@ class DBHandler:
         kpi_role = kpi_entry.iloc[0]["role"]
 
         return {"id": kpi_id, "role": kpi_role}
+    
+    def retrieve_kpis(self):
+        kpis: pd.DataFrame = self.read(table_name="kpi")
+        kpis = kpis.set_index("id").to_dict(orient="index")
+        for column in kpis:
+            dic = kpis[column]
+            for key in dic:
+                dic[key] = None if pd.isna(dic[key]) else dic[key]
+        return kpis
 
     def retrieve_kpi(self, ticker: str, kpi_id, kpi_role, limit: int | None = 1, date: datetime | date | None = None):
 
@@ -350,18 +360,8 @@ class DBHandler:
         
         results_raw = self.read_execute(sql_query, params={"request": f"%{search_request}%"})
         logging.debug(results_raw)
-        for idx, result in enumerate(results_raw):
-            if len(results_raw) > 1 and idx != len(results_raw) - 1:
-                if idx % 2 == 0:
-                    continue
-                entries = [result, results_raw[idx + 1]]
-            else:
-                entries = [result]
-            entry_res = {}
-            for entry in entries:
-                name, symbol = entry if len(entry) == 2 else [entry[0], ""]
-                entry_res[symbol] = name
+        for (name, symbol) in results_raw:
             
-            results[idx] = entry_res
+            results[symbol] = {"name": name}
 
         return results

@@ -1,11 +1,11 @@
 import { getColor, getDashOffset } from "../utils/functions";
 import ScoreIcon from "./ScoreIcon";
 import { useCompanyStoreSync } from "../hooks/hooks";
-import { useCompanyStore } from "../context/CompanyStoreProvider";
+import { useCompanyStore } from "../context/CompanyStoreContext";
 import type { CompanyAPIResponse } from "../types/types";
 import { useState } from "react";
 
-interface RadialScoreProps {
+interface ScoreRadialProps {
   KPI: "financial_score" | "valuation_score"; // Optional type for the score
 }
 
@@ -18,7 +18,7 @@ function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
   }
 }
 
-function RadialScore({ KPI }: RadialScoreProps) {
+function ScoreRadial({ KPI }: ScoreRadialProps) {
   const store = useCompanyStore();
   const [data, setData] = useState<CompanyAPIResponse | null>(null);
 
@@ -60,4 +60,4 @@ function RadialScore({ KPI }: RadialScoreProps) {
   );
 }
 
-export default RadialScore;
+export default ScoreRadial;

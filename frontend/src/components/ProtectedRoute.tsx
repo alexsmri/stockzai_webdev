@@ -14,7 +14,6 @@ interface DecodedToken {
 }
 
 function ProtectedRoute(props: ProtectedRouteProps) {
-    console.log(props.children)
     const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
     useEffect(() => {

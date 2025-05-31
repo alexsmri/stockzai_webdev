@@ -3,12 +3,12 @@ import CompaniesPage from "./pages/CompaniesPage"
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import Home from "./pages/Home";
-import NotFOund from "./pages/NotFound";
+import SearchBar from "./components/SearchBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function Logout() {
   localStorage.clear();
-  return <Navigate to="/login"/>;
+  return <Navigate to="/users/login"/>;
 }
 
 function CreateAndLogout() {
@@ -41,7 +41,11 @@ function App() {
         element = {<CreateAndLogout />}
       />
       <Route
-        path="/companies/:symbol"
+        path="/companies/search/"
+        element = {<SearchBar />}
+      />
+      <Route
+        path="/companies/page/:symbol"
         element = {
         <ProtectedRoute>
           <CompaniesPage />

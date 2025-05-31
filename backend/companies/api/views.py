@@ -20,3 +20,26 @@ class CompanyPageView(APIView):
             raise Http404("No data found for this symbol.")
         
         return Response(intel)
+
+class KPIView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None  # This should be set to the appropriate serializer class
+
+    def get(self, request):
+        # Logic to retrieve the company object based on the request
+        # For example, you might use self.request.user.company
+        
+        kpis = db.retrieve_kpis()
+        print(kpis)
+        return Response(kpis)
+
+class CompanySearchView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None  # This should be set to the appropriate serializer class
+
+    def get(self, request, query):
+        # Logic to retrieve the company object based on the request
+        # For example, you might use self.request.user.company
+        
+        results = db.search_company(query)
+        return Response(results)
