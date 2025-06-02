@@ -40,6 +40,8 @@ class CompanySearchView(APIView):
     def get(self, request, query):
         # Logic to retrieve the company object based on the request
         # For example, you might use self.request.user.company
+
+        unique = request.GET.get("unique", "false").lower() == "true"
         
-        results = db.search_company(query)
+        results = db.search_company(query, ["financial_score", "valuation_score"], unique=unique)
         return Response(results)

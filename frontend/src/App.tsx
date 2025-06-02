@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import CompaniesPage from "./pages/CompaniesPage"
+import ComparisonPage from "./pages/ComparisonPage";
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import Home from "./pages/Home";
-import SearchBar from "./components/SearchBar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SearchPage from "./pages/SearchPage";
 
 function Logout() {
   localStorage.clear();
@@ -42,13 +43,21 @@ function App() {
       />
       <Route
         path="/companies/search/"
-        element = {<SearchBar />}
+        element = {<SearchPage />}
       />
       <Route
         path="/companies/page/:symbol"
         element = {
         <ProtectedRoute>
           <CompaniesPage />
+          </ProtectedRoute>
+          }
+      />
+      <Route
+        path="/companies/compare/"
+        element = {
+        <ProtectedRoute>
+          <ComparisonPage />
           </ProtectedRoute>
           }
       />

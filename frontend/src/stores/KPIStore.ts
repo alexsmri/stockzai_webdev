@@ -13,7 +13,7 @@ export default class KPIStore extends BaseAPIStore<KPIAPIResponse>{
         return store;
     }
 
-    protected async fetch() {
+    async fetch() {
         const kpis = await api.get(`/api/companies/kpis/`);
         return kpis.data
 

@@ -7,7 +7,7 @@ export default abstract class BaseAPIStore<T> {
 
     protected constructor() {}
 
-    protected abstract fetch(): Promise<T>
+    abstract fetch(): Promise<T>
 
     async init() {
         this.status = "loading"
@@ -29,6 +29,10 @@ export default abstract class BaseAPIStore<T> {
 
     getError() {
         return this.error;
+    }
+
+    getData() {
+        return this.data;
     }
 
     async get(subscriber: () => void) {

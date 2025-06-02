@@ -352,16 +352,34 @@ class DBHandler:
 
         return {"company_intel": company_intel, "latest_entries": latest_entries}
     
-    def search_company(self, search_request: str):
+    def search_company(self, search_request: str, additional_kpis: list[str] = [], unique: bool = False):
         results = {}
-        sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
-                    "FROM basics b "
-                    "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request);")
+
+        additional_kpis_info = {kpi: self._retrieve_kpi_info(kpi) for kpi in additional_kpis}
+
+        if not unique:
+            sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
+                        "FROM basics b "
+                        "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request);")
+            results_raw = self.read_execute(sql_query, params={"request": f"%{search_request}%"})
+        else:
+            sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
+                        "FROM basics b "
+                        "WHERE (b.KPI = 90) AND b.SYMBOL = :request;")
+            results_raw = self.read_execute(sql_query, params={"request": search_request})
+            print(search_request)
         
-        results_raw = self.read_execute(sql_query, params={"request": f"%{search_request}%"})
         logging.debug(results_raw)
         for (name, symbol) in results_raw:
+            results_dic = {"name": name}
+            for kpi in additional_kpis_info:
+                symboL_kpi = self.retrieve_kpi(symbol, 
+                                               additional_kpis_info[kpi]["id"], 
+                                               additional_kpis_info[kpi]["role"])["value"]
+                print(symboL_kpi)
+                if symboL_kpi:
+                    results_dic[kpi] = symboL_kpi
             
-            results[symbol] = {"name": name}
+            results[symbol] = results_dic
 
         return results

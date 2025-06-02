@@ -15,7 +15,7 @@ export default class CompanyStore extends BaseAPIStore<CompanyAPIResponse> {
         await store.init();
         return store;
     }
-    protected async fetch() {
+    async fetch() {
         const company = await api.get(`/api/companies/${this.symbol}/`);
         return company.data
     }
