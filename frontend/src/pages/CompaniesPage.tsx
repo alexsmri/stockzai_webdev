@@ -19,20 +19,16 @@ function CompaniesPage() {
     <KPIStoreProvider args={[]}>
       <CompanyStoreProvider args={[symbol]}>
         <SectionInfo title="Scores.">
-          <div>
-            <ScoreRadial KPI="financial_score" />
-            <ScoreRadial KPI="valuation_score" />
-          </div>
+          <ScoreRadial KPI="financial_score" />
+          <ScoreRadial KPI="valuation_score" />
         </SectionInfo>
         <SectionInfo title="Basics.">
-          <div>
-            <CardInfo KPI="name" />
-            <CardInfo KPI="sector" />
-            <CardInfo KPI="industry" />
-            <CardInfo KPI="country" />
-            <CardInfo KPI="currency" />
-            <CardInfo KPI="fullTimeEmployees" />
-          </div>
+          <CardInfo KPI="name" />
+          <CardInfo KPI="sector" />
+          <CardInfo KPI="industry" />
+          <CardInfo KPI="country" />
+          <CardInfo KPI="currency" />
+          <CardInfo KPI="fullTimeEmployees" />
         </SectionInfo>
         <SectionInfo title="Financials.">
           <TableInfo table_role="income_statement"/>

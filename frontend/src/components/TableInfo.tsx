@@ -28,12 +28,12 @@ export default function TableInfo({ table_role }: TableInfoProps) {
   }))
 
   return (
-  <div>
+  <div className="border-2 border-white h-fit">
     {Object.entries(table_entries)
       .filter(([_, value]) => Object.keys(data.latest_entries).includes(value.KPI))
       .map(([key, value]) => (
-        <div key={key}>
-          <h5>{getKPIText(value.KPI)}</h5>
+        <div key={key} className="flex justify-between">
+          <strong>{getKPIText(value.KPI)}</strong>
           <p>{data.latest_entries[value.KPI]}</p>
         </div>
       ))}

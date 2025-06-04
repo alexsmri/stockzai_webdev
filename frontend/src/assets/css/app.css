@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Bold.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Semibold.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Medium.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Regular.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Light.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'ClashDisplay';
+  src: url('../fonts/ClashDisplay-Extralight.woff2') format('woff2'),
+       url('../fonts/ClashDisplay-Extralight.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@theme {
+  --default-font-family: 'ClashDisplay', sans-serif;
+  --color-*: initial;
+  --color-black: #000;
+  --color-white: #fff;
+  --color-green: #00d26d;
+  --color-blue: #474f97;
+}
+@layer base {
+    html {
+        @apply bg-black text-white
+    }
+    h1 {
+        @apply text-center text-6xl font-bold;
+    }
+    h2 {
+        @apply text-center text-5xl font-bold;
+    }
+    h3 {
+        @apply text-center text-4xl font-medium;
+    }
+    h4 {
+        @apply text-center text-3xl font-medium;
+    }
+    h5 {
+        @apply text-center text-2xl font-light;
+    }
+    h6 {
+        @apply text-center font-light;
+    }
+    strong {
+        @apply text-center font-semibold;
+    }
+}

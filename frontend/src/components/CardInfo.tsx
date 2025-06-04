@@ -4,11 +4,11 @@ import type { CompanyAPIResponse } from "../types/types";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { getKPIText } from "../utils/functions";
 
-interface InfoCardProps {
+interface CardInfoProps {
   KPI: string;
 }
 
-export default function InfoCard({ KPI }: InfoCardProps) {
+export default function CardInfo({ KPI }: CardInfoProps) {
   const store = useCompanyStore();
   const [data, setData] = useState<CompanyAPIResponse | null>(null);
 
@@ -19,7 +19,7 @@ export default function InfoCard({ KPI }: InfoCardProps) {
   return (
     <>
       <div>
-        <h5>{title}</h5>
+        <strong>{title}</strong>
         <p>{data.latest_entries[KPI]}</p>
       </div>
     </>

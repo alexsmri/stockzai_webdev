@@ -19,7 +19,7 @@ export default function InfoCard({ KPI }: InfoCardProps) {
   return (
     <>
       <div>
-        <h5>{title}</h5>
+        <strong>{title}</strong>
         <p>{data.latest_entries[KPI]}</p>
       </div>
     </>
