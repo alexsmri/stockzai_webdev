@@ -28,7 +28,7 @@ export default function TableInfo({ table_role }: TableInfoProps) {
   }))
 
   return (
-  <div className="border-2 border-white h-fit">
+  <div className="flex flex-col border border-subtle rounded-x1 h-fit p-4 w-[30%] gap-3">
     {Object.entries(table_entries)
       .filter(([_, value]) => Object.keys(data.latest_entries).includes(value.KPI))
       .map(([key, value]) => (

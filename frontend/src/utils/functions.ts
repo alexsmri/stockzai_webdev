@@ -1,10 +1,10 @@
 export function getColor(score: number): string {
   if (score >= 8) {
-    return "#4caf50"; // Green for high scores
+    return "#00D26D"; // Green for high scores
   } else if (score >= 5) {
-    return "#ff9800"; // Orange for medium scores
+    return "#D0D0D0"; // White for medium scores
   } else {
-    return "#f44336"; // Red for low scores
+    return "#EE0034"; // Red for low scores
   }
 }
 

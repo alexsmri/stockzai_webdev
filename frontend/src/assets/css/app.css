@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
 @font-face {
@@ -44,36 +45,45 @@
 }
 
 @theme {
-  --default-font-family: 'ClashDisplay', sans-serif;
+  --default-font-family: 'Work Sans', sans-serif;
+  --font-clash: 'ClashDisplay', sans-serif;
+  --text-base: 0.9vw;
+  --text-base--line-height: 1.5;
   --color-*: initial;
   --color-black: #000;
   --color-white: #fff;
   --color-green: #00d26d;
   --color-blue: #474f97;
+  --color-subtle: rgba(255, 255, 255, 0.23);
+  --radius-xs: 0.6vw;
+  --radius-x1: 0.8vw;
 }
 @layer base {
     html {
-        @apply bg-black text-white
+        @apply bg-black text-white text-base font-light;
     }
     h1 {
-        @apply text-center text-6xl font-bold;
+        @apply font-clash text-center text-6xl font-bold;
     }
     h2 {
-        @apply text-center text-5xl font-bold;
+        @apply font-clash text-center text-5xl font-bold;
     }
     h3 {
-        @apply text-center text-4xl font-medium;
+        @apply font-clash text-center text-4xl font-medium;
     }
     h4 {
-        @apply text-center text-3xl font-medium;
+        @apply font-clash text-center text-3xl font-medium;
     }
     h5 {
-        @apply text-center text-2xl font-light;
+        @apply font-clash text-center text-2xl font-light;
     }
     h6 {
         @apply text-center font-light;
     }
     strong {
-        @apply text-center font-semibold;
+        @apply text-center font-medium;
+    }
+    text {
+      @apply fill-white;
     }
 }

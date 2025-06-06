@@ -18,7 +18,7 @@ export default function CardInfo({ KPI }: CardInfoProps) {
   const title = getKPIText(KPI);
   return (
     <>
-      <div>
+      <div className="border border-subtle rounded-xs p-3">
         <strong>{title}</strong>
         <p>{data.latest_entries[KPI]}</p>
       </div>

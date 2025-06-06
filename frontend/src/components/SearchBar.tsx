@@ -1,10 +1,11 @@
 interface SearchBarProps {
     input: string;
-    handleSubmit: (e: React.FormEvent) => void;
+    submit?: boolean
+    handleSubmit?: (e: React.FormEvent) => void | null;
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function SearchBar({ input, handleSubmit, handleChange }: SearchBarProps) {
+export default function SearchBar({ input, submit = true, handleSubmit, handleChange }: SearchBarProps) {
 
     return (
     <>
@@ -15,7 +16,7 @@ export default function SearchBar({ input, handleSubmit, handleChange }: SearchB
             onChange={handleChange}
             placeholder="Search for a ticker..."
           />
-          <button type="submit">Submit</button>
+          {submit && <button type="submit">Submit</button>}
         </form>
 
         {/* Completions shown while typing */}

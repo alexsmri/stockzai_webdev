@@ -18,6 +18,7 @@ function CompaniesPage() {
     <>
     <KPIStoreProvider args={[]}>
       <CompanyStoreProvider args={[symbol]}>
+        <div className="flex flex-col gap-30">
         <SectionInfo title="Scores.">
           <ScoreRadial KPI="financial_score" />
           <ScoreRadial KPI="valuation_score" />
@@ -35,6 +36,7 @@ function CompaniesPage() {
           <TableInfo table_role="balance_sheet"/>
           <TableInfo table_role="cashflow_statement"/>
         </SectionInfo>
+        </div>
       </CompanyStoreProvider>
       </KPIStoreProvider>
     </>

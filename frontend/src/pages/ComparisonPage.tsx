@@ -11,16 +11,16 @@ export default function SearchPage() {
     const [ showCompletions, setShowCompletions ] = useState<boolean>(false)
     const [ showResults, setShowResults ] = useState<boolean>(false)
     const [submitIndex, setSubmitIndex ] = useState<number>(0)
-    
-    const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (input.length > 1) {
-        setSubmittedQuery(input);
-        setShowCompletions(false);
-        setShowResults(true)
-        setSubmitIndex((prev) => prev + 1)
-      }
-    };
+  
+    //const handleSubmit = (e: React.FormEvent) => {
+      //e.preventDefault();
+      //if (input.length > 1) {
+        //setSubmittedQuery(input);
+        //setShowCompletions(false);
+        //setShowResults(true)
+        //setSubmitIndex((prev) => prev + 1)
+      //}
+    //};
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -29,7 +29,7 @@ export default function SearchPage() {
 
     return (
     <>
-      <SearchBar input={input ?? ""} handleChange={handleChange} handleSubmit={handleSubmit}></SearchBar>
+      <SearchBar input={input ?? ""} submit={false} handleChange={handleChange}></SearchBar>
       {input.length > 2 && showCompletions && (
         <SearchStoreProvider args={[input]}>
             <SearchCompletion onSelect={(val) => {
