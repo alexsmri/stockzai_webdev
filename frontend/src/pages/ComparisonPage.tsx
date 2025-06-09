@@ -1,8 +1,8 @@
 import { SearchStoreProvider } from "../context/SearchStoreContext";
 import { useState } from "react";
-import SearchBar from "../components/SearchBar";
-import ComparisonResults from "../components/ComparisonResults";
-import SearchCompletion from "../components/SearchCompletion";
+import SearchBar from "../components/CO_SearchBar";
+import ComparisonResults from "../components/CO_ComparisonResults";
+import SearchCompletion from "../components/CO_SearchCompletion";
 
 export default function SearchPage() {
   const [submittedQuery, setSubmittedQuery] = useState<string | "">("");

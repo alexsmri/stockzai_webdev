@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
-import SectionInfo from "../components/SectionInfo";
-import ScoreRadial from "../components/ScoreRadial";
+import CO_SectionInfo from "../components/CO_SectionInfo";
+import ScoreRadial from "../components/CO_ScoreRadial";
 import CardInfo from "../components/CardInfo";
 import { CompanyStoreProvider } from "../context/CompanyStoreContext";
 import { KPIStoreProvider } from "../context/KPIStoreContext";
 import NotFound from "./NotFound";
-import KPILightbox from "../components/KPILightbox";
-import TableInfo from "../components/TableInfo";
+import KPILightbox from "../components/CO_LightboxKPI";
+import CO_TableInfo from "../components/CO_TableInfo";
 import { LightboxProvider } from "../context/LightboxContext";
 
 function CompaniesPage() {
@@ -23,23 +23,23 @@ function CompaniesPage() {
           <CompanyStoreProvider args={[symbol]}>
             <div className="flex flex-col gap-30">
               <KPILightbox />
-              <SectionInfo title="Scores.">
+              <CO_SectionInfo title="Scores.">
                 <ScoreRadial KPI="financial_score" />
                 <ScoreRadial KPI="valuation_score" />
-              </SectionInfo>
-              <SectionInfo title="Basics.">
+              </CO_SectionInfo>
+              <CO_SectionInfo title="Basics.">
                 <CardInfo KPI="name" />
                 <CardInfo KPI="sector" />
                 <CardInfo KPI="industry" />
                 <CardInfo KPI="country" />
                 <CardInfo KPI="currency" />
                 <CardInfo KPI="fullTimeEmployees" />
-              </SectionInfo>
-              <SectionInfo title="Financials.">
-                <TableInfo table_role="income_statement" />
-                <TableInfo table_role="balance_sheet" />
-                <TableInfo table_role="cashflow_statement" />
-              </SectionInfo>
+              </CO_SectionInfo>
+              <CO_SectionInfo title="Financials.">
+                <CO_TableInfo prTableRole="income_statement" />
+                <CO_TableInfo prTableRole="balance_sheet" />
+                <CO_TableInfo prTableRole="cashflow_statement" />
+              </CO_SectionInfo>
             </div>
           </CompanyStoreProvider>
         </KPIStoreProvider>

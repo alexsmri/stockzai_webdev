@@ -1,9 +1,13 @@
 import { useLightbox } from "../context/LightboxContext";
-import Lightbox from "./Lightbox";
+import Lightbox from "./CO_Lightbox";
 import ChartLine from "./ChartLine";
 
 export default function KPILightbox() {
-  const { isOpen, selectedKPI, close } = useLightbox();
+  const {
+    stIsOpen: isOpen,
+    stSelectedKPI: selectedKPI,
+    handleClose: close,
+  } = useLightbox();
   if (!isOpen) return null;
 
   return (

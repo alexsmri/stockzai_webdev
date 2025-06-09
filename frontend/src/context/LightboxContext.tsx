@@ -1,10 +1,10 @@
 import { createContext, useContext, useState } from "react";
 
 interface LightboxContextType {
-  isOpen: boolean;
-  openWithKPI: (KPI: string) => void;
-  close: () => void;
-  selectedKPI: string | null;
+  stIsOpen: boolean;
+  handleLBOpen: (KPI: string) => void;
+  handleClose: () => void;
+  stSelectedKPI: string | null;
 }
 
 const LightboxContext = createContext<LightboxContextType | undefined>(
@@ -16,22 +16,27 @@ export const LightboxProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedKPI, setSelectedKPI] = useState<string | null>(null);
+  const [stIsOpen, setStIsOpen] = useState(false);
+  const [stSelectedKPI, setStSelectedKPI] = useState<string | null>(null);
 
-  const openWithKPI = (KPI: string) => {
-    setSelectedKPI(KPI);
-    setIsOpen(true);
+  const handleLBOpen = (KPI: string) => {
+    setStSelectedKPI(KPI);
+    setStIsOpen(true);
   };
 
-  const close = () => {
-    setIsOpen(false);
-    setSelectedKPI(null);
+  const handleClose = () => {
+    setStIsOpen(false);
+    setStSelectedKPI(null);
   };
 
   return (
     <LightboxContext.Provider
-      value={{ isOpen, openWithKPI, close, selectedKPI }}
+      value={{
+        stIsOpen,
+        handleLBOpen,
+        handleClose,
+        stSelectedKPI,
+      }}
     >
       {children}
     </LightboxContext.Provider>

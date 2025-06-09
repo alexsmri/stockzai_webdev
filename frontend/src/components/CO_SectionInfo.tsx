@@ -4,7 +4,7 @@ interface InfoSectionProps {
   children: React.ReactNode;
 }
 
-function SectionInfo(props: InfoSectionProps) {
+function CO_SectionInfo(props: InfoSectionProps) {
   return (
     <>
       <div>
@@ -16,4 +16,4 @@ function SectionInfo(props: InfoSectionProps) {
   );
 }
 
-export default SectionInfo;
+export default CO_SectionInfo;

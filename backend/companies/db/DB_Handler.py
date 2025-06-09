@@ -3,10 +3,9 @@ from datetime import datetime, date
 import pandas as pd
 import os
 import logging
-import numpy
 
 
-class DBHandler:
+class DB_Handler:
 
     def __init__(self,
                  database: str,
@@ -28,85 +27,8 @@ class DBHandler:
         self.engine = create_engine(f'mysql+pymysql://{login_data["DB_USERNAME"]}:{login_data["DB_PASSWORD"]}@{login_data["DB_HOST"]}:{port}/{database}')
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
-
-    def read_execute(self, query: str, table_name: str | None = None, params: list | None = None):
-
-        with self.engine.connect() as conn:
-            results = conn.execute(text(query), parameters=params).fetchall()
-
-        if table_name:
-            columns = []
-            metadata = MetaData()
-            table_columns = Table(table_name,
-                                  metadata,
-                                  autoload_with=self.engine
-                                  ).columns
-            if table_columns:
-                columns.extend(column.name for column in table_columns if query.find(str(column.name)) != -1)
-
-            df = pd.DataFrame(results, columns=columns)
-            return df
-
-        return results
-
-    def write(self, table, value: dict, check=True, check_exclude: list | None = None):
-
-        if not check_exclude:
-            check_exclude = []
-
-        table_obj = self.metadata.tables.get(table)
-
-        if table_obj is None:
-            raise ValueError(f"Table {table} does not exist in the database schema")
-
-        cleaned_value = {key: (None if value[key] is None or str(value[key]) == "Infinity" else value[key])
-                         for key in value}
-
-        existing = self.selectcount(table,
-                                    conditions={value: cleaned_value[value] for value in cleaned_value if value not in check_exclude}) \
-            if check else False
-
-        if not existing:
-            ins = insert(table_obj).values(**cleaned_value)
-
-            with self.engine.connect() as conn:
-                conn.execute(ins)
-                conn.commit()
-
-        return True
-
-    def write_df(self, table: str, df: pd.DataFrame, check=True, returncheck=True):
-        columns = df.columns
-
-        for idx, (_, values) in enumerate(df.iterrows()):
-            dic = {}
-            for column in columns:
-                dic[column] = values[column]
-            if check and self.selectcount(table, conditions=dic) != 0:
-                continue
-            else:
-                self.write(table, dic)
-
-        if returncheck:
-            output = pd.DataFrame(columns=columns)
-        return output
-
-    def check_df(self, table, df: pd.DataFrame):
-        columns = df.columns
-        values_out = []
-
-        for idx, (_, values) in enumerate(df.iterrows()):
-            dic = {}
-            for column in columns:
-                dic[column] = values[column]
-            if self.selectcount(table, conditions=dic) != 0:
-                continue
-            else:
-                values_out.append(values)
-        output = pd.DataFrame(values_out, columns=columns)
-        return output if any(output) else None
-
-    def read(self,
+    
+    def dbu_read(self,
              table_name: str,
              column_name: str | bool = False,
              conditions: dict | bool = False,
@@ -172,7 +94,7 @@ class DBHandler:
 
         return df
 
-    def selectcount(self, table_name: str, column_name: str | bool = False, conditions: dict | bool = False) -> int:
+    def dbu_read_selectcount(self, table_name: str, column_name: str | bool = False, conditions: dict | bool = False) -> int:
         # Base query with parameterized table and column names
         query = f"SELECT COUNT(*) FROM {self.database}.`{table_name}`"
         if column_name:
@@ -222,7 +144,7 @@ class DBHandler:
 
         return results
 
-    def selectdistinct(self, table_name, column_name: str | bool = False, conditions: dict | bool = False):
+    def dbu_read_selectdistinct(self, table_name, column_name: str | bool = False, conditions: dict | bool = False):
 
         query = f"SELECT DISTINCT FROM {self.database}.{table_name}"
 
@@ -280,16 +202,93 @@ class DBHandler:
 
         return df
 
-    def _retrieve_kpi_info(self, kpi):
-        kpi_entry: pd.DataFrame = self.read(table_name="kpi", conditions={"KPI": kpi})
+    def dbu_read_execute(self, query: str, table_name: str | None = None, params: list | None = None):
+
+        with self.engine.connect() as conn:
+            results = conn.execute(text(query), parameters=params).fetchall()
+
+        if table_name:
+            columns = []
+            metadata = MetaData()
+            table_columns = Table(table_name,
+                                  metadata,
+                                  autoload_with=self.engine
+                                  ).columns
+            if table_columns:
+                columns.extend(column.name for column in table_columns if query.find(str(column.name)) != -1)
+
+            df = pd.DataFrame(results, columns=columns)
+            return df
+
+        return results
+
+    def dbu_write(self, table, value: dict, check=True, check_exclude: list | None = None):
+
+        if not check_exclude:
+            check_exclude = []
+
+        table_obj = self.metadata.tables.get(table)
+
+        if table_obj is None:
+            raise ValueError(f"Table {table} does not exist in the database schema")
+
+        cleaned_value = {key: (None if value[key] is None or str(value[key]) == "Infinity" else value[key])
+                         for key in value}
+
+        existing = self.dbu_read_selectcount(table,
+                                    conditions={value: cleaned_value[value] for value in cleaned_value if value not in check_exclude}) \
+            if check else False
+
+        if not existing:
+            ins = insert(table_obj).values(**cleaned_value)
+
+            with self.engine.connect() as conn:
+                conn.execute(ins)
+                conn.commit()
+
+        return True
+
+    def dbu_write_df(self, table: str, df: pd.DataFrame, check=True, returncheck=True):
+        columns = df.columns
+
+        for idx, (_, values) in enumerate(df.iterrows()):
+            dic = {}
+            for column in columns:
+                dic[column] = values[column]
+            if check and self.dbu_read_selectcount(table, conditions=dic) != 0:
+                continue
+            else:
+                self.dbu_write(table, dic)
+
+        if returncheck:
+            output = pd.DataFrame(columns=columns)
+        return output
+
+    def dbu_check_df(self, table, df: pd.DataFrame):
+        columns = df.columns
+        values_out = []
+
+        for idx, (_, values) in enumerate(df.iterrows()):
+            dic = {}
+            for column in columns:
+                dic[column] = values[column]
+            if self.dbu_read_selectcount(table, conditions=dic) != 0:
+                continue
+            else:
+                values_out.append(values)
+        output = pd.DataFrame(values_out, columns=columns)
+        return output if any(output) else None
+
+    def dbq_get_kpi_info(self, kpi):
+        kpi_entry: pd.DataFrame = self.dbu_read(table_name="kpi", conditions={"KPI": kpi})
 
         kpi_id = kpi_entry.iloc[0]["id"]
         kpi_role = kpi_entry.iloc[0]["role"]
 
         return {"id": kpi_id, "role": kpi_role}
     
-    def retrieve_kpis(self):
-        kpis: pd.DataFrame = self.read(table_name="kpi")
+    def dbq_get_kpis(self):
+        kpis: pd.DataFrame = self.dbu_read(table_name="kpi")
         kpis = kpis.set_index("id").to_dict(orient="index")
         for column in kpis:
             dic = kpis[column]
@@ -297,7 +296,7 @@ class DBHandler:
                 dic[key] = None if pd.isna(dic[key]) else dic[key]
         return kpis
 
-    def retrieve_kpi(self, ticker: str, kpi_id, kpi_role, limit: int | None = 1, date: datetime | date | None = None):
+    def dbq_get_kpi(self, ticker: str, kpi_id, kpi_role, limit: int | None = 1, date: datetime | date | None = None):
 
         if date is not None:
             conditions = {"SYMBOL": ticker, "KPI": kpi_id, 'date': f"<=TIMESTAMP('{date}')func"}
@@ -305,7 +304,7 @@ class DBHandler:
             conditions = {"SYMBOL": ticker, "KPI": kpi_id}
 
         try:
-            kpi_entry: pd.DataFrame = self.read(
+            kpi_entry: pd.DataFrame = self.dbu_read(
                 table_name=kpi_role,
                 conditions=conditions,
                 order_by="date",
@@ -326,18 +325,18 @@ class DBHandler:
         except IndexError:
             return
         
-    def retrieve_company_data(self, ticker):
+    def dbq_get_company_data(self, ticker):
         company_intel = {}
         latest_entries = {}
         wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics"]
         
-        kpis_df = self.read("kpi")
+        kpis_df = self.dbu_read("kpi")
         kpis = [(row["id"], row["role"], row["KPI"]) for _, row in kpis_df.iterrows()]
 
         for kpi_id, role, kpi_name in kpis:
             if role in wanted_roles:
                 kpi_dictionary = {}
-                company_kpis_df = self.retrieve_kpi(ticker, kpi_id, role, limit=None)
+                company_kpis_df = self.dbq_get_kpi(ticker, kpi_id, role, limit=None)
 
                 # store each value by date
                 for _, row in company_kpis_df.iterrows():
@@ -352,28 +351,28 @@ class DBHandler:
 
         return {"company_intel": company_intel, "latest_entries": latest_entries}
     
-    def search_company(self, search_request: str, additional_kpis: list[str] = [], unique: bool = False):
+    def dbg_get_company_search(self, search_request: str, additional_kpis: list[str] = [], unique: bool = False):
         results = {}
 
-        additional_kpis_info = {kpi: self._retrieve_kpi_info(kpi) for kpi in additional_kpis}
+        additional_kpis_info = {kpi: self.dbq_get_kpi_info(kpi) for kpi in additional_kpis}
 
         if not unique:
             sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
                         "FROM basics b "
                         "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request);")
-            results_raw = self.read_execute(sql_query, params={"request": f"%{search_request}%"})
+            results_raw = self.dbu_read_execute(sql_query, params={"request": f"%{search_request}%"})
         else:
             sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
                         "FROM basics b "
                         "WHERE (b.KPI = 90) AND b.SYMBOL = :request;")
-            results_raw = self.read_execute(sql_query, params={"request": search_request})
+            results_raw = self.dbu_read_execute(sql_query, params={"request": search_request})
             print(search_request)
         
         logging.debug(results_raw)
         for (name, symbol) in results_raw:
             results_dic = {"name": name}
             for kpi in additional_kpis_info:
-                symboL_kpi = self.retrieve_kpi(symbol, 
+                symboL_kpi = self.dbq_get_kpi(symbol, 
                                                additional_kpis_info[kpi]["id"], 
                                                additional_kpis_info[kpi]["role"])["value"]
                 print(symboL_kpi)

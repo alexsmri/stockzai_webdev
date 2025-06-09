@@ -1,7 +1,7 @@
-import UserForm from "../components/UserForm"
+import CO_UserForm from "../components/CO_UserForm";
 
-function UserLogin () {
-    return <UserForm method="login" route="/api/users/token/" />
+function UserLogin() {
+  return <CO_UserForm prMethod="login" prRoute="/api/users/token/" />;
 }
 
 export default UserLogin;
