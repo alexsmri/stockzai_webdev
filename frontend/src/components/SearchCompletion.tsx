@@ -17,12 +17,17 @@ function SearchCompletion({ onSelect }: SearchCompletionProps) {
 
   return (
     <>
-     {data && Object.entries(data).map(([symbol, res]) => (
-        <div key={symbol} onClick={() => onSelect(symbol)}>
-            <p>{symbol}</p>
+      {data &&
+        Object.entries(data).map(([symbol, res]) => (
+          <div
+            key={symbol}
+            onClick={() => onSelect(symbol)}
+            className="flex flex-col text-wrap cursor-pointer z-50 bg-grey w-full p-[0.4vw]"
+          >
+            <strong className="text-left">{symbol}</strong>
             <p>{res.name}</p>
-        </div>
-     ))}
+          </div>
+        ))}
     </>
   );
 }

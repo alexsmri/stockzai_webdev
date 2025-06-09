@@ -49,7 +49,12 @@ function ScoreRadial({ KPI }: ScoreRadialProps) {
         transform="rotate(-70 50 50)"
       ></circle>
 
-      <text className="text-[10px]" x="50%" y="53%" textAnchor="middle">
+      <text
+        className="text-[10px] cursor-pointer"
+        x="50%"
+        y="53%"
+        textAnchor="middle"
+      >
         {text}
       </text>
 

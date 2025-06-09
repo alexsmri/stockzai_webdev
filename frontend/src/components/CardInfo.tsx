@@ -4,11 +4,7 @@ import type { CompanyAPIResponse } from "../types/types";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { getKPIText } from "../utils/functions";
 
-interface CardInfoProps {
-  KPI: string;
-}
-
-export default function CardInfo({ KPI }: CardInfoProps) {
+export default function CardInfo({ KPI }: { KPI: string }) {
   const store = useCompanyStore();
   const [data, setData] = useState<CompanyAPIResponse | null>(null);
 
