@@ -3,6 +3,7 @@ import { useState } from "react";
 import SearchBar from "../components/CO_SearchBar";
 import ComparisonResults from "../components/CO_ComparisonResults";
 import SearchCompletion from "../components/CO_SearchCompletion";
+import CO_Hero from "../components/CO_Hero";
 
 export default function SearchPage() {
   const [submittedQuery, setSubmittedQuery] = useState<string | "">("");
@@ -28,14 +29,9 @@ export default function SearchPage() {
 
   return (
     <>
-      <div className="flex flex-col h-[30vh] bg-gradient-ambience">
-        <div className="flex flex-col text-center m-auto gap-[0.9vw]">
-          <h1>
-            <span className="text-gradient-primary">Compare</span> Tickers
-          </h1>
-          <p>And find the best ones!</p>
-        </div>
-        <div className="relative flex flex-col w-[15vw] m-auto mb-[1vw] gap-[0.7vw]">
+      <CO_Hero>
+          <h1 className="look-text-x7">Compare Tickers</h1>
+        <div className="area-flex-col">
           <SearchBar
             input={input ?? ""}
             submit={false}
@@ -56,7 +52,7 @@ export default function SearchPage() {
             </div>
           )}
         </div>
-      </div>
+      </CO_Hero>
       <div className="w-[80%] place-self-center mt-[4vw]">
         <div className="grid grid-cols-[5%_15%_auto_20%_20%] p-[0.4vw] text-center">
           <p></p>

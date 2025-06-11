@@ -1,6 +1,6 @@
 import { useLightbox } from "../context/LightboxContext";
 import Lightbox from "./CO_Lightbox";
-import ChartLine from "./ChartLine";
+import ChartLine from "./CO_ChartLine";
 
 export default function KPILightbox() {
   const {

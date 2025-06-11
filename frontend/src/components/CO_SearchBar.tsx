@@ -19,7 +19,7 @@ export default function SearchBar({
           value={input}
           onChange={handleChange}
           placeholder="Search for a ticker..."
-          className="input-text w-[15vw]"
+          className="look-input-primary"
         />
         {submit && <button type="submit">Submit</button>}
       </form>

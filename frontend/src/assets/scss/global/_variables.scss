@@ -1,0 +1,9 @@
+:root {
+    --gap-m: .8rem;
+    --gap-l: calc(var(--gap-m) * 2);
+    --gap-xl: calc(var(--gap-l) * 2);
+
+    --padding-m: .8rem;
+    --padding-l: calc(var(--padding-m) * 2);
+    --padding-xl: calc(var(--padding-l) * 2);
+}

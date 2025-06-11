@@ -1,5 +1,5 @@
 import { getColor, getDashOffset } from "../utils/functions";
-import ScoreIcon from "./ScoreIcon";
+import ScoreIcon from "./CO_ScoreIcon";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { useCompanyStore } from "../context/CompanyStoreContext";
 import type { CompanyAPIResponse } from "../types/types";

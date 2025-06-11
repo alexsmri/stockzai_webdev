@@ -1,10 +1,10 @@
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
-from companies.function.DBHandler import DBHandler
+from ..db.DB_Handler import DB_Handler
 from rest_framework.response import Response
 from django.http import Http404
 
-db = DBHandler("companies")
+db = DB_Handler("companies")
 
 class CompanyPageView(APIView):
     permission_classes = [AllowAny]

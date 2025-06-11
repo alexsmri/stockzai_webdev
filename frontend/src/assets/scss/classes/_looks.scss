@@ -1,0 +1,62 @@
+@use "../util/index" as u;
+
+html {
+  background-color: var(--color-black);
+  background-image: radial-gradient(ellipse at 150% 5%, var(--color-green-a10), transparent);
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100%;
+  min-width: 100%;
+  color: var(--color-white);
+}
+
+p {
+  font-size: u.scale_font(0);
+  font-family: 'Work Sans';
+  @include u.remove-margin()
+}
+.look-input-primary {
+    @include u.look-glass();
+    padding: u.scale-padding(0.5)
+}
+.look-text-x7 {
+  font-size: u.scale_font(6);
+  font-weight: 600;
+  font-family: 'ClashDisplay';
+  @include u.remove-margin()
+}
+.look-text-x6 {
+  font-size: u.scale_font(5);
+  font-family: 'ClashDisplay';
+  @include u.remove-margin()
+}
+.look-text-x5 {
+  font-size: u.scale_font(4);
+  font-weight: 500;
+  font-family: 'ClashDisplay';
+  @include u.remove-margin()
+}
+.look-text-x4 {
+  font-size: u.scale_font(3);
+  font-family: 'ClashDisplay';
+  @include u.remove-margin()
+}
+.look-text-x3 {
+  font-size: u.scale_font(2);
+  font-family: 'Work Sans';
+  @include u.remove-margin()
+}
+.look-text-x2 {
+  font-size: u.scale_font(1);
+  font-family: 'Work Sans';
+  @include u.remove-margin()
+}
+.look-text-svg {
+  font-size: 5.625rem;
+}
+.look-text-accent {
+  font-size: 5.625rem;
+}
+.look-text-mono {
+  font-size: 5.625rem;
+}

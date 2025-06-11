@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import Loading from "../components/Loading";
+import Loading from "../components/CO_Loading";
 
 type StoreWithCreate<TStore, TArgs extends any[]> = {
   create: (...args: TArgs) => Promise<TStore>;

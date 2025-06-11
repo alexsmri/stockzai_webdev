@@ -4,7 +4,7 @@ import ComparisonPage from "./pages/ComparisonPage";
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import Home from "./pages/Home";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/CO_ProtectedRoute";
 import SearchPage from "./pages/SearchPage";
 
 function Logout() {

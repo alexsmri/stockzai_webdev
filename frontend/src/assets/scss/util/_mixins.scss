@@ -1,0 +1,13 @@
+@use './functions' as f;
+
+@mixin look-glass($radius: 0.7rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
+    background-image: f.paint-gradient($color);
+    background-color: transparent;
+    border-radius: $radius;
+    box-shadow: inset (-$offset) $offset $blur (-$offset) rgba($color, 0.35);
+    border-width: 0.08rem;
+    border-color: rgba($color, 0.2);
+}
+@mixin remove-margin {
+    margin: 0;
+}

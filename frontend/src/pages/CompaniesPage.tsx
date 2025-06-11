@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import CO_SectionInfo from "../components/CO_SectionInfo";
 import ScoreRadial from "../components/CO_ScoreRadial";
-import CardInfo from "../components/CardInfo";
+import CardInfo from "../components/CO_CardInfo";
 import { CompanyStoreProvider } from "../context/CompanyStoreContext";
 import { KPIStoreProvider } from "../context/KPIStoreContext";
 import NotFound from "./NotFound";

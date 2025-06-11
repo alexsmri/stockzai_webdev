@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.db import models
-from .function.DBHandler import DBHandler
+from .db.DB_Handler import DB_Handler
 from django.http import Http404
 import logging
 from django.conf import settings
@@ -11,7 +11,7 @@ lvl = getattr(settings, 'LOG_LEVEL', logging.DEBUG)
 
 logging.basicConfig(format=fmt, level=lvl)
 
-db = DBHandler("companies")
+db = DB_Handler("companies")
 
 
 def list_view(request):
