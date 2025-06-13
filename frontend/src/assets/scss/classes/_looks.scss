@@ -7,17 +7,24 @@ html {
   background-size: cover;
   min-height: 100%;
   min-width: 100%;
-  color: var(--color-white);
-}
-
-p {
+  color: rgba(255, 255, 255, 0.9);
   font-size: u.scale_font(0);
   font-family: 'Work Sans';
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-input-primary {
     @include u.look-glass();
-    padding: u.scale-padding(0.5)
+    padding: u.scale-padding(0.5);
+    color: var(--color-white);
+}
+.look-button-primary {
+    @include u.look-glass($color: rgba(0, 210, 109));
+    padding-top: u.scale-padding(0.5);
+    padding-bottom: u.scale-padding(0.5);
+    padding-left: u.scale-padding(2);
+    padding-right: u.scale-padding(2);
+    color: rgba(0, 210, 109, 0.9);
 }
 .look-text-x7 {
   font-size: u.scale_font(6);

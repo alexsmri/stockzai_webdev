@@ -5,6 +5,7 @@ import SearchResults from "../components/CO_SearchResults";
 import { useNavigate } from "react-router-dom";
 import SearchCompletion from "../components/CO_SearchCompletion";
 import CO_Hero from "../components/CO_Hero";
+import CO_Navbar from "../components/CO_Navbar";
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ export default function SearchPage() {
 
   return (
     <>
+    <CO_Navbar />
     <CO_Hero>
       <h1 className="look-text-x7">Search Ticker</h1>
       <SearchBar

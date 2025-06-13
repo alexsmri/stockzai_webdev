@@ -5,8 +5,8 @@ interface ScoreIconProps {
   height?: string;
 }
 
-import FinancialScore from "@/assets/media/FinancialScoreIcon.svg?react";
-import ValuationScore from "@/assets/media/ValuationScoreIcon.svg?react";
+import FinancialScore from "@/assets/media/ICON_Financial.svg?react";
+import ValuationScore from "@/assets/media/ICON_Valuation.svg?react";
 
 const icons = {
   financial_score: FinancialScore,

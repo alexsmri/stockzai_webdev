@@ -1,0 +1,8 @@
+@use '../util' as u;
+
+.mod-space-between {
+    justify-content: space-between;
+}
+.mod-gap-l {
+    gap: u.scale-gap(2)
+}

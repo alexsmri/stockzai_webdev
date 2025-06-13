@@ -14,7 +14,7 @@ class CompanyPageView(APIView):
         # Logic to retrieve the company object based on the request
         # For example, you might use self.request.user.company
         
-        intel = db.retrieve_company_data(symbol)
+        intel = db.dbq_get_company_data(symbol)
         latest_entries = intel["latest_entries"]
         if not latest_entries:
             raise Http404("No data found for this symbol.")
@@ -29,7 +29,7 @@ class KPIView(APIView):
         # Logic to retrieve the company object based on the request
         # For example, you might use self.request.user.company
         
-        kpis = db.retrieve_kpis()
+        kpis = db.dbq_get_kpis()
         print(kpis)
         return Response(kpis)
 
@@ -43,5 +43,5 @@ class CompanySearchView(APIView):
 
         unique = request.GET.get("unique", "false").lower() == "true"
         
-        results = db.search_company(query, ["financial_score", "valuation_score"], unique=unique)
+        results = db.dbg_get_company_search(query, ["financial_score", "valuation_score"], unique=unique)
         return Response(results)

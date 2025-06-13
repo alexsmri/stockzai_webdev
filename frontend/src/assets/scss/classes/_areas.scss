@@ -1,8 +1,10 @@
+@use "../util" as u;
+
 .area-flex-col {
     display: flex;
     flex-direction: column;
-    row-gap: var(--gap-m);
-    padding: var(--padding-m);
+    row-gap: u.scale-gap(1);
+    padding: u.scale-padding(1);
     align-items: center;
     justify-items: center;
 }
@@ -10,30 +12,31 @@
 .area-flex-row {
     display: flex;
     flex-direction: row;
-    column-gap: var(--gap-m);
-    padding: var(--padding-m)
+    column-gap: u.scale-gap(1);
+    padding: u.scale-padding(1);
+    flex-shrink:initial;
 }
 
 .area-flex-wrap {
     display: flex;
     flex-wrap: wrap;
-    padding: var(--padding-m)
+    padding: u.scale-padding(1);
 }
 
 .area-grid-auto {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
-    padding: var(--padding-m)
+    padding: u.scale-padding(1);
 }
 
 .area-grid-col-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    padding: var(--padding-m);
+    padding: u.scale-padding(1);
 }
 
 .area-grid-col-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    padding: var(--padding-m);
+    padding: u.scale-padding(1);
 }

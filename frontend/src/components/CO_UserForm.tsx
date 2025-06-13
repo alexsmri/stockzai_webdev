@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import CO_Hero from "./CO_Hero";
 
 interface PI_UserForm {
   prRoute: string;
@@ -36,22 +37,28 @@ function CO_UserForm(props: PI_UserForm) {
     }
   };
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>{name}</h1>
+    <>
+    <CO_Hero>
+    <h1 className="look-text-x7">{name}</h1>
+    <form onSubmit={handleSubmit} className="area-flex-col">
       <input
         type="text"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
+        className="look-input-primary"
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
+        className="look-input-primary"
       />
-      <button>{name}</button>
+      <button className="look-button-primary">{name}</button>
     </form>
+    </CO_Hero>
+  </>
   );
 }
 

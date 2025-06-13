@@ -4,7 +4,7 @@
     background-image: f.paint-gradient($color);
     background-color: transparent;
     border-radius: $radius;
-    box-shadow: inset (-$offset) $offset $blur (-$offset) rgba($color, 0.35);
+    box-shadow: inset (-$offset) $offset $blur (-$offset) rgba($color, 0.1);
     border-width: 0.08rem;
     border-color: rgba($color, 0.2);
 }
