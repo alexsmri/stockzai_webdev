@@ -9,21 +9,22 @@ interface PI_UserForm {
   prMethod: "login" | "register";
 }
 
-function CO_UserForm(props: PI_UserForm) {
+function CO_UserForm({ prRoute, prMethod }: PI_UserForm) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const name = props.prMethod === "login" ? "Login" : "Register";
+  const name = prMethod === "login" ? "Login" : "Register";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
     e.preventDefault();
 
     try {
-      const res = await api.post(props.prRoute, { email, password });
-      if (props.prMethod === "login") {
+      const res = await api.post(prRoute, { email, password, username });
+      if (prMethod === "login") {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate("/");
@@ -48,6 +49,13 @@ function CO_UserForm(props: PI_UserForm) {
         placeholder="Email"
         className="look-input-primary"
       />
+      {prMethod === "register" && 
+      <input 
+        type="text" 
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
+        className="look-input-primary"/>}
       <input
         type="password"
         value={password}

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from datetime import timedelta
+import uuid
 
 from .managers import UserManager
 
@@ -32,3 +34,21 @@ class User(AbstractBaseUser, PermissionsMixin):
             ("is_paid", "Owns a subscription"),
         ]
 
+class TokenPasswordReset(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_token")
+    token = models.CharField(max_length=64, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField()
+
+    def is_expired(self):
+        return self.created_at < timezone.now() - timedelta(hours=24)
+
+class TokenVerification(models.Model):
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_token")
+    token = models.CharField(max_length=64, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return self.created_at < timezone.now() - timedelta(hours=24)

@@ -9,7 +9,7 @@ export function getColor(score: number): string {
 }
 
 export function getDashOffset(score: number): string {
-  const offset = 264 - score * (234.667 / 10);
+  const offset = 264 - score * (264 / 10);
   return offset.toString();
 }
 

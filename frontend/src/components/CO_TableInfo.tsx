@@ -8,7 +8,7 @@ import { getKPIText } from "../utils/functions";
 import { useLightbox } from "../context/LightboxContext";
 
 interface PI_TableInfo {
-  prTableRole: "income_statement" | "balance_sheet" | "cashflow_statement";
+  prTableRole: "income_statement" | "balance_sheet" | "cashflow_statement" | "basics";
 }
 
 export default function CO_TableInfo({ prTableRole }: PI_TableInfo) {
@@ -31,19 +31,20 @@ export default function CO_TableInfo({ prTableRole }: PI_TableInfo) {
     }));
 
   return (
-    <div className="flex flex-col border border-subtle rounded-x1 h-fit p-4 w-[30%] gap-3">
+    <div className="look-div-container">
       {Object.entries(table_entries)
         .filter(([_, value]) =>
           Object.keys(stData.latest_entries).includes(value.KPI)
         )
         .map(([key, value]) => (
-          <div key={key} className="flex justify-between">
-            <strong
-              className="cursor-pointer"
-              onClick={() => handleLBOpen(value.KPI)}
-            >
-              {getKPIText(value.KPI)}
-            </strong>
+          <div key={key} className="area-flex-row mod-space-between">
+            {prTableRole !== "basics" ? (
+              <p className="mod-cursor-pointer" onClick={() => handleLBOpen(value.KPI)}>
+                {getKPIText(value.KPI)}
+              </p>
+            ) : (
+              <p>{getKPIText(value.KPI)}</p>
+            )}
             <p>{stData.latest_entries[value.KPI]}</p>
           </div>
         ))}

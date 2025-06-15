@@ -1,9 +1,9 @@
 import { getColor, getDashOffset } from "../utils/functions";
-import ScoreIcon from "./CO_ScoreIcon";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { useCompanyStore } from "../context/CompanyStoreContext";
 import type { CompanyAPIResponse } from "../types/types";
 import { useState } from "react";
+import CO_IconColor from "./CO_IconColor";
 
 interface ScoreRadialProps {
   KPI: "financial_score" | "valuation_score"; // Optional type for the score
@@ -30,6 +30,8 @@ function ScoreRadial({ KPI }: ScoreRadialProps) {
   const offset = getDashOffset(score);
   const text = getScoreText(KPI);
   return (
+    <>
+    <div className="area-flex-col">
     <svg
       width="9VW"
       height="9VW"
@@ -40,13 +42,25 @@ function ScoreRadial({ KPI }: ScoreRadialProps) {
         cx="50"
         cy="50"
         r="42"
-        stroke={color}
-        strokeWidth="2%"
+        stroke="rgba(255, 255, 255, 0.04)"
+        strokeWidth="3%"
         fill="none"
         strokeLinecap="round"
-        strokeDasharray="234.667"
-        strokeDashoffset={offset}
+        strokeDasharray="264"
+        strokeDashoffset="0"
         transform="rotate(-70 50 50)"
+      ></circle>
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
+        stroke={color}
+        strokeWidth="3%"
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray="264"
+        strokeDashoffset={offset}
+        transform="rotate(-90 50 50)"
       ></circle>
 
       <text
@@ -58,10 +72,14 @@ function ScoreRadial({ KPI }: ScoreRadialProps) {
         {text}
       </text>
 
-      <g transform="translate(40, 0)">
-        <ScoreIcon color={color} scoreKPI={KPI} />
-      </g>
+      
     </svg>
+    <div className="area-flex-wrap">
+    <CO_IconColor prColor={color} prPath={"ICON_Triangle"} prWidth="34%" prHeight="34%"/>
+    <p>3%</p>
+    </div>
+    </div>
+    </>
   );
 }
 

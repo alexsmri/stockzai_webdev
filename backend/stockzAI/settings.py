@@ -15,6 +15,10 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
+from decouple import config
+
+
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,10 +29,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=cfbgzaz5)1fk8!7plti*78sk9ryw1cl)%@9mff7r7o%d4074j'
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -62,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_rest_passwordreset',
     'corsheaders',
 
     'companies', 
@@ -164,3 +169,13 @@ LOGIN_URL = '/users/login/'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.strato.de'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "alex@stockz.ai"
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+FRONTEND_URL=config('FRONTEND_URL')

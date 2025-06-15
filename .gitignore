@@ -1,7 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+
+# Environments
 .venv/
 venv/
+env/
+.env*
+ENV/
+
+# Editor configs
 .idea/
 .vscode/
-__pycache__/
-*.pyc
-node_modules
+
+# Node
+node_modules/
+dist/
+build/
+
+# OS / Misc
+.DS_Store
+Thumbs.db
+
+# Env & config
+.env
+.env.*
+!.env.example  # optional: allow a template for env vars
+
+# Django specific (optional, if using static/media dirs)
+staticfiles/
+media/
+db.sqlite3
+
+# Logs
+*.log

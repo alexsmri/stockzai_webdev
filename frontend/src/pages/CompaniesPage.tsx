@@ -8,6 +8,7 @@ import NotFound from "./NotFound";
 import KPILightbox from "../components/CO_LightboxKPI";
 import CO_TableInfo from "../components/CO_TableInfo";
 import { LightboxProvider } from "../context/LightboxContext";
+import CO_Navbar from "../components/CO_Navbar";
 
 function CompaniesPage() {
   const { symbol } = useParams<{ symbol: string }>();
@@ -21,20 +22,19 @@ function CompaniesPage() {
       <LightboxProvider>
         <KPIStoreProvider args={[]}>
           <CompanyStoreProvider args={[symbol]}>
-            <div className="flex flex-col gap-30">
+            <CO_Navbar />
+            <h1 className="look-text-x7">{symbol}</h1>
+            <div className="area-flex-col mod-gap-xl mod-padding-xl">
+            <div className="area-flex-row mod-flex-grow-children">
               <KPILightbox />
               <CO_SectionInfo title="Scores.">
                 <ScoreRadial KPI="financial_score" />
                 <ScoreRadial KPI="valuation_score" />
               </CO_SectionInfo>
               <CO_SectionInfo title="Basics.">
-                <CardInfo KPI="name" />
-                <CardInfo KPI="sector" />
-                <CardInfo KPI="industry" />
-                <CardInfo KPI="country" />
-                <CardInfo KPI="currency" />
-                <CardInfo KPI="fullTimeEmployees" />
+                <CO_TableInfo prTableRole="basics" />
               </CO_SectionInfo>
+            </div>
               <CO_SectionInfo title="Financials.">
                 <CO_TableInfo prTableRole="income_statement" />
                 <CO_TableInfo prTableRole="balance_sheet" />

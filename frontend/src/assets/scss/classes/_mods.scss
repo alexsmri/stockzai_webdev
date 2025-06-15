@@ -3,6 +3,23 @@
 .mod-space-between {
     justify-content: space-between;
 }
+.mod-space-around {
+    justify-content: space-around;
+}
+.mod-padding-xl {
+    padding: u.scale-padding(3)
+}
 .mod-gap-l {
     gap: u.scale-gap(2)
+}
+.mod-gap-xl {
+    gap: u.scale-gap(3)
+}
+.mod-cursor-pointer {
+    cursor: pointer;
+}
+.mod-flex-grow-children {
+    > * {
+        flex-grow: 1;
+    }
 }

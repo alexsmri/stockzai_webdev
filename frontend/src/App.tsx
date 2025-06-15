@@ -6,6 +6,7 @@ import UserRegister from "./pages/UserRegister";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/CO_ProtectedRoute";
 import SearchPage from "./pages/SearchPage";
+import PA_VerifyEmail from "./pages/PA_VerifyEmail";
 
 function Logout() {
   localStorage.clear();
@@ -32,6 +33,7 @@ function App() {
         <Route path="/users/login" element={<UserLogin />} />
         <Route path="/users/logout" element={<Logout />} />
         <Route path="/users/register" element={<CreateAndLogout />} />
+        <Route path="/users/verify-email/:uid/:token" element={<PA_VerifyEmail />} />
         <Route path="/companies/search/" element={<SearchPage />} />
         <Route
           path="/companies/page/:symbol"
