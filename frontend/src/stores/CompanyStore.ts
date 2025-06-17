@@ -1,6 +1,6 @@
 import api from "../api"
 import type { CompanyAPIResponse } from "../types/types";
-import BaseAPIStore from "./BaseStores";
+import { BaseAPIStore } from "./BaseStores";
 
 export default class CompanyStore extends BaseAPIStore<CompanyAPIResponse> {
 

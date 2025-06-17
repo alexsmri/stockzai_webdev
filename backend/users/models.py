@@ -39,16 +39,17 @@ class TokenPasswordReset(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_token")
     token = models.CharField(max_length=64, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_used = models.BooleanField()
+    is_used = models.BooleanField(default=False)
 
     def is_expired(self):
         return self.created_at < timezone.now() - timedelta(hours=24)
 
 class TokenVerification(models.Model):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="password_reset_token")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="verification_token")
     token = models.CharField(max_length=64, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
 
     def is_expired(self):
         return self.created_at < timezone.now() - timedelta(hours=24)

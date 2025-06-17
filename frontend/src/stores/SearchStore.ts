@@ -1,6 +1,6 @@
 import api from "../api"
 import type { SearchAPIResponse } from "../types/types";
-import BaseAPIStore from "./BaseStores";
+import { BaseAPIStore } from "./BaseStores";
 
 export default class SearchStore extends BaseAPIStore<SearchAPIResponse> {
 

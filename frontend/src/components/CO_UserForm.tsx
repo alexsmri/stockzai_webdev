@@ -29,7 +29,7 @@ function CO_UserForm({ prRoute, prMethod }: PI_UserForm) {
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate("/");
       } else {
-        navigate("/login");
+        navigate(`/verification/token/request`);
       }
     } catch (error) {
       alert(error);

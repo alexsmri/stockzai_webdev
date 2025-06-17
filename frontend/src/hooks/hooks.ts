@@ -3,6 +3,8 @@ import type { CompanyAPIResponse, KPIAPIResponse, SearchAPIResponse } from "../t
 import CompanyStore from "../stores/CompanyStore";
 import KPIStore from "../stores/KPIStore";
 import SearchStore from "../stores/SearchStore";
+import type UserStore from "../stores/UserStore";
+import type { ValidKeys } from "../stores/UserStore";
 
 export function useCompanyStoreSync(
     store: CompanyStore, 
@@ -49,5 +51,22 @@ export function useSearchStoreSync(
     store.get(subscriber).then(setData);
 
     return () => store.unsubscribe(subscriber);
+  }, [store])
+}
+
+export function useUserStoreSync(
+    store: UserStore, 
+    key: ValidKeys,
+    setData: React.Dispatch<React.SetStateAction<any | null>>
+) {
+
+  useEffect(() => {
+    const subscriber = () => {
+      store.get(key).then(setData);
+    };
+
+    store.get(key, subscriber).then(setData);
+
+    return () => store.unsubscribe(key, subscriber);
   }, [store])
 }
