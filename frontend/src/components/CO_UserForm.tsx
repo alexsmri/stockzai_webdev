@@ -3,6 +3,7 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import CO_Hero from "./CO_Hero";
+import { useUserStore } from "../context/UserStoreContext";
 
 interface PI_UserForm {
   prRoute: string;
@@ -13,6 +14,7 @@ function CO_UserForm({ prRoute, prMethod }: PI_UserForm) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const utStore = useUserStore()
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -23,13 +25,13 @@ function CO_UserForm({ prRoute, prMethod }: PI_UserForm) {
     e.preventDefault();
 
     try {
-      const res = await api.post(prRoute, { email, password, username });
+      const res = await utStore.post("ActionRegistration", {email, username, password});
       if (prMethod === "login") {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate("/");
       } else {
-        navigate(`/verification/token/request`);
+        utStore.post("TokenVerificationRequest", {email})
       }
     } catch (error) {
       alert(error);

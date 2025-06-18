@@ -2,9 +2,9 @@ import { BaseStore } from "./BaseStores"
 import api from "../api";
 
 const ROUTE_CONFIG = {
-  TokenVerification: "api/users/verification/token/validate",
-  TokenPasswordReset: "test/",
-  ActionVerification: "test/",
+  ActionVerification: "api/users/verification/",
+  TokenVerificationRequest: "api/users/verification/token",
+  ActionRegistration: "/api/users/register/",
 } as const;
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;

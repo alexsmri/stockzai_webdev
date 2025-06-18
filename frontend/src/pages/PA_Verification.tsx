@@ -5,14 +5,14 @@ import { useUserStore } from "../context/UserStoreContext";
 import { useUserStoreSync } from "../hooks/hooks";
 
 export default function PA_Verication() {
-  const { uid, token } = useParams();
+  const { uid, token, email } = useParams();
   const [valid, setValid] = useState(false);
   const [message, setMessage] = useState("Verifying...")
   const utStore = useUserStore()
 
-  useUserStoreSync(utStore, "TokenVerification", setValid)
+  useUserStoreSync(utStore, "ActionVerification", setValid)
 
-  utStore.post("TokenVerification", {uid: uid, token: token})
+  utStore.post("ActionVerification", { uid, token, email })
   const navigate = useNavigate()
 
   useEffect(() => {

@@ -10,12 +10,13 @@ from .models import TokenPasswordReset, TokenVerification
 @receiver(post_save, sender=TokenPasswordReset)
 def password_reset_token_created(sender, instance, created, **kwargs):
     if created:
-        base_url = settings.FRONTEND_URL
-        token = "?token={}".format(instance.token)
-        uid = "&uid={}".format(instance.uid)
-        link = f"{base_url}/users/password_reset/{uid}/{token}"
-
         user_email = instance.user.email
+        base_url = settings.FRONTEND_URL
+        uid = instance.uid
+        token = instance.token
+        email = instance.user.email
+        link = f"{base_url}/users/password-reset/?uid={uid}&token={token}&email={email}"
+        
         context = {
             'link': link,
             'email_adress': user_email
@@ -37,16 +38,18 @@ def password_reset_token_created(sender, instance, created, **kwargs):
 @receiver(post_save, sender=TokenVerification)
 def verification_token_created(sender, instance, created, **kwargs):
     if created:
-        base_url = settings.FRONTEND_URL
-        token = "?token={}".format(instance.token)
-        uid = "&uid={}".format(instance.uid)
-        link = f"{base_url}/users/verification/{uid}/{token}"
-
         user_email = instance.user.email
+        base_url = settings.FRONTEND_URL
+        uid = instance.uid
+        token = instance.token
+        email = instance.user.email
+        link = f"{base_url}/users/verification/?uid={uid}&token={token}&email={email}"
         context = {
             'link': link,
             'email_adress': user_email
         }
+        print(f"Sending link: {link}")
+        
 
         html_message = render_to_string("email_verification.html", context=context)
         plain_message = strip_tags(html_message)

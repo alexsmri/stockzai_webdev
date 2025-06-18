@@ -65,7 +65,8 @@ export function useUserStoreSync(
       store.get(key).then(setData);
     };
 
-    store.get(key, subscriber).then(setData);
+    store.subscribe(key, subscriber)
+    store.get(key).then(setData);
 
     return () => store.unsubscribe(key, subscriber);
   }, [store])

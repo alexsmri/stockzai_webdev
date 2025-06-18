@@ -6,9 +6,9 @@ from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
 from django.http import JsonResponse
 from users.tokens import VerificationTokenGenerator, PasswordResetTokenGenerator
+import json
 
 class RegisterUserView(generics.CreateAPIView):
     """
@@ -23,7 +23,8 @@ def view_verification_token(request):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST requests allowed"}, status=400)
     try:
-        email = request.POST.get("email")
+        body = json.loads(request.body)
+        email = body.get('email')
         user = User.objects.get(email=email)
         if user:
             token = VerificationTokenGenerator().make_token(user)
@@ -32,7 +33,7 @@ def view_verification_token(request):
             return JsonResponse({"msg": "Token created and saved."})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
-    
+'''
 @csrf_exempt
 def view_validate_verification_token(request):
     if request.method != "GET":
@@ -56,15 +57,17 @@ def view_validate_verification_token(request):
         
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
-
+'''
 @csrf_exempt
 def view_verify(request):
     if request.method != "POST":
         return JsonResponse({"error": "Only POST requests allowed"}, status=400)
     try:
-        token = request.POST.get("token")
-        uid = request.POST.get("uid")
-        email = request.POST.get("email")
+        body = json.loads(request.body)
+        token = body.get("token")
+        uid = body.get("uid")
+        email = body.get("email")
+        print(token, uid, email)
         token_obj = TokenVerification.objects.get(token=token, uid=uid)
         user = token_obj.user
         token_obj = token_obj if user.email == email else None

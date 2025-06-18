@@ -94,8 +94,7 @@ export abstract class BaseStore {
         return this.data;
     }
 
-    async get(key: string, subscriber: () => void) {
-    this.subscribe(key, subscriber)
+    async get(key: string) {
     return this.data[key]
     }
 
