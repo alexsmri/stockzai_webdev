@@ -9,6 +9,7 @@ from django.utils.encoding import force_bytes
 from django.http import JsonResponse
 from users.tokens import VerificationTokenGenerator, PasswordResetTokenGenerator
 import json
+from base64 import b64decode
 
 class RegisterUserView(generics.CreateAPIView):
     """
@@ -16,7 +17,7 @@ class RegisterUserView(generics.CreateAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]  # Allow any user to create an account
+    permission_classes = [AllowAny]
 
 @csrf_exempt
 def view_verification_token(request):
@@ -67,6 +68,7 @@ def view_verify(request):
         token = body.get("token")
         uid = body.get("uid")
         email = body.get("email")
+        email = email
         print(token, uid, email)
         token_obj = TokenVerification.objects.get(token=token, uid=uid)
         user = token_obj.user
@@ -83,7 +85,7 @@ def view_verify(request):
             user.is_active = True
             user.save()
 
-            return JsonResponse({"msg": "User Verification successful!"}, status=200)
+            return JsonResponse({"msg": True}, status=200)
     
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)

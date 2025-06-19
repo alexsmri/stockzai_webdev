@@ -23,40 +23,43 @@ function CreateAndLogout() {
 function App() {
   return (
     <UserStoreProvider args={[]}>
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/users/login" element={<UserLogin />} />
-        <Route path="/users/logout" element={<Logout />} />
-        <Route path="/users/register" element={<CreateAndLogout />} />
-        <Route path="users/verification/token/request/" element={<PA_VericationRequest />} />
-        <Route path="/users/verification/:uid/:token/:email" element={<PA_Verication />} />
-        <Route path="/companies/search/" element={<SearchPage />} />
-        <Route
-          path="/companies/page/:symbol"
-          element={
-            <ProtectedRoute>
-              <CompaniesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/companies/compare/"
-          element={
-            <ProtectedRoute>
-              <ComparisonPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/users/login" element={<UserLogin />} />
+          <Route path="/users/logout" element={<Logout />} />
+          <Route path="/users/register" element={<CreateAndLogout />} />
+          <Route
+            path="/users/verification/token/request/"
+            element={<PA_VericationRequest />}
+          />
+          <Route path="/users/verification" element={<PA_Verication />} />
+          <Route path="/companies/search/" element={<SearchPage />} />
+          <Route
+            path="/companies/page/:symbol"
+            element={
+              <ProtectedRoute>
+                <CompaniesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/companies/compare/"
+            element={
+              <ProtectedRoute>
+                <ComparisonPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </UserStoreProvider>
   );
 }

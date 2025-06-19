@@ -4,6 +4,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.conf import settings
+from urllib.parse import urlencode
+from base64 import b64encode
 
 from .models import TokenPasswordReset, TokenVerification
 
@@ -14,8 +16,8 @@ def password_reset_token_created(sender, instance, created, **kwargs):
         base_url = settings.FRONTEND_URL
         uid = instance.uid
         token = instance.token
-        email = instance.user.email
-        link = f"{base_url}/users/password-reset/?uid={uid}&token={token}&email={email}"
+        email = b64encode(instance.user.email)
+        link = f"{base_url}users/password-reset/?uid={uid}&token={token}&email={email}"
         
         context = {
             'link': link,
@@ -43,19 +45,23 @@ def verification_token_created(sender, instance, created, **kwargs):
         uid = instance.uid
         token = instance.token
         email = instance.user.email
-        link = f"{base_url}/users/verification/?uid={uid}&token={token}&email={email}"
+
+        link = f"{base_url}users/verification/?uid={uid}&token={token}&email={email}"
         context = {
             'link': link,
             'email_adress': user_email
         }
+        print("Email context:", context)
         print(f"Sending link: {link}")
         
 
         html_message = render_to_string("email_verification.html", context=context)
+        print("Email HTML:", html_message)
+        print("Email context:", context)
         plain_message = strip_tags(html_message)
 
         msg = EmailMultiAlternatives(
-            subject = "Request for resetting password for {title}".format(title=user_email),
+            subject = "Verify your Account",
             body = plain_message,
             from_email = "alex@stockz.ai",
             to=[user_email]

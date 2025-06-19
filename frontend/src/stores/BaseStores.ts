@@ -56,8 +56,8 @@ export abstract class BaseAPIStore<T> {
   };
 
 export abstract class BaseStore {
-    private data: Record<string, Record<any, any>> = {};
-    private subscribers: Record<string, Set<() => void>> = {};
+    data: Record<string, Record<any, any>> = {};
+    protected subscribers: Record<string, Set<() => void>> = {};
     status: Record<string, "idle" | "loading" | "error" | "success"> = {}
     error: Record<string, unknown | null> = {}
     
@@ -68,35 +68,17 @@ export abstract class BaseStore {
 
     abstract fetch(key?: string | null): Promise<any>
 
-    async init() {
-        await Promise.all(this.keys.map(async (key) => {
-             try {
-                this.status[key] = "loading"
-                this.data[key] = await this.fetch(key);
-                this.status[key] = "success"
-            } catch (error) {
-                this.status[key] = "error"
-                this.error[key] = error
-        } finally {
-            this.notify(key);
-        }}));
+    init() {}
+
+    getStatus(key: string) {
+        return this.status[key];
     }
 
-    getStatus() {
-        return this.status;
+    getError(key: string) {
+        return this.error[key];
     }
 
-    getError() {
-        return this.error;
-    }
-
-    getData() {
-        return this.data;
-    }
-
-    async get(key: string) {
-    return this.data[key]
-    }
+    abstract get(key: string): any;
 
     update(key: string, updateData: Record<any, any>) {
         this.data[key] = updateData;
@@ -115,7 +97,7 @@ export abstract class BaseStore {
         this.subscribers[key].delete(unsubscriber)
     }
 
-    private notify(key: string) {
+    protected notify(key: string) {
         this.subscribers[key]?.forEach(cb => cb());
     }
 
