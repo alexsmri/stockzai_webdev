@@ -36,3 +36,5 @@ db.sqlite3
 
 # Logs
 *.log
+.idea/
+.vscode/
