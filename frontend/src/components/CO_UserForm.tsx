@@ -33,12 +33,17 @@ function CO_UserForm({ prRoute, prMethod }: PI_UserForm) {
               username,
               password,
             });
+      utStore.update("PropertyCredentials", {
+        email: email,
+        username: username,
+      });
       if (prMethod === "login") {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate("/");
       } else {
         utStore.post("TokenVerificationRequest", { email });
+        navigate("/users/verification/token/request/");
       }
     } catch (error) {
       alert(error);

@@ -10,8 +10,6 @@ export default function PA_Verication() {
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 
-  console.log(uid, token, email);
-
   const [valid, setValid] = useState(false);
   const [message, setMessage] = useState("Verifying...");
   const utStore = useUserStore();

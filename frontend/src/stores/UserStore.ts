@@ -1,10 +1,13 @@
 import { BaseStore } from "./BaseStores"
 import api from "../api";
-import { json } from "node:stream/consumers";
 
 const ROUTE_CONFIG = {
+  PropertyCredentials: "",
   ActionVerification: "api/users/verification/",
-  TokenVerificationRequest: "api/users/verification/token",
+  TokenVerificationRequest: "api/users/verification/token/",
+  TokenPasswordResetRequest: "api/users/password_reset/token/",
+  TokenPasswordResetValidation: "api/users/password_reset/token/validate/",
+  ActionPasswordReset: "/api/users/password_reset/",
   ActionRegistration: "/api/users/register/",
   ActionLogin: "/api/users/token/",
 } as const;
@@ -28,7 +31,7 @@ export default class UserStore extends BaseStore {
         if (!this.data[key]) {
             try {
             this.status[key] = "loading"
-            const value = await this.fetch(key)     // Not unconditionally, might suck with POST routes
+            const value = await this.fetch(key)
             this.data[key] = value
             this.status[key] = "success"
             } catch (error) {
