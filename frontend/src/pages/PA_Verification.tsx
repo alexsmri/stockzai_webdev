@@ -8,7 +8,6 @@ export default function PA_Verication() {
   const [searchParams] = useSearchParams();
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");
-  const email = searchParams.get("email");
 
   const [valid, setValid] = useState(false);
   const [message, setMessage] = useState("Verifying...");
@@ -17,8 +16,8 @@ export default function PA_Verication() {
   useUserStoreSync(utStore, "ActionVerification", setValid);
 
   useEffect(() => {
-    utStore.post("ActionVerification", { uid, token, email });
-  }, [uid, token, email]);
+    utStore.post("ActionVerification", { uid, token });
+  }, [uid, token]);
 
   useEffect(() => {
     const verify = async () => {

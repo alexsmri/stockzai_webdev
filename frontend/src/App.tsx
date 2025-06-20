@@ -9,6 +9,8 @@ import SearchPage from "./pages/SearchPage";
 import PA_Verication from "./pages/PA_Verification";
 import { UserStoreProvider } from "./context/UserStoreContext";
 import PA_VericationRequest from "./pages/PA_VerificationRequest";
+import PA_PasswordResetRequest from "./pages/PA_PasswordResetRequest";
+import PA_PasswordReset from "./pages/PA_PasswordReset";
 
 function Logout() {
   localStorage.clear();
@@ -41,6 +43,11 @@ function App() {
             element={<PA_VericationRequest />}
           />
           <Route path="/users/verification" element={<PA_Verication />} />
+          <Route
+            path="/users/passwordreset/token/request/"
+            element={<PA_PasswordResetRequest />}
+          />
+          <Route path="/users/passwordreset" element={<PA_PasswordReset />} />
           <Route path="/companies/search/" element={<SearchPage />} />
           <Route
             path="/companies/page/:symbol"

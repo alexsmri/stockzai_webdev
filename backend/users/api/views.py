@@ -1,28 +1,44 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from users.models import User, TokenVerification, TokenPasswordReset
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import generics
-from .serializers import UserSerializer
+from .serializers import UserSerializer, TokenLoginSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.http import JsonResponse
+from stockzAI.response import api_json_response
 from users.tokens import VerificationTokenGenerator, PasswordResetTokenGenerator
+from rest_framework.decorators import permission_classes, api_view
 import json
-from base64 import b64decode
 
 class RegisterUserView(generics.CreateAPIView):
-    """
-    API view to create a new user.
-    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+
+class LoginUserView(TokenObtainPairView):
+    serializer_class = TokenLoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return api_json_response(error="Credentials Invalid.", status=400)
+        msg={
+            "access": serializer.validated_data["access"],
+            "refresh": serializer.validated_data["refresh"],
+            }
+        return api_json_response(msg=msg)
+    
+
 @csrf_exempt
 def view_verification_token(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Only POST requests allowed"}, status=400)
+        return api_json_response(error="Only POST requests allowed", status=400)
     try:
         body = json.loads(request.body)
         email = body.get('email')
@@ -31,38 +47,14 @@ def view_verification_token(request):
             token = VerificationTokenGenerator().make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             TokenVerification.objects.create(user=user, token=token, uid=uid)
-            return JsonResponse({"msg": "Token created and saved."})
+            return api_json_response(msg=True)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
-'''
-@csrf_exempt
-def view_validate_verification_token(request):
-    if request.method != "GET":
-        return JsonResponse({"error": "Only GET requests allowed"}, status=400)
-    try:
-        token = request.GET.get("token")
-        uid = request.GET.get("uid")
-        email = request.GET.get("email")
-        token_obj = TokenVerification.objects.get(token=token, uid=uid)
-        user = token_obj.user
-        token_obj = token_obj if user.email == email else None
-        
-        if token_obj:
-            
-            if token_obj.is_expired():
-                return JsonResponse({"msg": False}, status=200)
-            if token_obj.is_used:
-                return JsonResponse({"msg": False}, status=200)
-            
-            return JsonResponse({"msg": True}, status=200)
-        
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
-'''
+        return api_json_response(error="Something went wrong", status=400)
+
 @csrf_exempt
 def view_verify(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Only POST requests allowed"}, status=400)
+        return api_json_response(error="Only POST requests allowed", status=400)
     try:
         body = json.loads(request.body)
         token = body.get("token")
@@ -75,9 +67,9 @@ def view_verify(request):
         token_obj = token_obj if user.email == email else None
         if token_obj:
             if token_obj.is_expired():
-                return JsonResponse({"error": "Token expired."}, status=400)
+                return api_json_response(error="Token Invalid.", status=400)
             if token_obj.is_used:
-                return JsonResponse({"error": "Token already in use."}, status=400)
+                return api_json_response(error="Token Invalid.", status=400)
             
             token_obj.is_used = True
             token_obj.save()
@@ -85,67 +77,65 @@ def view_verify(request):
             user.is_active = True
             user.save()
 
-            return JsonResponse({"msg": True}, status=200)
+            return api_json_response(msg=True)
     
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return api_json_response(error="Something went wrong", status=400)
     
 @csrf_exempt
 def view_password_reset_token(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Only POST requests allowed"}, status=400)
+        return api_json_response(error="Only POST requests allowed", status=400)
     try:
-        email = request.POST.get("email")
+        body = json.loads(request.body)
+        email = body.get("email")
         user = User.objects.get(email=email)
         if user:
             token = PasswordResetTokenGenerator().make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             TokenPasswordReset.objects.create(user=user, token=token, uid=uid)
-            return JsonResponse({"msg": "Token created and saved."})
+            return api_json_response(msg=True)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return api_json_response(error="Something went wrong", status=400)
 
 @csrf_exempt
 def view_validate_password_reset_token(request):
-    if request.method != "GET":
-        return JsonResponse({"error": "Only GET requests allowed"}, status=400)
+    if request.method != "POST":
+        return api_json_response(error="Only POST requests allowed", status=400)
     try:
-        token = request.GET.get("token")
-        uid = request.GET.get("uid")
-        email = request.GET.get("email")
+        body = json.loads(request.body)
+        token = body.get("token")
+        uid = body.get("uid")
         token_obj = TokenPasswordReset.objects.get(token=token, uid=uid)
-        user = token_obj.user
-        token_obj = token_obj if user.email == email else None
         
         if token_obj:
             
             if token_obj.is_expired():
-                return JsonResponse({"msg": False}, status=200)
+                return api_json_response(msg=False)
             if token_obj.is_used:
-                return JsonResponse({"msg": False}, status=200)
+                return api_json_response(msg=False)
             
-            return JsonResponse({"msg": True}, status=200)
+            return api_json_response(msg=True)
         
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return api_json_response(error="Something went wrong", status=400)
     
 @csrf_exempt
 def view_reset_password(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Only POST requests allowed"}, status=400)
+        return api_json_response(error="Only POST requests allowed", status=400)
     try:
-        token = request.POST.get("token")
-        uid = request.POST.get("uid")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        body = json.loads(request.body)
+        token = body.get("token")
+        uid = body.get("uid")
+        password = body.get("password")
         token_obj = TokenPasswordReset.objects.get(token=token, uid=uid)
         user = token_obj.user
-        token_obj = token_obj if user.email == email else None
         if token_obj:
             if token_obj.is_expired():
-                return JsonResponse({"error": "Token expired."}, status=400)
+                return api_json_response(msg=False)
             if token_obj.is_used:
-                return JsonResponse({"error": "Token already in use."}, status=400)
+                return api_json_response(msg=False)
             
             token_obj.is_used = True
             token_obj.save()
@@ -153,8 +143,24 @@ def view_reset_password(request):
             user.set_password(password)
             user.save()
 
-            return JsonResponse({"msg": "Password Reset successful!"}, status=200)
+            return api_json_response(msg=True)
     
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return api_json_response(error="Something went wrong", status=400)
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def view_credentials(request):
+    if request.method != "GET":
+        return api_json_response(error="Only GET requests allowed", status=400)
+    
+    user = request.user
+    msg = {
+        "uid": user.pk,
+        "email": user.email,
+        "username": user.username,
+        "is_active": user.is_active,
+        "is_staff": user.is_staff,
+        "is_superuser": user.is_superuser
+    }
+    return api_json_response(msg=msg)

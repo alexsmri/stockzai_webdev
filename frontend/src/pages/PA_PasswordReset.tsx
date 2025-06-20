@@ -3,7 +3,7 @@ import { useUserStore } from "../context/UserStoreContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useUserStoreSync } from "../hooks/hooks";
 
-export default function PA_PasswordResetRequest() {
+export default function PA_PasswordReset() {
   const [searchParams] = useSearchParams();
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");
@@ -11,7 +11,7 @@ export default function PA_PasswordResetRequest() {
 
   const [valid, setValid] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [password1, setPassword1] = useState("");
+  const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("Token Invalid");
@@ -23,15 +23,15 @@ export default function PA_PasswordResetRequest() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password1 !== password2) {
+    if (password !== password2) {
       setError("Passwords do not match!");
     } else {
-      utStore.post("ActionPasswordReset", { uid, token, email, password1 });
+      utStore.post("ActionPasswordReset", { uid, token, password });
     }
   };
 
   useEffect(() => {
-    utStore.post("TokenPasswordResetValidation", { uid, token, email });
+    utStore.post("TokenPasswordResetValidation", { uid, token });
   }, [uid, token, email]);
 
   useEffect(() => {
@@ -47,19 +47,23 @@ export default function PA_PasswordResetRequest() {
         <form onSubmit={handleSubmit}>
           <input
             type="password"
-            value={password1}
+            className="look-input-text"
+            value={password}
+            placeholder="New Password"
             onChange={(e) => {
-              setPassword1(e.target.value);
+              setPassword(e.target.value);
             }}
           />
           <input
             type="password"
+            className="look-input-text"
             value={password2}
+            placeholder="Repeat new Password"
             onChange={(e) => {
               setPassword2(e.target.value);
             }}
           />
-          <button type="submit">Submit</button>
+          <button className="look-button-primary" type="submit">Submit</button>
         </form>
       ) : (
         <div>{message}</div>

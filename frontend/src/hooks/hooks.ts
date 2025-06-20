@@ -62,7 +62,7 @@ export function useUserStoreSync(
 
   useEffect(() => {
     const subscriber = () => {
-      store.read(key).then(setData);
+      setData(store.read(key));
     };
 
     store.subscribe(key, subscriber)

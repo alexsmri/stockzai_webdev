@@ -1,7 +1,7 @@
-import CO_UserForm from "../components/CO_UserForm";
+import CO_FormRegister from "../components/CO_FormRegister";
 
 function UserRegister() {
-  return <CO_UserForm prMethod="register" prRoute="/api/users/register/" />;
+  return <CO_FormRegister/>;
 }
 
 export default UserRegister;

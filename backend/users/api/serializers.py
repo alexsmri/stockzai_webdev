@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.conf import settings
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -48,3 +49,19 @@ class UserSerializer(serializers.ModelSerializer):
         except Exception as e:
             print("Email sending failed", e)
         return user
+
+class TokenLoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        user = self.user
+        data.update({
+            "msg": "Login successful",
+            "user": {
+                "uid": user.pk,
+                "email": user.email,
+                "username": user.username,
+            }
+        })
+
+        return data

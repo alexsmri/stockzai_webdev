@@ -2,7 +2,7 @@ import { BaseStore } from "./BaseStores"
 import api from "../api";
 
 const ROUTE_CONFIG = {
-  PropertyCredentials: "",
+  PropertyCredentials: "api/users/credentials/",
   ActionVerification: "api/users/verification/",
   TokenVerificationRequest: "api/users/verification/token/",
   TokenPasswordResetRequest: "api/users/password_reset/token/",
@@ -11,7 +11,7 @@ const ROUTE_CONFIG = {
   ActionRegistration: "/api/users/register/",
   ActionLogin: "/api/users/token/",
 } as const;
-
+// Needs to write some stuff in LocalStorage and read from there, needs nice logic for that
 export type ValidKeys = keyof typeof ROUTE_CONFIG;
 
 export default class UserStore extends BaseStore {
@@ -47,14 +47,18 @@ export default class UserStore extends BaseStore {
             const value = await api.post(this.routes[key], postData)
             if (value instanceof Object) {
                 this.data[key] = value.data.msg
+                this.notify(key)
+                return true
             } else {
-                throw Error("Something went wrong")
+                return false
             }
         } catch (error) {
             return false
         }
     }
     read(key: ValidKeys): any {
-        return this.data[key]
+        console.log(key)
+        console.log(this.data[key])
+        return this.data[key];
     }
 }
