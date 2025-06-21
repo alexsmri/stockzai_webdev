@@ -8,9 +8,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from stockzAI.response import api_json_response
-from users.tokens import VerificationTokenGenerator, PasswordResetTokenGenerator
+from users.tokens import verification_token, password_reset_token
 from rest_framework.decorators import permission_classes, api_view
 import json
+import traceback
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -44,8 +45,9 @@ def view_verification_token(request):
         email = body.get('email')
         user = User.objects.get(email=email)
         if user:
-            token = VerificationTokenGenerator().make_token(user)
+            token = verification_token.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
+            TokenVerification.objects.filter(user=user).delete()
             TokenVerification.objects.create(user=user, token=token, uid=uid)
             return api_json_response(msg=True)
     except Exception as e:
@@ -59,12 +61,8 @@ def view_verify(request):
         body = json.loads(request.body)
         token = body.get("token")
         uid = body.get("uid")
-        email = body.get("email")
-        email = email
-        print(token, uid, email)
         token_obj = TokenVerification.objects.get(token=token, uid=uid)
         user = token_obj.user
-        token_obj = token_obj if user.email == email else None
         if token_obj:
             if token_obj.is_expired():
                 return api_json_response(error="Token Invalid.", status=400)
@@ -80,9 +78,11 @@ def view_verify(request):
             return api_json_response(msg=True)
     
     except Exception as e:
+        print(e)
         return api_json_response(error="Something went wrong", status=400)
     
-@csrf_exempt
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def view_password_reset_token(request):
     if request.method != "POST":
         return api_json_response(error="Only POST requests allowed", status=400)
@@ -91,14 +91,21 @@ def view_password_reset_token(request):
         email = body.get("email")
         user = User.objects.get(email=email)
         if user:
-            token = PasswordResetTokenGenerator().make_token(user)
+            token = password_reset_token.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            TokenPasswordReset.objects.create(user=user, token=token, uid=uid)
+            print("A")
+            TokenPasswordReset.objects.filter(user=user).delete()
+            print("B")
+            token_obj = TokenPasswordReset(user=user, token=token, uid=uid)
+            print("token_obj.uid type:", type(token_obj.uid))
+            token_obj.save()
             return api_json_response(msg=True)
     except Exception as e:
+        traceback.print_exc()
         return api_json_response(error="Something went wrong", status=400)
 
-@csrf_exempt
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def view_validate_password_reset_token(request):
     if request.method != "POST":
         return api_json_response(error="Only POST requests allowed", status=400)
@@ -118,9 +125,11 @@ def view_validate_password_reset_token(request):
             return api_json_response(msg=True)
         
     except Exception as e:
+        traceback.print_exc()
         return api_json_response(error="Something went wrong", status=400)
     
-@csrf_exempt
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def view_reset_password(request):
     if request.method != "POST":
         return api_json_response(error="Only POST requests allowed", status=400)
@@ -146,6 +155,7 @@ def view_reset_password(request):
             return api_json_response(msg=True)
     
     except Exception as e:
+        traceback.print_exc()
         return api_json_response(error="Something went wrong", status=400)
 
 @api_view(["GET"])

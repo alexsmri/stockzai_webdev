@@ -44,10 +44,10 @@ function App() {
           />
           <Route path="/users/verification" element={<PA_Verication />} />
           <Route
-            path="/users/passwordreset/token/request/"
+            path="/users/password-reset/token/request/"
             element={<PA_PasswordResetRequest />}
           />
-          <Route path="/users/passwordreset" element={<PA_PasswordReset />} />
+          <Route path="/users/password-reset" element={<PA_PasswordReset />} />
           <Route path="/companies/search/" element={<SearchPage />} />
           <Route
             path="/companies/page/:symbol"

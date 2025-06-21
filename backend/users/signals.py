@@ -16,8 +16,7 @@ def password_reset_token_created(sender, instance, created, **kwargs):
         base_url = settings.FRONTEND_URL
         uid = instance.uid
         token = instance.token
-        email = b64encode(instance.user.email)
-        link = f"{base_url}users/password-reset/?uid={uid}&token={token}&email={email}"
+        link = f"{base_url}users/password-reset/?uid={uid}&token={token}"
         
         context = {
             'link': link,
@@ -44,9 +43,8 @@ def verification_token_created(sender, instance, created, **kwargs):
         base_url = settings.FRONTEND_URL
         uid = instance.uid
         token = instance.token
-        email = instance.user.email
 
-        link = f"{base_url}users/verification/?uid={uid}&token={token}&email={email}"
+        link = f"{base_url}users/verification/?uid={uid}&token={token}"
         context = {
             'link': link,
             'email_adress': user_email

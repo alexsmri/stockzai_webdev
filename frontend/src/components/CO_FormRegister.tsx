@@ -21,7 +21,7 @@ function CO_FormRegister() {
             username,
             password,
           });
-      utStore.get("PropertyCredentials");
+      utStore.update("PropertyCredentials", { email });
       navigate("/users/verification/token/request/");
       } catch (error) {
       alert(error);
