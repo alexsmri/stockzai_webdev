@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "../context/UserStoreContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useUserStoreSync } from "../hooks/hooks";
+import CO_Navbar from "../components/CO_Navbar";
 
 export default function PA_PasswordReset() {
   const [searchParams] = useSearchParams();
@@ -43,28 +44,28 @@ export default function PA_PasswordReset() {
 
   return (
     <>
+    <CO_Navbar />
       {valid ? (
-        <form onSubmit={handleSubmit}>
+        <>
+        <h1 className="look-text-x7">Reset Password</h1>
+        <form onSubmit={handleSubmit} className="area-flex-col">
           <input
-            type="password"
-            className="look-input-text"
+            type="text"
             value={password}
-            placeholder="New Password"
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Email"
+            className="look-input-primary"
           />
           <input
             type="password"
-            className="look-input-text"
             value={password2}
-            placeholder="Repeat new Password"
-            onChange={(e) => {
-              setPassword2(e.target.value);
-            }}
+            onChange={(e) => setPassword2(e.target.value)}
+            placeholder="Password"
+            className="look-input-primary"
           />
-          <button className="look-button-primary" type="submit">Submit</button>
+          <button className="look-button-primary">Submit</button>
         </form>
+        </>
       ) : (
         <div>{message}</div>
       )}

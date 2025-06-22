@@ -1,14 +1,13 @@
 import { useParams } from "react-router-dom";
 import CO_SectionInfo from "../components/CO_SectionInfo";
 import ScoreRadial from "../components/CO_ScoreRadial";
-import CardInfo from "../components/CO_CardInfo";
+import CO_Navbar from "../components/CO_Navbar";
 import { CompanyStoreProvider } from "../context/CompanyStoreContext";
 import { KPIStoreProvider } from "../context/KPIStoreContext";
 import NotFound from "./NotFound";
 import KPILightbox from "../components/CO_LightboxKPI";
 import CO_TableInfo from "../components/CO_TableInfo";
 import { LightboxProvider } from "../context/LightboxContext";
-import CO_Navbar from "../components/CO_Navbar";
 
 function CompaniesPage() {
   const { symbol } = useParams<{ symbol: string }>();

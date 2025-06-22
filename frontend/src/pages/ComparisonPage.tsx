@@ -4,6 +4,7 @@ import SearchBar from "../components/CO_SearchBar";
 import ComparisonResults from "../components/CO_ComparisonResults";
 import SearchCompletion from "../components/CO_SearchCompletion";
 import CO_Hero from "../components/CO_Hero";
+import CO_Navbar from "../components/CO_Navbar";
 
 export default function SearchPage() {
   const [submittedQuery, setSubmittedQuery] = useState<string | "">("");
@@ -29,6 +30,7 @@ export default function SearchPage() {
 
   return (
     <>
+     <CO_Navbar />
       <CO_Hero>
           <h1 className="look-text-x7">Compare Tickers</h1>
         <div className="area-flex-col">

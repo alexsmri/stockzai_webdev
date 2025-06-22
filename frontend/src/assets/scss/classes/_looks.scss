@@ -1,17 +1,23 @@
 @use "../util/index" as u;
 
 .look-input-primary {
-    @include u.look-glass();
-    padding: u.scale-padding(0.5);
+    @include u.look-transparent($color: rgba(0, 210, 109));
+    padding: u.scale-padding(0.8);
+    color: var(--color-white);
+}
+.look-input-secondary {
+    @include u.look-transparent();
+    padding: u.scale-padding(0.8);
     color: var(--color-white);
 }
 .look-button-primary {
     @include u.look-glass($color: rgba(0, 210, 109));
-    padding-top: u.scale-padding(0.5);
-    padding-bottom: u.scale-padding(0.5);
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
     padding-left: u.scale-padding(2);
     padding-right: u.scale-padding(2);
     color: rgba(0, 210, 109, 0.9);
+    cursor: pointer;
 }
 
 .look-div-container {

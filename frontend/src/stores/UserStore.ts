@@ -17,7 +17,6 @@ const PERSISTED_KEYS: ValidKeys[] = [
     "PropertyCredentials"
 ]
 
-// Needs to write some stuff in LocalStorage and read from there, needs nice logic for that
 export type ValidKeys = keyof typeof ROUTE_CONFIG;
 
 export default class UserStore extends BaseStore {

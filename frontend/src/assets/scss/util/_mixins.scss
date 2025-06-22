@@ -1,18 +1,59 @@
 @use './functions' as f;
 
-@mixin look-glass($radius: 0.7rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
+@mixin look-glass($radius: 0.8rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
     background-image: f.paint-gradient($color);
     background-color: transparent;
     border-radius: $radius;
-    box-shadow: inset (-$offset) $offset $blur (-$offset) rgba($color, 0.1);
+    box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.15);
+    border: 0.08rem solid;
+    border-color: rgba($color, 0.2);
+    border-top-color: rgba($color, 0.4);
+    border-right-color: rgba($color, 0.4);
+
+    &:hover {
+        box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.2);
+        border-color: rgba($color, 0.3);
+        border-top-color: rgba($color, 0.5);
+        border-right-color: rgba($color, 0.5);
+        transition: all 0.2s ease-in-out;
+    }
+    &:active {
+        outline:none;
+        box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.2);
+        border-color: rgba($color, 0.5);
+        border-top-color: rgba($color, 0.7);
+        border-right-color: rgba($color, 0.7);
+        transition: all 0.2s ease-in-out;
+    }
+}
+@mixin look-transparent($radius: 0.8rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
+    background-image: f.paint-gradient($color);
+    background-color: transparent;
+    border-radius: $radius;
     border-width: 0.08rem;
     border-color: rgba($color, 0.2);
+    border-top-color: rgba($color, 0.4);
+    border-right-color: rgba($color, 0.3);
+
+    &:hover {
+        border-color: rgba($color, 0.3);
+        border-top-color: rgba($color, 0.4);
+        border-right-color: rgba($color, 0.4);
+        transition: all 0.2s ease-in-out;
+    }
+    &:focus {
+        outline:none;
+        border-color: rgba($color, 0.8);
+        border-top-color: rgba($color, 0.9);
+        border-right-color: rgba($color, 0.9);
+        transition: all 0.2s ease-in-out;
+    }
 }
 @mixin remove-margin {
     margin: 0;
 }
 
-@mixin look-container($radius: 0.7rem) {
+@mixin look-container($radius: 0.8rem) {
     border-radius: $radius;
     border: solid 0.08rem rgba(255, 255, 255, 0.2);
     background-image: f.paint-gradient(rgba(255, 255, 255));

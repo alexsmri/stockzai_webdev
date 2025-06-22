@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../context/UserStoreContext";
 import { useUserStoreSync } from "../hooks/hooks";
+import CO_Navbar from "../components/CO_Navbar";
 
 export default function PA_Verication() {
   const [searchParams] = useSearchParams();
@@ -32,5 +33,5 @@ export default function PA_Verication() {
     verify();
   }, [utStore]);
 
-  return <div className="look-text-x4">{message}</div>;
+  return <><CO_Navbar /><div className="look-text-x4">{message}</div></>;
 }
