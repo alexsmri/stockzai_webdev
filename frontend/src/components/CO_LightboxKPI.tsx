@@ -14,7 +14,7 @@ export default function KPILightbox() {
     <>
       <Lightbox isOpen={isOpen} onClose={close}>
         {selectedKPI && (
-          <div className="flex">
+          <div className="mod-wh-full">
             <ChartLine KPI={selectedKPI} />
           </div>
         )}

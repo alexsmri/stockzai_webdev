@@ -12,9 +12,9 @@
 
     &:hover {
         box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.2);
-        border-color: rgba($color, 0.3);
-        border-top-color: rgba($color, 0.5);
-        border-right-color: rgba($color, 0.5);
+        border-color: rgba($color, 0.4);
+        border-top-color: rgba($color, 0.6);
+        border-right-color: rgba($color, 0.6);
         transition: all 0.2s ease-in-out;
     }
     &:active {
@@ -36,9 +36,9 @@
     border-right-color: rgba($color, 0.3);
 
     &:hover {
-        border-color: rgba($color, 0.3);
-        border-top-color: rgba($color, 0.4);
-        border-right-color: rgba($color, 0.4);
+        border-color: rgba($color, 0.4);
+        border-top-color: rgba($color, 0.6);
+        border-right-color: rgba($color, 0.6);
         transition: all 0.2s ease-in-out;
     }
     &:focus {

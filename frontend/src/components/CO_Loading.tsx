@@ -1,5 +1,5 @@
 function Loading() {
-  return <div>Loading...</div>;
+  return <div className="look-loader" />;
 }
 
 export default Loading;

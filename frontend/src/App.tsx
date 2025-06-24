@@ -11,6 +11,7 @@ import { UserStoreProvider } from "./context/UserStoreContext";
 import PA_VericationRequest from "./pages/PA_VerificationRequest";
 import PA_PasswordResetRequest from "./pages/PA_PasswordResetRequest";
 import PA_PasswordReset from "./pages/PA_PasswordReset";
+import Loading from "./components/CO_Loading";
 
 function Logout() {
   localStorage.clear();
@@ -43,11 +44,22 @@ function App() {
             element={<PA_VericationRequest />}
           />
           <Route path="/users/verification" element={<PA_Verication />} />
-          <Route
-            path="/users/password-reset/token/request/"
-            element={<PA_PasswordResetRequest />}
+          <Route 
+            path="/users/password-reset/token/request" 
+            element={
+              <ProtectedRoute>
+                <PA_PasswordResetRequest />
+              </ProtectedRoute>
+            } 
           />
-          <Route path="/users/password-reset" element={<PA_PasswordReset />} />
+          <Route 
+            path="/users/password-reset" 
+            element={
+              <ProtectedRoute>
+                <PA_PasswordReset />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/companies/search/" element={<SearchPage />} />
           <Route
             path="/companies/page/:symbol"
@@ -65,6 +77,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/loading/" element={<Loading />}/>
         </Routes>
       </BrowserRouter>
     </UserStoreProvider>

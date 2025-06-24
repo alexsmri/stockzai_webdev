@@ -39,7 +39,7 @@ export default function CO_TableInfo({ prTableRole }: PI_TableInfo) {
         .map(([key, value]) => (
           <div key={key} className="area-flex-row mod-space-between">
             {prTableRole !== "basics" ? (
-              <p className="mod-cursor-pointer" onClick={() => handleLBOpen(value.KPI)}>
+              <p className="look-button-ghost" onClick={() => handleLBOpen(value.KPI)}>
                 {getKPIText(value.KPI)}
               </p>
             ) : (

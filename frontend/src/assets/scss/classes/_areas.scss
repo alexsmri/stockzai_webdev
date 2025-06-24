@@ -17,6 +17,22 @@
     flex-shrink:initial;
 }
 
+.area-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-color: var(--color-ba70);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(0.5rem);
+
+    > * {
+        width: 70%;
+        height: 70%
+    }
+}
+
 .area-flex-wrap {
     display: flex;
     flex-wrap: wrap;

@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import api from '../api';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
 import { useState, useEffect, type JSX } from 'react';
+import Loading from './CO_Loading';
 
 interface ProtectedRouteProps {
     children: JSX.Element
@@ -66,7 +67,7 @@ function ProtectedRoute(props: ProtectedRouteProps) {
     }
     
     if (isAuthorized === null) {
-        return <div>Loading...</div>;
+        return <Loading />;
     };
 
     return isAuthorized ? props.children : <Navigate to="/users/login/" replace />;
