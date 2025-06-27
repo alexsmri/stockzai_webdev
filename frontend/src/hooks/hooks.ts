@@ -59,12 +59,10 @@ export function useUserStoreSync(
     key: ValidKeys,
     setData: React.Dispatch<React.SetStateAction<any | null>>
 ) {
-
   useEffect(() => {
     const subscriber = () => {
       setData(store.read(key));
     };
-
     store.subscribe(key, subscriber)
 
     return () => store.unsubscribe(key, subscriber);

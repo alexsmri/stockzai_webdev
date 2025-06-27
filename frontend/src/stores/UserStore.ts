@@ -10,11 +10,13 @@ const ROUTE_CONFIG = {
   ActionPasswordReset: "/api/users/password-reset/",
   ActionRegistration: "/api/users/register/",
   ActionLogin: "/api/users/token/",
+  ActionRefreshToken: "/api/users/token/refresh/",
 } as const;
 
 const PERSISTED_KEYS: ValidKeys[] = [
     "ActionLogin",
-    "PropertyCredentials"
+    "PropertyCredentials",
+    "ActionRefreshToken",
 ]
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;

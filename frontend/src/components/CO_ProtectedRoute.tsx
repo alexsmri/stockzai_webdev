@@ -1,9 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import api from '../api';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
 import { useState, useEffect, type JSX } from 'react';
 import Loading from './CO_Loading';
+import { useUserStore } from '../context/UserStoreContext';
+import { useUserStoreSync } from '../hooks/hooks';
 
 interface ProtectedRouteProps {
     children: JSX.Element
@@ -15,7 +15,11 @@ interface DecodedToken {
 }
 
 function ProtectedRoute(props: ProtectedRouteProps) {
+    const utStore = useUserStore()
+
     const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+    const [tokens, setTokens] = useState<any>(utStore.read("ActionLogin"))
+    useUserStoreSync(utStore, "ActionLogin", setTokens)
 
     useEffect(() => {
         (async () => {
@@ -27,18 +31,16 @@ function ProtectedRoute(props: ProtectedRouteProps) {
     })();
     }, []);
 
+    console.log(tokens)
+
     const refreshToken = async () => {
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN);
-        if (!refreshToken) {
-            setIsAuthorized(false);
-            return;
-        }
-        try {
-            const res = await api.post('/api/users/token/refresh/', {
+        if (tokens) {
+            const refreshToken = tokens["refresh"];
+            try {
+            await utStore.post("ActionRefreshToken", {
                 refresh: refreshToken
             });
-            if (res.status === 200) {
-                localStorage.setItem(ACCESS_TOKEN, res.data.access);
+            if (tokens) {
                 setIsAuthorized(true);
             } else {
                 setIsAuthorized(false);
@@ -47,22 +49,27 @@ function ProtectedRoute(props: ProtectedRouteProps) {
             setIsAuthorized(false);
             console.log(error)
         }
+        } else {
+            setIsAuthorized(false)
+            return
+        }
+        
     }
 
     const auth = async () => {
-        const token = localStorage.getItem(ACCESS_TOKEN);
-        if (!token) {
+        if (!tokens) {
             setIsAuthorized(false);
             return
-        }
-        const decoded = jwtDecode<DecodedToken>(token)
-        const tokenExpiration = decoded.exp
-
-        const now = Date.now() / 1000;
-        if (typeof tokenExpiration === "number" && tokenExpiration < now) {
-            await refreshToken();
         } else {
-            setIsAuthorized(true);
+            const decoded = jwtDecode<DecodedToken>(tokens["access"])
+            const tokenExpiration = decoded.exp
+
+            const now = Date.now() / 1000;
+            if (typeof tokenExpiration === "number" && tokenExpiration < now) {
+            await refreshToken();
+            } else {
+                setIsAuthorized(true);
+            }
         }
     }
     
