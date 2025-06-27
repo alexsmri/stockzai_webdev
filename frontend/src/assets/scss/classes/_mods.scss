@@ -6,6 +6,9 @@
 .mod-space-around {
     justify-content: space-around;
 }
+.mod-padding-l {
+    padding: u.scale-padding(2)
+}
 .mod-padding-xl {
     padding: u.scale-padding(3)
 }
@@ -14,6 +17,12 @@
 }
 .mod-gap-xl {
     gap: u.scale-gap(3)
+}
+.mod-margin-xl {
+    margin: u.scale-gap(3)
+}
+.mod-margin-2xl {
+    margin: u.scale-gap(4)
 }
 .mod-cursor-pointer {
     cursor: pointer;
@@ -26,4 +35,8 @@
 .mod-wh-full {
     width: 100%;
     height: 100%;
+}
+.mod-align-left {
+    align-items: normal;
+    text-align: left;
 }

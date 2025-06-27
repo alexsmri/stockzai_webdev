@@ -58,3 +58,12 @@
     border: solid 0.08rem rgba(255, 255, 255, 0.2);
     background-image: f.paint-gradient(rgba(255, 255, 255));
 }
+@mixin look-container-hover() {
+    cursor: pointer;
+    &:hover {
+        transform: scale(1.1);
+        background-image: f.paint-gradient(rgba(200, 200, 200));
+        box-shadow: 0.5rem 0.5rem 3rem var(--color-ba20);
+        transition: all 0.2s ease-in-out;
+    }
+}

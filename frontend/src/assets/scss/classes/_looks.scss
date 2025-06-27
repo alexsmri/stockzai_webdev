@@ -23,13 +23,16 @@
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      transform: scale(1.03);
+      color: var(--color-wa80);
       transition: all 0.2s ease-in-out;
     }
 }
 
 .look-div-container {
   @include u.look-container();
+}
+.look-div-hover {
+  @include u.look-container-hover();
 }
 .look-text-x7 {
   font-size: u.scale_font(6);
@@ -53,6 +56,7 @@
 }
 .look-text-x4 {
   font-size: u.scale_font(3);
+  font-weight: 500;
   font-family: 'ClashDisplay';
   text-align: center;
   @include u.remove-margin()
