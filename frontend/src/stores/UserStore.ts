@@ -102,7 +102,9 @@ export default class UserStore extends BaseStore {
     hydrate(key: ValidKeys): any | null {
         if (PERSISTED_KEYS.includes(key)) {
             const raw = localStorage.getItem(`userStore:${key}`);
-            return raw ? JSON.parse(raw) : null;
+            if (raw !== "undefined") {
+                return raw ? JSON.parse(raw) : null;
+            }
         }
         return null
     }

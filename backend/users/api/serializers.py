@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.conf import settings
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer as JWTRefreshSerializer
 
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -64,4 +64,14 @@ class TokenLoginSerializer(TokenObtainPairSerializer):
             }
         })
 
+        return data
+
+class TokenRefreshSerializer(JWTRefreshSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        data.update({
+            "msg": "Token Refreshed",
+        })
+        print(data)
         return data

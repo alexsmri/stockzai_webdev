@@ -7,7 +7,7 @@ from django.http import Http404
 db = DB_Handler("companies")
 
 class CompanyPageView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = None  # This should be set to the appropriate serializer class
 
     def get(self, request, symbol):
@@ -22,7 +22,7 @@ class CompanyPageView(APIView):
         return Response(intel)
 
 class KPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = None  # This should be set to the appropriate serializer class
 
     def get(self, request):
@@ -34,7 +34,7 @@ class KPIView(APIView):
         return Response(kpis)
 
 class CompanySearchView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = None  # This should be set to the appropriate serializer class
 
     def get(self, request, query):

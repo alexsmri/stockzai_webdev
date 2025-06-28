@@ -37,11 +37,12 @@ function ProtectedRoute(props: ProtectedRouteProps) {
         if (tokens) {
             const refreshToken = tokens["refresh"];
             try {
-            await utStore.post("ActionRefreshToken", {
+            const res = await utStore.post("ActionRefreshToken", {
                 refresh: refreshToken
             });
-            if (tokens) {
+            if (res.msg["access"]) {
                 setIsAuthorized(true);
+                utStore.update("ActionLogin", {refresh: refreshToken, access: res.msg["access"]})
             } else {
                 setIsAuthorized(false);
             }
