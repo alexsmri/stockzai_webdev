@@ -16,6 +16,6 @@
       "@contexts/*": ["./src/contexts/*"],
     }
   },
-  "include": ["src", "src/**/*.d.ts"],
+  "include": ["src", "src/**/*.d.ts", "src/types/svg.d.ts"],
 
 }

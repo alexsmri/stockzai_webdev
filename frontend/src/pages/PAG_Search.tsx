@@ -7,7 +7,7 @@ import COM_SearchCompletion from "../components/COM_SearchCompletion";
 import COM_Hero from "../components/COM_Hero";
 import COM_Navbar from "../components/COM_Navbar";
 
-export default function PA_Search() {
+export default function PAG_Search() {
   const navigate = useNavigate();
 
   const [submittedQuery, setSubmittedQuery] = useState<string | "">("");

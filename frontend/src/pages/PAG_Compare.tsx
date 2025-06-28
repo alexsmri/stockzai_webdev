@@ -6,7 +6,7 @@ import COM_SearchCompletion from "../components/COM_SearchCompletion";
 import COM_Hero from "../components/COM_Hero";
 import COM_Navbar from "../components/COM_Navbar";
 
-export default function PA_Compare() {
+export default function PAG_Compare() {
   const [submittedQuery, setSubmittedQuery] = useState<string | "">("");
   const [input, setInput] = useState<string>("");
   const [showCompletions, setShowCompletions] = useState<boolean>(false);

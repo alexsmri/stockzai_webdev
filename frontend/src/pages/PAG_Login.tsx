@@ -2,7 +2,7 @@ import COM_FormLogin from "../components/COM_FormLogin";
 import COM_Navbar from "../components/COM_Navbar";
 import COM_Hero from "../components/COM_Hero";
 
-function PA_Login() {
+function PAG_Login() {
   return (
   <>
     <COM_Navbar />
@@ -13,4 +13,4 @@ function PA_Login() {
   );
 }
 
-export default PA_Login;
+export default PAG_Login;

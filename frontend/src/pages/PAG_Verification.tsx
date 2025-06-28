@@ -5,7 +5,7 @@ import { useUserStore } from "../context/CTX_UserStore";
 import { useUserStoreSync } from "../hooks/hooks";
 import COM_Navbar from "../components/COM_Navbar";
 
-export default function PA_Verication() {
+export default function PAG_Verication() {
   const [searchParams] = useSearchParams();
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");

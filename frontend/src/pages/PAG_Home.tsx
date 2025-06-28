@@ -1,7 +1,7 @@
 import COM_Navbar from "../components/COM_Navbar";
 import COM_Hero from "../components/COM_Hero";
 
-function PA_Home () {
+function PAG_Home () {
     return (
     <>
     <COM_Navbar />
@@ -26,4 +26,4 @@ function PA_Home () {
 )
 }
 
-export default PA_Home;
+export default PAG_Home;

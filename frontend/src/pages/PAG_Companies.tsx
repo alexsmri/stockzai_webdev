@@ -4,12 +4,12 @@ import COM_ScoreRadial from "../components/COM_ScoreRadial";
 import COM_Navbar from "../components/COM_Navbar";
 import { PRV_CompanyStore } from "../context/CTX_CompanyStore";
 import { PRV_KPIStore } from "../context/CTX_KPIStore";
-import NotFound from "./PA_404";
+import NotFound from "./PAG_404";
 import COM_KPILightbox from "../components/COM_LightboxKPI";
 import COM_TableInfo from "../components/COM_TableInfo";
 import { PRV_Lightbox } from "../context/CTX_Lightbox";
 
-function PA_Companies() {
+function PAG_Companies() {
   const { symbol } = useParams<{ symbol: string }>();
 
   if (!symbol) {
@@ -46,4 +46,4 @@ function PA_Companies() {
     </>
   );
 }
-export default PA_Companies;
+export default PAG_Companies;

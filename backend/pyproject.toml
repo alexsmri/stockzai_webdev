@@ -17,7 +17,8 @@ dependencies = [
     "djangorestframework",
     "djangorestframework-simplejwt",
     "django-cors-headers",
-    "python-decouple"
+    "python-decouple",
+    "gunicorn"
 ]
 
 

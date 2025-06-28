@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useUserStoreSync } from "../hooks/hooks";
 import COM_Navbar from "../components/COM_Navbar";
 
-export default function PA_PasswordReset() {
+export default function PAG_PasswordReset() {
   const [searchParams] = useSearchParams();
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");

@@ -18,16 +18,17 @@
 **st**: State
 
 
-# JS / TS:**
+# REACT / TSX:**
 
-## Class Names (PascalCase):
+## Class / File Names (PascalCase):
 
-**UT**: Utility
-**CO**: React Component
-**PA**: React Page
-**PV**: React Provider
-**ST**: React Store
-**PI**: React Props Interface
+**UTI_**: Utility
+**COM_**: React Component
+**PAG:**: React Page
+**PRV_**: React Provider
+**CTX_**: React Context
+**STO_**: React Store
+**PRI_**: React Props Interface
 
 ## Function Names (camelCase):
 
