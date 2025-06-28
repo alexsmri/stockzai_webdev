@@ -37,6 +37,7 @@ export default function SearchPage() {
       <CO_Navbar />
       <CO_Hero>
         <h1 className="look-text-x7">Search Ticker</h1>
+        <div className="area-flex-col mod-postion-relative">
         <SearchBar
           input={input ?? ""}
           submit={false}
@@ -44,6 +45,7 @@ export default function SearchPage() {
           handleSubmit={handleSubmit}
         ></SearchBar>
         {input.length > 2 && showCompletions && (
+          <div className="look-div-completion mod-z-1">
           <SearchStoreProvider args={[input]}>
             <SearchCompletion
               onSelect={(val) => {
@@ -51,7 +53,9 @@ export default function SearchPage() {
               }}
             />
           </SearchStoreProvider>
+          </div>
         )}
+        </div>
       </CO_Hero>
       {showResults && (
         <SearchStoreProvider args={[submittedQuery]}>

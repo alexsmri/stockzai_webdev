@@ -13,15 +13,15 @@ function SearchResults() {
 
   return (
     <>
-    <div className="area-grid-col-3 mod-gap-xl mod-margin-xl">
+    <div className="area-grid-auto mod-gap-xl mod-margin-xl">
      {data && Object.entries(data).map(([symbol, value]) => (
         <div key={symbol} 
-              className="area-flex-col look-div-container look-div-hover mod-align-left mod-padding-l"
+              className="area-flex-col look-div-container hover-scale mod-align-left mod-padding-l"
               onClick={() => {navigate(`/companies/page/${symbol}`)}}
               >
+            <p className="look-text-x0">{value.sectorRanking ? `#${value.sectorRanking} in ${value.sector}` : `${value.sector}`}</p>
             <h5 className="look-text-x4 mod-align-left">{symbol}</h5>
             <p>{value.name}</p>
-
         </div>
      ))}
      </div>

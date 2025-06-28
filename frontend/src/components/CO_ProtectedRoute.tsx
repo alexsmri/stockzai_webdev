@@ -29,7 +29,7 @@ function ProtectedRoute(props: ProtectedRouteProps) {
                 setIsAuthorized(false);
             }
     })();
-    }, []);
+    }, [tokens]);
 
     console.log(tokens)
 
@@ -37,12 +37,12 @@ function ProtectedRoute(props: ProtectedRouteProps) {
         if (tokens) {
             const refreshToken = tokens["refresh"];
             try {
-            const res = await utStore.post("ActionRefreshToken", {
+            await utStore.post("ActionRefreshToken", {
                 refresh: refreshToken
             });
-            if (res.msg["access"]) {
+            if (utStore.read("ActionRefreshToken")) {
                 setIsAuthorized(true);
-                utStore.update("ActionLogin", {refresh: refreshToken, access: res.msg["access"]})
+                utStore.update("ActionLogin", {refresh: refreshToken, access: utStore.read("ActionRefreshToken")})
             } else {
                 setIsAuthorized(false);
             }

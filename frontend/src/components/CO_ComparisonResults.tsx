@@ -31,7 +31,11 @@ export default function ComparisonResults({
 
   useEffect(() => {
     if (cachedResult && Object.keys(cachedResult)[0] === submittedQuery)
-      setResults((prev) => [...prev, cachedResult]);
+      setResults((prev) => {
+        const symbol = Object.keys(cachedResult)[0];
+        if (prev.some((r) => Object.keys(r)[0] === symbol)) return prev;
+        return [...prev, cachedResult];
+      })
   }, [submitIndex]);
 
   const handleClose = (symbol: string) => {
@@ -48,13 +52,15 @@ export default function ComparisonResults({
         Object.entries(result).map(([key, value]) => (
           <div
             key={`${index}-${key}`}
-            className="grid grid-cols-[5%_15%_auto_20%_20%] p-[0.4vw] text-center"
+            className="area-grid-comparison mod-wh-full"
           >
-            <button onClick={() => handleClose(key)}>×</button>
+            <a className="look-button-ghost" onClick={() => handleClose(key)}>×</a>
             <p className="text-green-400">{key}</p>
-            <p>{value.name}</p>
-            <p>{value.financial_score}</p>
-            <p>{value.valuation_score}</p>
+            <p>{value.name ?? "--"}</p>
+            <p>{value.sector ?? "--"}</p>
+            <p>{value.financial_score ?? "--"}</p>
+            <p>{value.valuation_score ?? "--"}</p>
+            <p>{value.sectorRanking ?? "--"}</p>
           </div>
         ))
       )}

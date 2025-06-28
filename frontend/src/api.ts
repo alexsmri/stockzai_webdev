@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ACCESS_TOKEN } from "./constants";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -8,9 +7,12 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem(ACCESS_TOKEN);
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        const token = localStorage.getItem("userStore:ActionLogin");
+        if (token && typeof token === "string") {
+            const parsedToken = JSON.parse(token)
+            if (typeof parsedToken === "object" && "access" in parsedToken) {
+                config.headers.Authorization = `Bearer ${parsedToken["access"]}`;
+            }
         }
         console.log(`[REQ] ${config.method?.toUpperCase()} ${config.url}`, config);
         return config;

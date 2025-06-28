@@ -56,14 +56,15 @@
 @mixin look-container($radius: 0.8rem) {
     border-radius: $radius;
     border: solid 0.08rem rgba(255, 255, 255, 0.2);
-    background-image: f.paint-gradient(rgba(255, 255, 255));
+    background-image: f.paint-gradient(rgba(180, 180, 180));
+    box-shadow: 0.5rem 0.5rem 3rem var(--color-ba20);
+    backdrop-filter: blur(0.2rem);
 }
-@mixin look-container-hover() {
+@mixin look-container-hover($scale: 1.1) {
     cursor: pointer;
     &:hover {
-        transform: scale(1.1);
-        background-image: f.paint-gradient(rgba(200, 200, 200));
-        box-shadow: 0.5rem 0.5rem 3rem var(--color-ba20);
+        transform: scale($scale);
+        background-image: f.paint-gradient(rgba(100, 100, 100));
         transition: all 0.2s ease-in-out;
     }
 }

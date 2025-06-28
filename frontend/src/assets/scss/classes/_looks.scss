@@ -31,8 +31,9 @@
 .look-div-container {
   @include u.look-container();
 }
-.look-div-hover {
-  @include u.look-container-hover();
+
+.look-div-completion {
+  top: 100%;
 }
 .look-text-x7 {
   font-size: u.scale_font(6);
@@ -69,6 +70,12 @@
 .look-text-x2 {
   font-size: u.scale_font(1);
   font-family: 'Work Sans';
+  @include u.remove-margin()
+}
+.look-text-x0 {
+  font-size: u.scale_font(-1);
+  font-family: 'Work Sans';
+  color: var(--color-wa60);
   @include u.remove-margin()
 }
 .look-text-svg {

@@ -1,0 +1,8 @@
+@use "../util/index" as u;
+
+.hover-scale {
+  @include u.look-container-hover();
+}
+.hover-color {
+  @include u.look-container-hover(1);
+}

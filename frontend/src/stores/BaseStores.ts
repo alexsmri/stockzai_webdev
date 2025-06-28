@@ -80,10 +80,7 @@ export abstract class BaseStore {
 
     abstract get(key: string): any;
 
-    update(key: string, updateData: Record<any, any>) {
-        this.data[key] = updateData;
-        this.notify(key);
-    }   
+    abstract update(key: string, updateData: Record<any, any>): any;
 
     abstract post?(key: string, postData: any): any;
 

@@ -322,8 +322,8 @@ class DB_Handler:
             else:
                 return kpi_entry[:limit]
 
-        except IndexError:
-            return
+        except Exception:
+            return {"value": None, "value2": None}
         
     def dbq_get_company_data(self, ticker):
         company_intel = {}
@@ -368,7 +368,6 @@ class DB_Handler:
             results_raw = self.dbu_read_execute(sql_query, params={"request": search_request})
             print(search_request)
         
-        logging.debug(results_raw)
         for (name, symbol) in results_raw:
             results_dic = {"name": name}
             for kpi in additional_kpis_info:

@@ -18,16 +18,20 @@ function SearchCompletion({ onSelect }: SearchCompletionProps) {
   return (
     <>
       {data &&
-        Object.entries(data).map(([symbol, res]) => (
+        <div className="look-div-container">
+        {Object.entries(data).map(([symbol, res]) => (
           <div
             key={symbol}
             onClick={() => onSelect(symbol)}
-            className="flex flex-col text-wrap cursor-pointer z-50 bg-grey w-full p-[0.4vw]"
+            className="area-flex-wrap hover-color mod-cursor-pointer"
           >
-            <strong className="text-left">{symbol}</strong>
-            <p>{res.name}</p>
+            <p className="mod-align-left">{symbol}</p>
+            <p className="look-text-x0 mod-align-left">{res.name}</p>
           </div>
         ))}
+        </div>
+        }
+        
     </>
   );
 }

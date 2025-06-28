@@ -92,6 +92,11 @@ export default class UserStore extends BaseStore {
         console.log(this.data[key])
         return this.data[key];
     }
+    update(key: ValidKeys, updateData: Record<any, any>): any {
+        this.data[key] = updateData;
+        this.persist(key);
+        this.notify(key);
+    }
 
     persist(key: ValidKeys): void {
         if (PERSISTED_KEYS.includes(key)) {

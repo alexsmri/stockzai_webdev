@@ -37,6 +37,7 @@
     display: flex;
     flex-wrap: wrap;
     padding: u.scale-padding(1);
+    column-gap: u.scale-gap(1);
 }
 
 .area-grid-auto {
@@ -54,5 +55,12 @@
 .area-grid-col-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    padding: u.scale-padding(1);
+}
+
+.area-grid-comparison {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr 0.5fr 0.5fr;
+    justify-items: center;
     padding: u.scale-padding(1);
 }

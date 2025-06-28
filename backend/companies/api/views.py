@@ -42,6 +42,9 @@ class CompanySearchView(APIView):
         # For example, you might use self.request.user.company
 
         unique = request.GET.get("unique", "false").lower() == "true"
-        
-        results = db.dbg_get_company_search(query, ["financial_score", "valuation_score"], unique=unique)
+        results = None
+        try:
+            results = db.dbg_get_company_search(query, ["financial_score", "valuation_score", "sector", "sectorRanking"], unique=unique)
+        except Exception as e:
+            print(type(e))
         return Response(results)

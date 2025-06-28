@@ -5,4 +5,4 @@ export interface CompanyAPIResponse {
 
 export type KPIAPIResponse = Record<string, Record<"KPI" | "role" | "scoring" , any>>
 
-export type SearchAPIResponse = Record<string, Record<"name" | "financial_score" | "valuation_score", string | null>>
+export type SearchAPIResponse = Record<string, Record<"name" | "financial_score" | "valuation_score" | "sector" | "sectorRanking", string | null>>
