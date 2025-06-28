@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useUserStore } from "../context/UserStoreContext";
+import { useUserStore } from "../context/CTX_UserStore";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useUserStoreSync } from "../hooks/hooks";
-import CO_Navbar from "../components/CO_Navbar";
+import COM_Navbar from "../components/COM_Navbar";
 
 export default function PA_PasswordReset() {
   const [searchParams] = useSearchParams();
@@ -44,7 +44,7 @@ export default function PA_PasswordReset() {
 
   return (
     <>
-    <CO_Navbar />
+    <COM_Navbar />
       {valid ? (
         <>
         <h1 className="look-text-x7">Reset Password</h1>

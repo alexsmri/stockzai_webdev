@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import type { CompanyAPIResponse, KPIAPIResponse, SearchAPIResponse } from "../types/types";
-import CompanyStore from "../stores/CompanyStore";
-import KPIStore from "../stores/KPIStore";
-import SearchStore from "../stores/SearchStore";
-import type UserStore from "../stores/UserStore";
-import type { ValidKeys } from "../stores/UserStore";
+import STO_Companies from "../stores/STO_Companies";
+import STO_KPI from "../stores/STO_KPI";
+import STO_Search from "../stores/STO_Search";
+import type STO_Users from "../stores/STO_Users";
+import type { ValidKeys } from "../stores/STO_Users";
 
 export function useCompanyStoreSync(
-    store: CompanyStore, 
+    store: STO_Companies, 
     setData: React.Dispatch<React.SetStateAction<CompanyAPIResponse | null>>
 ) {
 
@@ -23,7 +23,7 @@ export function useCompanyStoreSync(
 }
 
 export function useKPIStoreSync(
-    store: KPIStore, 
+    store: STO_KPI, 
     setData: React.Dispatch<React.SetStateAction<KPIAPIResponse | null>>
 ) {
 
@@ -39,7 +39,7 @@ export function useKPIStoreSync(
 }
 
 export function useSearchStoreSync(
-    store: SearchStore, 
+    store: STO_Search, 
     setData: React.Dispatch<React.SetStateAction<SearchAPIResponse | null>>
 ) {
 
@@ -55,7 +55,7 @@ export function useSearchStoreSync(
 }
 
 export function useUserStoreSync(
-    store: UserStore, 
+    store: STO_Users, 
     key: ValidKeys,
     setData: React.Dispatch<React.SetStateAction<any | null>>
 ) {
