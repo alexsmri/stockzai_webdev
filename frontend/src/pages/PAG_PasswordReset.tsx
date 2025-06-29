@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "../context/CTX_UserStore";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useUserStoreSync } from "../hooks/hooks";
 import COM_Navbar from "../components/COM_Navbar";
 
@@ -14,11 +14,10 @@ export default function PAG_PasswordReset() {
   const [success, setSuccess] = useState(false);
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [error, setError] = useState("");
+  const [, setError] = useState("");
   const [message, setMessage] = useState("Token Invalid");
 
   const utStore = useUserStore();
-  const navigate = useNavigate();
   useUserStoreSync(utStore, "TokenPasswordResetValidation", setValid);
   useUserStoreSync(utStore, "ActionPasswordReset", setSuccess);
 

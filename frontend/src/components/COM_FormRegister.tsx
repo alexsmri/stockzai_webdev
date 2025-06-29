@@ -7,7 +7,7 @@ function COM_FormRegister() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const utStore = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const name = "Register";

@@ -35,8 +35,7 @@ export abstract class BaseAPIStore<T> {
         return this.data;
     }
 
-    async get(subscriber: () => void) {
-    this.subscribe(subscriber)
+    async get() {
     return this.data
     }
 

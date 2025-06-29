@@ -1,0 +1,12 @@
+Django
+sqlalchemy
+pymysql
+pandas
+cryptography
+python-dotenv
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+python-decouple
+gunicorn
+psycopg2-binary

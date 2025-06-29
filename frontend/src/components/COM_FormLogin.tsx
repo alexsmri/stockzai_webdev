@@ -9,7 +9,7 @@ function COM_FormLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const utStore = useUserStore();
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const navigate = useNavigate();
   const [tokens, setTokens] = useState<Record<string, any> | null >(null)
 

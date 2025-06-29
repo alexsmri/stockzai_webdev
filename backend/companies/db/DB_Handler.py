@@ -2,7 +2,6 @@ from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
 import pandas as pd
 import os
-import logging
 
 
 class DB_Handler:

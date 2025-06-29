@@ -16,9 +16,8 @@ export function useCompanyStoreSync(
       store.get().then(setData);
     };
 
-    store.get(subscriber).then(setData);
-
-    return () => store.unsubscribe(subscriber);
+    store.subscribe(subscriber)
+    store.get().then(setData);
   }, [store])
 }
 
@@ -32,7 +31,8 @@ export function useKPIStoreSync(
       store.get().then(setData);
     };
 
-    store.get(subscriber).then(setData);
+    store.subscribe(subscriber)
+    store.get().then(setData);
 
     return () => store.unsubscribe(subscriber);
   }, [store])
@@ -48,7 +48,8 @@ export function useSearchStoreSync(
       store.get().then(setData);
     };
 
-    store.get(subscriber).then(setData);
+    store.subscribe(subscriber)
+    store.get().then(setData);
 
     return () => store.unsubscribe(subscriber);
   }, [store])
