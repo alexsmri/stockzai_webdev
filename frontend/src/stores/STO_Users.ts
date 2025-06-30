@@ -2,11 +2,11 @@ import { STO_Base } from "./STO_Base"
 import api from "../api";
 
 const ROUTE_CONFIG = {
-  PropertyCredentials: "api/users/credentials/",
-  ActionVerification: "api/users/verification/",
-  TokenVerificationRequest: "api/users/verification/token/",
-  TokenPasswordResetRequest: "api/users/password-reset/token/",
-  TokenPasswordResetValidation: "api/users/password-reset/token/validate/",
+  PropertyCredentials: "/api/users/credentials/",
+  ActionVerification: "/api/users/verification/",
+  TokenVerificationRequest: "/api/users/verification/token/",
+  TokenPasswordResetRequest: "/api/users/password-reset/token/",
+  TokenPasswordResetValidation: "/api/users/password-reset/token/validate/",
   ActionPasswordReset: "/api/users/password-reset/",
   ActionRegistration: "/api/users/register/",
   ActionLogin: "/api/users/token/",
