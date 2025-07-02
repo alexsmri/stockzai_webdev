@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-LOCK_FILE="/tmp/frontend-deploy.lock"
+LOCK_FILE="/tmp/web-deploy.lock"
 trap 'rm -f "$LOCK_FILE"' EXIT
 
 if [ -e "$LOCK_FILE" ]; then
@@ -14,16 +14,16 @@ touch "$LOCK_FILE"
 echo "$(date): Pulling latest code..."
 git pull
 
-echo "$(date): Building new frontend image..."
-docker compose -f docker-compose.prod.yml build frontend
+echo "$(date): Building new backend and frontend images..."
+docker compose -f docker-compose.prod.yml build backend frontend
 
-echo "$(date): Bringing up new frontend container alongside existing..."
-docker compose -f docker-compose.prod.yml up -d --scale frontend=2
+echo "$(date): Running migrations..."
+docker compose -f docker-compose.prod.yml run --rm backend python manage.py migrate
 
-echo "$(date): Waiting for new frontend container to be healthy..."
-sleep 20
+echo "$(date): Collecting static files..."
+docker compose -f docker-compose.prod.yml run --rm backend python manage.py collectstatic --noinput
 
-echo "$(date): Scaling down old frontend container..."
-docker compose -f docker-compose.prod.yml up -d --scale frontend=1
+echo "$(date): Rebuilding and restarting frontend and backend..."
+docker compose -f docker-compose.prod.yml up -d frontend backend
 
 echo "$(date): Deployment complete."
