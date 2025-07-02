@@ -11,7 +11,7 @@ function PAG_Home () {
         <h3 className="look-text-x4">Last month's best predictions</h3>
         <div className="area-flex-row">
         <div className="area-flex-col look-div-container">
-            <p className="look-text-x4">AAPL</p>
+            <p className="look-text-x4">TEST</p>
         </div>
         <div className="area-flex-col look-div-container">
             <p className="look-text-x4">AAPL</p>
