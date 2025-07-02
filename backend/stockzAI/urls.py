@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import error_404_view
+from .views import view_health
 
 app_name = "stockzAI"
 
@@ -11,6 +11,5 @@ urlpatterns = [
     path('api/users/', include('users.api.urls')),
     path('api/companies/', include('companies.api.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('health/', view_health, name="healthcheck"),
 ]
-
-handler404 = "stockzAI.views.error_404_view"

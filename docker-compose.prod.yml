@@ -19,9 +19,19 @@ services:
     ports:
       - "8000:8000"
     env_file: ./backend/.env.prod
+    networks:
+      - default
+      - SA-network
     volumes:
       - static_volume:/backend/static
       - media_volume:/backend/media
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   
   frontend:
     build:
@@ -41,7 +51,7 @@ services:
       - static_volume:/backend/static
       - media_volume:/backend/media
       - frontend_build:/var/www/frontend
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/certbot/conf:/etc/letsencrypt
       - ./nginx/certbot/www:/var/www/certbot
     depends_on:
@@ -60,3 +70,7 @@ volumes:
   static_volume:
   media_volume:
   frontend_build:
+
+networks:
+  SA-network:
+    external: true

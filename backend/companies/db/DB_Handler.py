@@ -11,7 +11,7 @@ class DB_Handler:
 
         def get_db_login():
             login = {}
-            for login_info in ["DB_USERNAME", "DB_PASSWORD", "DB_HOST", "DB_PORT"]:
+            for login_info in ["MYSQL_USERNAME", "MYSQL_PASSWORD", "MYSQL_HOST", "MYSQL_DATABASE"]:
                 value = os.getenv(login_info)
 
                 if not value:
@@ -22,7 +22,7 @@ class DB_Handler:
 
         login_data = get_db_login()
         self.database = database
-        self.engine = create_engine(f'mysql+pymysql://{login_data["DB_USERNAME"]}:{login_data["DB_PASSWORD"]}@{login_data["DB_HOST"]}:{login_data["DB_PORT"]}/{database}')
+        self.engine = create_engine(f'mysql+pymysql://{login_data["MYSQL_USERNAME"]}:{login_data["MYSQL_PASSWORD"]}@{login_data["MYSQL_HOST"]}/{login_data["MYSQL_DATABASE"]}')
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
     
