@@ -11,6 +11,7 @@ logging.basicConfig(format=fmt, level=lvl)
 
 def view_health(request):
     health = False
+    error=None
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")

@@ -17,13 +17,16 @@ git pull
 echo "$(date): Building new backend and frontend images..."
 docker compose -f docker-compose.prod.yml build backend frontend
 
+echo "$(date): Running frontend copy..."
+docker compose -f docker-compose.prod.yml run --rm frontend
+
 echo "$(date): Running migrations..."
 docker compose -f docker-compose.prod.yml run --rm backend python manage.py migrate
 
 echo "$(date): Collecting static files..."
 docker compose -f docker-compose.prod.yml run --rm backend python manage.py collectstatic --noinput
 
-echo "$(date): Rebuilding and restarting frontend and backend..."
-docker compose -f docker-compose.prod.yml up -d frontend backend
+echo "$(date): Rebuilding and restarting nginx and backend..."
+docker compose -f docker-compose.prod.yml up -d backend nginx
 
 echo "$(date): Deployment complete."
