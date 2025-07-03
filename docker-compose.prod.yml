@@ -38,7 +38,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
-    command: cp -r /frontend/dist /output
+    command: /bin/sh -c "rm -rf /output/* && cp -r /frontend/dist/* /output/"
     depends_on:
       - backend
     volumes:
