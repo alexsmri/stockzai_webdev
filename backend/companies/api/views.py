@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from ..db.DB_Handler import DB_Handler
-from rest_framework.response import Response
+from stockzAI.response import api_json_response
 from django.http import Http404
 
 db = DB_Handler("companies")
@@ -19,7 +19,7 @@ class CompanyPageView(APIView):
         if not latest_entries:
             raise Http404("No data found for this symbol.")
         
-        return Response(intel)
+        return api_json_response(msg=intel)
 
 class KPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -31,7 +31,7 @@ class KPIView(APIView):
         
         kpis = db.dbq_get_kpis()
         print(kpis)
-        return Response(kpis)
+        return api_json_response(msg=kpis)
 
 class CompanySearchView(APIView):
     permission_classes = [IsAuthenticated]
@@ -47,4 +47,4 @@ class CompanySearchView(APIView):
             results = db.dbg_get_company_search(query, ["financial_score", "valuation_score", "sector", "sectorRanking"], unique=unique)
         except Exception as e:
             print(type(e))
-        return Response(results)
+        return api_json_response(msg=results)

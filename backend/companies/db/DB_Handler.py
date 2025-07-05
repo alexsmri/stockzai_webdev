@@ -326,7 +326,7 @@ class DB_Handler:
     def dbq_get_company_data(self, ticker):
         company_intel = {}
         latest_entries = {}
-        wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics"]
+        wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics", "ratios", "valuation"]
         
         kpis_df = self.dbu_read("kpi")
         kpis = [(row["id"], row["role"], row["KPI"]) for _, row in kpis_df.iterrows()]
@@ -337,7 +337,7 @@ class DB_Handler:
                 company_kpis_df = self.dbq_get_kpi(ticker, kpi_id, role, limit=None)
 
                 # store each value by date
-                for _, row in company_kpis_df.iterrows():
+                for _, row in company_kpis_df.sort_values("date", ascending=True).iterrows():
                     kpi_dictionary[str(row["date"])] = row["value"]
 
                 # store latest entry (most recent date)

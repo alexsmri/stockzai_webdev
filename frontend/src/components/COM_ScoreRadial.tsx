@@ -1,7 +1,6 @@
-import { getColor, getDashOffset } from "../utils/functions";
+import { getScoreColor, getDashOffset } from "../utils/functions";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { useCompanyStore } from "../context/CTX_CompanyStore";
-import type { CompanyAPIResponse } from "../types/types";
 import { useState } from "react";
 import COM_IconColor from "./COM_IconColor";
 
@@ -20,13 +19,13 @@ function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
 
 function COM_ScoreRadial({ KPI }: ScoreRadialProps) {
   const store = useCompanyStore();
-  const [data, setData] = useState<CompanyAPIResponse | null>(null);
+  const [data, setData] = useState<Record<string, any> | null>(null);
 
   useCompanyStoreSync(store, setData);
 
   if (!data || !data.latest_entries[KPI]) return null;
   const score = data.latest_entries[KPI];
-  const color = getColor(score);
+  const color = getScoreColor(score);
   const offset = getDashOffset(score);
   const text = getScoreText(KPI);
   return (

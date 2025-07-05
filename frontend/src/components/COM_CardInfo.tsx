@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useCompanyStore } from "../context/CTX_CompanyStore";
-import type { CompanyAPIResponse } from "../types/types";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { getKPIText } from "../utils/functions";
 
 export default function COM_CardInfo({ KPI }: { KPI: string }) {
   const store = useCompanyStore();
-  const [data, setData] = useState<CompanyAPIResponse | null>(null);
+  const [data, setData] = useState<Record<string, any> | null>(null);
 
   useCompanyStoreSync(store, setData);
 

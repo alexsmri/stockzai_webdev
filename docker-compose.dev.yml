@@ -1,24 +1,43 @@
+
 services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./backend/.env.dev
+
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    container_name: backend
-    ports: 
-      - '8000:8000'
-    volumes:
-      - ./backend:/app
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    env_file: ./backend/.env.dev
+    networks:
+      - default
+      - SA-network-DEV
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
+  
   frontend:
-    build: 
+    stdin_open: true
+    build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    env_file: ./frontend/.env.dev
+    ports:
+      - 5173:5173
     depends_on:
       - backend
-    container_name: frontend
-    ports:
-      - '5173:5173'
-    stdin_open: true
-    tty: true
-    volumes:
-      - .frontend:/app
+
+networks:
+  SA-network-DEV:
+    external: true

@@ -32,4 +32,4 @@ EXPOSE 8000
 
 RUN chmod +x /backend/entrypoint.prod.sh
 
-CMD ["./backend/entrypoint.prod.sh"]
+CMD ["./entrypoint.prod.sh"]

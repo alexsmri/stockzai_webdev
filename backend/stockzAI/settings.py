@@ -156,10 +156,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'backend' / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "backend" / "static",
-    BASE_DIR / "frontend" / "dist",  # adjust if your build output is somewhere else
-]
+if not DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / "backend" / "static",
+        BASE_DIR / "frontend" / "dist",
+    ]
+else:
+    STATICFILES_DIRS = []
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -1,12 +1,11 @@
 import { useSearchStore } from "../context/CTX_SearchStore";
 import { useSearchStoreSync } from "../hooks/hooks";
-import type { SearchAPIResponse } from "../types/types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function COM_SearchResults() {
   const store = useSearchStore();
-  const [data, setData] = useState<SearchAPIResponse | null>(null);
+  const [data, setData] = useState<Record<string, any> | null>(null);
 
   useSearchStoreSync(store, setData)
   const navigate = useNavigate()

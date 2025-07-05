@@ -1,4 +1,3 @@
-import type { SearchAPIResponse } from "../types/types";
 import { useSearchStore } from "../context/CTX_SearchStore";
 import { useSearchStoreSync } from "../hooks/hooks";
 import { useEffect, useState } from "react";
@@ -13,9 +12,9 @@ export default function COM_ComparisonResults({
   submitIndex,
 }: ComparisonResultsProps) {
   const store = useSearchStore();
-  const [result, setResult] = useState<SearchAPIResponse | null>(null);
-  const [results, setResults] = useState<SearchAPIResponse[]>([]);
-  const [cachedResult, setCachedResult] = useState<SearchAPIResponse | null>(
+  const [result, setResult] = useState<Record<string, any> | null>(null);
+  const [results, setResults] = useState<Record<string, any>[]>([]);
+  const [cachedResult, setCachedResult] = useState<Record<string, any> | null>(
     null
   );
 

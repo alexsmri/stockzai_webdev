@@ -24,16 +24,20 @@ function PAG_Companies() {
             <COM_Navbar />
             <h1 className="look-text-x7">{symbol}</h1>
             <div className="area-flex-col mod-gap-xl mod-padding-xl">
-            <div className="area-flex-row mod-flex-grow-children">
-              <COM_KPILightbox />
-              <COM_SectionInfo title="Scores.">
-                <COM_ScoreRadial KPI="financial_score" />
-                <COM_ScoreRadial KPI="valuation_score" />
+              <div className="area-flex-row mod-flex-grow-children">
+                <COM_KPILightbox />
+                <COM_SectionInfo title="Scores.">
+                  <COM_ScoreRadial KPI="financial_score" />
+                  <COM_ScoreRadial KPI="valuation_score" />
+                </COM_SectionInfo>
+                <COM_SectionInfo title="Basics.">
+                  <COM_TableInfo prTableRole="basics" />
+                </COM_SectionInfo>
+              </div>
+              <COM_SectionInfo title="Ratios.">
+                <COM_TableInfo prTableRole="ratios" />
+                <COM_TableInfo prTableRole="valuation" />
               </COM_SectionInfo>
-              <COM_SectionInfo title="Basics.">
-                <COM_TableInfo prTableRole="basics" />
-              </COM_SectionInfo>
-            </div>
               <COM_SectionInfo title="Financials.">
                 <COM_TableInfo prTableRole="income_statement" />
                 <COM_TableInfo prTableRole="balance_sheet" />

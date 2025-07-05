@@ -1,4 +1,4 @@
-export function getColor(score: number): string {
+export function getScoreColor(score: number): string {
   if (score >= 8) {
     return "#00D26D"; // Green for high scores
   } else if (score >= 5) {
@@ -6,6 +6,35 @@ export function getColor(score: number): string {
   } else {
     return "#EE0034"; // Red for low scores
   }
+}
+export function getChangeColor(utChange: number): string {
+  if (utChange > 0) {
+    return "#00D26D"; // Green for high scores
+  } else if (utChange === 0) {
+    return "#D0D0D0"; // White for medium scores
+  } else {
+    return "#EE0034"; // Red for low scores
+  }
+}
+
+export function formatLargeNumber(number: number): string {
+  const NUMBER_LOOKUP: Record<number, string> = {
+    1000000000000: "T",
+    1000000000: "B",
+    1000000: "M",
+    1000: "k",
+  };
+
+  const key = Object.keys(NUMBER_LOOKUP)
+    .map(Number)
+    .sort((a, b) => b - a) 
+    .find((val) => Math.abs(number) >= val);
+
+  if (key !== undefined) {
+    return `${(number / key).toFixed(1)}${NUMBER_LOOKUP[key]}`;
+  }
+
+  return `${number}`;
 }
 
 export function getDashOffset(score: number): string {
@@ -135,4 +164,16 @@ export function getKPIText(KPI: string) {
 };
 
 return KPI_TITLE_LOOKUP[KPI] || null;
+}
+
+export function getRoleText(role: string) {
+  const ROLE_TITLE_LOOKUP: Record<string, string> = {
+    balance_sheet: "Balance Sheet",
+    income_statement: "Income Statement",
+    cashflow_statement: "Cashflow Statement",
+    ratios: "Financial Ratios",
+    valuation: "Valuation Ratios",
+  }
+  
+return ROLE_TITLE_LOOKUP[role] || null;
 }

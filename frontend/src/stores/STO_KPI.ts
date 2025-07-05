@@ -1,8 +1,8 @@
 import api from "../api"
-import type { KPIAPIResponse } from "../types/types";
+import type { APIResponse } from "../types/types";
 import { BaseAPIStore } from "./STO_Base";
 
-export default class STO_KPI extends BaseAPIStore<KPIAPIResponse>{
+export default class STO_KPI extends BaseAPIStore<APIResponse>{
     constructor() {
         super()
     }
@@ -15,7 +15,7 @@ export default class STO_KPI extends BaseAPIStore<KPIAPIResponse>{
 
     async fetch() {
         const kpis = await api.get(`/api/companies/kpis/`);
-        return kpis.data
+        return kpis.data.msg
 
   };
 }

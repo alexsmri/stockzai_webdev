@@ -2,7 +2,6 @@ import { Line } from "react-chartjs-2";
 import { useCompanyStore } from "../context/CTX_CompanyStore";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { useState } from "react";
-import type { CompanyAPIResponse } from "../types/types";
 import { getKPIText } from "../utils/functions";
 import {
   Chart as ChartJS,
@@ -21,7 +20,7 @@ interface ChartLineProps {
 
 export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const store = useCompanyStore();
-  const [data, setData] = useState<CompanyAPIResponse | null>(null);
+  const [data, setData] = useState<Record<string, any> | null>(null);
   useCompanyStoreSync(store, setData);
   ChartJS.register(
     CategoryScale,

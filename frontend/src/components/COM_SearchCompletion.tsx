@@ -1,6 +1,5 @@
 import { useSearchStoreSync } from "../hooks/hooks";
 import { useSearchStore } from "../context/CTX_SearchStore";
-import type { SearchAPIResponse } from "../types/types";
 import { useState } from "react";
 
 interface SearchCompletionProps {
@@ -9,7 +8,7 @@ interface SearchCompletionProps {
 
 function COM_SearchCompletion({ onSelect }: SearchCompletionProps) {
   const store = useSearchStore();
-  const [data, setData] = useState<SearchAPIResponse | null>(null);
+  const [data, setData] = useState<Record<string, any> | null>(null);
 
   useSearchStoreSync(store, setData);
 

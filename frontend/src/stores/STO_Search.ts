@@ -1,8 +1,8 @@
 import api from "../api"
-import type { SearchAPIResponse } from "../types/types";
+import type { APIResponse } from "../types/types";
 import { BaseAPIStore } from "./STO_Base";
 
-export default class STO_Search extends BaseAPIStore<SearchAPIResponse> {
+export default class STO_Search extends BaseAPIStore<APIResponse> {
 
     private query: string
     private unique?: boolean
@@ -19,7 +19,7 @@ export default class STO_Search extends BaseAPIStore<SearchAPIResponse> {
     }
     async fetch() {
         const company = await api.get(`/api/companies/search/${this.query}/?unique=${this.unique}`);
-        return company.data
+        return company.data.msg
     }
 
   };
