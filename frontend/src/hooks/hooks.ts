@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { CompanyAPIResponse, KPIAPIResponse, SearchAPIResponse } from "../types/types";
+import type { APIResponse } from "../types/types";
 import STO_Companies from "../stores/STO_Companies";
 import STO_KPI from "../stores/STO_KPI";
 import STO_Search from "../stores/STO_Search";
@@ -8,7 +8,7 @@ import type { ValidKeys } from "../stores/STO_Users";
 
 export function useCompanyStoreSync(
     store: STO_Companies, 
-    setData: React.Dispatch<React.SetStateAction<CompanyAPIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
 ) {
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function useCompanyStoreSync(
 
 export function useKPIStoreSync(
     store: STO_KPI, 
-    setData: React.Dispatch<React.SetStateAction<KPIAPIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
 ) {
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function useKPIStoreSync(
 
 export function useSearchStoreSync(
     store: STO_Search, 
-    setData: React.Dispatch<React.SetStateAction<SearchAPIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
 ) {
 
   useEffect(() => {
