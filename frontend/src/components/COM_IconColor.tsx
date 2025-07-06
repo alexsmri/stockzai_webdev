@@ -6,6 +6,7 @@ interface PI_IconColor {
   prPath: string;
   prWidth?: string;
   prHeight?: string;
+  prRotation?: string;
 }
 
 const COM_IconColor = React.memo(function COM_IconColor({
@@ -13,6 +14,7 @@ const COM_IconColor = React.memo(function COM_IconColor({
   prPath,
   prWidth = "20%",
   prHeight = "20%",
+  prRotation = "0"
 }: PI_IconColor) {
   const IconComponent = lazy(() =>
     import(`../assets/media/${prPath}.svg?react`)
@@ -21,9 +23,13 @@ const COM_IconColor = React.memo(function COM_IconColor({
   return (
     <Suspense fallback={null}>
       <IconComponent
-        style={{ color: prColor }}
+        style={{ 
+          color: prColor,
+          transform: `rotate(${prRotation}deg`
+        }}
         width={prWidth}
         height={prHeight}
+        rotate={prRotation}
       />
     </Suspense>
   );

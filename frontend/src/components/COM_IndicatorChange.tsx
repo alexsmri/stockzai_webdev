@@ -52,8 +52,9 @@ function COM_IndicatorChange({ KPI, prShowDiv }: {KPI: string, prShowDiv?: boole
         <COM_IconColor 
           prColor={utColor} 
           prPath={"ICON_Triangle"} 
-          prWidth="1rem" 
-          prHeight="1rem"
+          prWidth="1.2rem" 
+          prHeight="1.2rem"
+          prRotation={utChange < 0 ? "180" : "0"}
         />
       </div>
   )
