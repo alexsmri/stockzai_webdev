@@ -3,7 +3,7 @@ import React from "react";
 
 interface PI_IconColor {
   prColor: string;
-  prPath: string;        // without ".svg"
+  prPath: string;
   prWidth?: string;
   prHeight?: string;
 }
