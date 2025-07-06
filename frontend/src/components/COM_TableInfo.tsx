@@ -43,24 +43,24 @@ export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
           Object.keys(stData.latest_entries).includes(value.KPI)
         )
         .map(([key, value]) => (
-          <div key={key} className="area-flex-row mod-space-between">
+            <>
             {prTableRole !== "basics" ? (
-              <>
-                <p className="look-button-ghost" onClick={() => handleLBOpen(value.KPI)}>
-                  {getKPIText(value.KPI)}
-                </p>
-                <div className="area-flex-col">
-                  <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
+                <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
+                  <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
+                    <p className="look-button-ghost" onClick={() => handleLBOpen(value.KPI)}>
+                      {getKPIText(value.KPI)}
+                    </p>
+                    <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
+                  </div>
                   <COM_IndicatorChange KPI={value.KPI}/>
                 </div>
-            </>
             ) : (
-              <>
+              <div key={key} className="area-flex-row mod-space-between">
                 <p>{getKPIText(value.KPI)}</p>
                 <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
-              </>
+              </div>
             )}
-          </div>
+            </>
         ))}
     </div>
     </div>

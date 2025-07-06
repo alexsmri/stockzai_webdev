@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import React from "react";
 
 interface PI_IconColor {
   prColor: string;
@@ -7,7 +8,7 @@ interface PI_IconColor {
   prHeight?: string;
 }
 
-function COM_IconColor({
+const COM_IconColor = React.memo(function COM_IconColor({
   prColor,
   prPath,
   prWidth = "20%",
@@ -26,6 +27,6 @@ function COM_IconColor({
       />
     </Suspense>
   );
-}
+});
 
 export default COM_IconColor;

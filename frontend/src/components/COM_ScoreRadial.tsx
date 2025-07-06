@@ -2,9 +2,9 @@ import { getScoreColor, getDashOffset } from "../utils/functions";
 import { useCompanyStoreSync } from "../hooks/hooks";
 import { useCompanyStore } from "../context/CTX_CompanyStore";
 import { useState } from "react";
-import COM_IconColor from "./COM_IconColor";
-
-interface ScoreRadialProps {
+import COM_IndicatorChange from "./COM_IndicatorChange";
+import { useLightbox } from "../context/CTX_Lightbox";
+interface PI_ScoreRadial {
   KPI: "financial_score" | "valuation_score"; // Optional type for the score
 }
 
@@ -17,11 +17,12 @@ function getScoreText(scoreKPI: "financial_score" | "valuation_score"): string {
   }
 }
 
-function COM_ScoreRadial({ KPI }: ScoreRadialProps) {
+function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
   const store = useCompanyStore();
   const [data, setData] = useState<Record<string, any> | null>(null);
 
   useCompanyStoreSync(store, setData);
+  const { handleLBOpen } = useLightbox();
 
   if (!data || !data.latest_entries[KPI]) return null;
   const score = data.latest_entries[KPI];
@@ -63,20 +64,18 @@ function COM_ScoreRadial({ KPI }: ScoreRadialProps) {
       ></circle>
 
       <text
-        className="text-[10px] cursor-pointer"
+        className="mod-cursor-pointer"
         x="50%"
         y="53%"
         textAnchor="middle"
+        onClick={() => handleLBOpen(KPI)}
       >
         {text}
       </text>
 
       
     </svg>
-    <div className="area-flex-wrap">
-    <COM_IconColor prColor={color} prPath={"ICON_Triangle"} prWidth="34%" prHeight="34%"/>
-    <p>3%</p>
-    </div>
+    <COM_IndicatorChange KPI={KPI} />
     </div>
     </>
   );

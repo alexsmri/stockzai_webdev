@@ -26,7 +26,7 @@ function PAG_Companies() {
             <div className="area-flex-col mod-gap-xl mod-padding-xl">
               <div className="area-flex-row mod-flex-grow-children">
                 <COM_KPILightbox />
-                <COM_SectionInfo title="Scores.">
+                <COM_SectionInfo title="Scores." prShowChange={true}>
                   <COM_ScoreRadial KPI="financial_score" />
                   <COM_ScoreRadial KPI="valuation_score" />
                 </COM_SectionInfo>

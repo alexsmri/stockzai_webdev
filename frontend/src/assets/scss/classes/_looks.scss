@@ -28,6 +28,33 @@
     }
 }
 
+.look-div-success {
+    @include u.look-glass($color: rgba(0, 210, 109));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
+    color: rgba(0, 210, 109, 0.9);
+}
+
+.look-div-neutral {
+    @include u.look-glass($color: rgba(200, 200, 200));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
+    color: rgba(200, 200, 200, 0.9);
+}
+
+.look-div-failure {
+    @include u.look-glass($color: rgba(238, 0, 52));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
+    color: rgba(238, 0, 52, 0.9);
+}
+
 .look-div-container {
   @include u.look-container();
 }

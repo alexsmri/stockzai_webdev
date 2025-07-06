@@ -39,6 +39,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     command: /bin/sh -c "rm -rf /output/* && cp -r /frontend/dist/* /output/"
+    env_file: ./frontend/.env.prod
     depends_on:
       - backend
     volumes:
