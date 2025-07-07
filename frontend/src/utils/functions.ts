@@ -43,7 +43,7 @@ export function formatLargeNumber(number: number): string {
     return `${(number / key).toFixed(1)}${NUMBER_LOOKUP[key]}`;
   }
 
-  return `${number}`;
+  return `${Math.round(number * 1000) / 1000}`;
 }
 
 export function getDashOffset(score: number): string {

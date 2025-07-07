@@ -12,21 +12,21 @@ export default function COM_ComparisonResults({
   submitIndex,
 }: ComparisonResultsProps) {
   const store = useSearchStore();
-  const [result, setResult] = useState<Record<string, any> | null>(null);
+  const [resultData, setResultData] = useState<Record<string, any> | null>(null);
   const [results, setResults] = useState<Record<string, any>[]>([]);
   const [cachedResult, setCachedResult] = useState<Record<string, any> | null>(
     null
   );
 
   useEffect(() => {
-    if (result) {
+    if (resultData && resultData.results) {
       setResults((prev) => {
-        const symbol = Object.keys(result)[0];
+        const symbol = Object.keys(resultData.results)[0];
         if (prev.some((r) => Object.keys(r)[0] === symbol)) return prev;
-        return [...prev, result];
+        return [...prev, resultData.results];
       });
     }
-  }, [result]);
+  }, [resultData]);
 
   useEffect(() => {
     if (cachedResult && Object.keys(cachedResult)[0] === submittedQuery)
@@ -43,7 +43,7 @@ export default function COM_ComparisonResults({
     setResults((prev) => prev.filter((r) => !r.hasOwnProperty(symbol)));
   };
 
-  useSearchStoreSync(store, setResult);
+  useSearchStoreSync(store, setResultData);
 
   return (
     <>
