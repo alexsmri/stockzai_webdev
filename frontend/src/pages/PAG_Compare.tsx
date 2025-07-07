@@ -12,6 +12,7 @@ export default function PAG_Compare() {
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [submitIndex, setSubmitIndex] = useState<number>(0);
+  const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?]
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -29,9 +30,9 @@ export default function PAG_Compare() {
             submit={false}
             handleChange={handleChange}
           ></COM_SearchBar>
-          {input.length > 2 && showCompletions && (
+          {input && showCompletions && (
             <div className="look-div-completion mod-z-1">
-              <PRV_SearchStore args={[input]}>
+              <PRV_SearchStore args={utStoreArgs}>
                 <COM_SearchCompletion
                   onSelect={(val) => {
                     setSubmittedQuery(val);
@@ -39,6 +40,7 @@ export default function PAG_Compare() {
                     setShowResults(true);
                     setSubmitIndex((prev) => prev + 1);
                   }}
+                  prQuery={input}
                 />
               </PRV_SearchStore>
             </div>

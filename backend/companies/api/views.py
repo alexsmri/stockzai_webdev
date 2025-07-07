@@ -47,4 +47,4 @@ class CompanySearchView(APIView):
             results = db.dbg_get_company_search(query, ["financial_score", "valuation_score", "sector", "sectorRanking"], unique=unique)
         except Exception as e:
             print(type(e))
-        return api_json_response(msg=results)
+        return api_json_response(msg={"query": query, "results": results})

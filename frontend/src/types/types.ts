@@ -1,1 +1,1 @@
-export type APIResponse = Record<string, Record<"msg" | "error", any>>
+export type APIResponse = Record<"msg" | "error", Record<any, any>>

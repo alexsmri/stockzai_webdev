@@ -31,17 +31,13 @@ function COM_ProtectedRoute(props: ProtectedRouteProps) {
     })();
     }, [tokens]);
 
-    console.log(tokens)
-
     const refreshToken = async () => {
         if (tokens) {
             const refreshToken = tokens["refresh"];
-            console.log(`Refresh: ${refreshToken}`)
             try {
             const refreshed = await utStore.post("ActionRefreshToken", {
                 refresh: refreshToken
             });
-            console.log(`refreshed: ${refreshed}`)
             if (refreshed 
                 && utStore.read("ActionRefreshToken") 
                 && utStore.read("ActionRefreshToken")["access"]
@@ -58,11 +54,9 @@ function COM_ProtectedRoute(props: ProtectedRouteProps) {
                 setIsAuthorized(false);
             }
         } catch (error) {
-            console.log(`Error refreshing: ${error}`)
             setIsAuthorized(false);
         }
         } else {
-            console.log("No tokens")
             setIsAuthorized(false)
             return
         }
@@ -79,7 +73,6 @@ function COM_ProtectedRoute(props: ProtectedRouteProps) {
 
             const now = Date.now() / 1000;
             if (typeof tokenExpiration === "number" && tokenExpiration < now) {
-            console.log("Token Expired")
             await refreshToken();
             } else {
                 const tokenValid = await utStore.post("TokenLoginValidation", { token: tokens["access"]})
@@ -87,7 +80,6 @@ function COM_ProtectedRoute(props: ProtectedRouteProps) {
                     setIsAuthorized(true);
                 } else {
                     setIsAuthorized(false);
-                    console.log("Token Invalid")
                 }
             }
         }

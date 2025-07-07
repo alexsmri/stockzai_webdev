@@ -2,6 +2,7 @@ import { useSearchStore } from "../context/CTX_SearchStore";
 import { useSearchStoreSync } from "../hooks/hooks";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { VAI_SearchData } from "../types/interfaces";
 
 function COM_SearchResults() {
   const store = useSearchStore();
@@ -9,11 +10,11 @@ function COM_SearchResults() {
 
   useSearchStoreSync(store, setData)
   const navigate = useNavigate()
-
+  const safeData = data as VAI_SearchData
   return (
     <>
     <div className="area-grid-auto mod-gap-xl mod-margin-xl">
-     {data && Object.entries(data).map(([symbol, value]) => (
+     {safeData?.results && Object.entries(safeData.results).map(([symbol, value]) => (
         <div key={symbol} 
               className="area-flex-col look-div-container hover-scale mod-align-left mod-padding-l"
               onClick={() => {navigate(`/companies/page/${symbol}`)}}

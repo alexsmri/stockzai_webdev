@@ -14,7 +14,7 @@ export default function PAG_Search() {
   const [input, setInput] = useState<string>("");
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
-
+  const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?]
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.length > 1) {
@@ -28,8 +28,6 @@ export default function PAG_Search() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
     setShowCompletions(true);
-    console.log(input);
-    console.log(showCompletions);
   };
 
   return (
@@ -44,13 +42,14 @@ export default function PAG_Search() {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
         ></COM_SearchBar>
-        {input.length > 2 && showCompletions && (
+        {input && showCompletions && (
           <div className="look-div-completion mod-z-1">
-          <PRV_SearchStore args={[input]}>
+            <PRV_SearchStore args={utStoreArgs}>
             <COM_SearchCompletion
               onSelect={(val) => {
                 navigate(`/companies/page/${val}`);
               }}
+              prQuery={input}
             />
           </PRV_SearchStore>
           </div>

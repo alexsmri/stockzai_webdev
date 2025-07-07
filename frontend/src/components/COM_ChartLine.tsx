@@ -45,7 +45,6 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   });
 
   const dataValues = Object.values(KPIData);
-  console.log(KPIData);
   const chartData = {
     labels,
     datasets: [{ label: `${text}`, data: dataValues, borderColor: "white" }],
