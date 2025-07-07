@@ -57,7 +57,7 @@ export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
             ) : (
               <div key={key} className="area-flex-row mod-space-between">
                 <p>{getKPIText(value.KPI)}</p>
-                <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
+                <p>{stData.latest_entries[value.KPI]}</p>
               </div>
             )}
             </>

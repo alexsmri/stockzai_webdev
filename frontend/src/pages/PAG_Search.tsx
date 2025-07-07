@@ -17,7 +17,7 @@ export default function PAG_Search() {
   const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?]
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.length > 1) {
+    if (input.length > 0) {
       setShowResults(false);
       setSubmittedQuery(input);
       setShowCompletions(false);

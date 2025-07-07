@@ -357,7 +357,8 @@ class DB_Handler:
         if not unique:
             sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
                         "FROM basics b "
-                        "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request);")
+                        "WHERE (b.KPI = 90) AND (b.SYMBOL LIKE :request OR b.value LIKE :request)"
+                        "LIMIT 20;")
             results_raw = self.dbu_read_execute(sql_query, params={"request": f"%{search_request}%"})
         else:
             sql_query = ("SELECT b.value AS company_name, b.SYMBOL AS company_ticker "
