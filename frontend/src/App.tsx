@@ -60,7 +60,14 @@ function App() {
               </COM_ProtectedRoute>
             } 
           />
-          <Route path="/companies/search/" element={<PAG_Search />} />
+          <Route 
+            path="/companies/search/" 
+            element={
+              <COM_ProtectedRoute>
+                <PAG_Search />
+              </COM_ProtectedRoute>
+              } 
+          />
           <Route
             path="/companies/page/:symbol"
             element={
