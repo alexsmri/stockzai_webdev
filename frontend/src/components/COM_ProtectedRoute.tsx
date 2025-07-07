@@ -42,8 +42,17 @@ function COM_ProtectedRoute(props: ProtectedRouteProps) {
                 refresh: refreshToken
             });
             console.log(`refreshed: ${refreshed}`)
-            if (refreshed & utStore.read("ActionRefreshToken")) {
-                utStore.update("ActionLogin", {refresh: refreshToken, access: utStore.read("ActionRefreshToken")})
+            if (refreshed 
+                && utStore.read("ActionRefreshToken") 
+                && utStore.read("ActionRefreshToken")["access"]
+            ) {
+                utStore.update(
+                    "ActionLogin", 
+                    {
+                        refresh: refreshToken, 
+                        access: utStore.read("ActionRefreshToken")["access"]
+                    }
+                )
                 setIsAuthorized(true);
             } else {
                 setIsAuthorized(false);

@@ -7,7 +7,7 @@ export default function PAG_VericationRequest() {
     const credentials = utStore.read("PropertyCredentials");
   
     useEffect(() => {
-      if (credentials["email"]) {
+      if (credentials && credentials["email"]) {
         utStore.post("TokenPasswordResetRequest", { email: credentials["email"] });
       }
     }, [credentials]);
