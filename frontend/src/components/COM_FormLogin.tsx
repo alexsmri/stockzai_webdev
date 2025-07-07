@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useUserStore } from "../context/CTX_UserStore";
 import { useUserStoreSync } from "../hooks/hooks";
 import { useEffect } from "react";
