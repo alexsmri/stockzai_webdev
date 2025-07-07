@@ -11,6 +11,7 @@ const ROUTE_CONFIG = {
   ActionRegistration: "/api/users/register/",
   ActionLogin: "/api/users/token/",
   ActionRefreshToken: "/api/users/token/refresh/",
+  TokenLoginValidation: "/api/users/token/validate/",
 } as const;
 
 const PERSISTED_KEYS: ValidKeys[] = [
@@ -71,15 +72,18 @@ export default class STO_Users extends STO_Base {
             const value = await api.post(this.routes[key], postData)
             if (value instanceof Object) {
                 this.data[key] = value.data.msg
+                console.log(key, value)
                 this.persist(key)
                 this.status[key] = "success"
                 return true
             } else {
                 this.status[key] = "error"
+                console.log(key, value)
                 return false
             }
         } catch (error) {
             this.error[key] = error;
+            console.log(key, error)
             this.status[key] = "error";
             return false
         } finally {

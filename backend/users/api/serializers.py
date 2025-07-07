@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.conf import settings
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer as JWTRefreshSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenVerifySerializer as JWTVerifySerializer, TokenRefreshSerializer as JWTRefreshSerializer
 
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
@@ -22,32 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         user.is_active = False
         user.save()
-        
-        base_url = settings.FRONTEND_URL
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = verification_token.make_token(user)
-
-        link = f"{base_url}/?uid={uid}/?token={token}"
-        context = {
-            'link': link,
-            'email_adress': user.email,
-        }
-
-        html_message = render_to_string("email_verification.html", context=context)
-        plain_message = strip_tags(html_message)
-
-        msg = EmailMultiAlternatives(
-            subject = "Verify your registration",
-            body = plain_message,
-            from_email = "alex@stockz.ai",
-            to=[user.email]
-        )
-
-        msg.attach_alternative(html_message, "text/html")
-        try:
-            msg.send()
-        except Exception as e:
-            print("Email sending failed", e)
         return user
 
 class TokenLoginSerializer(TokenObtainPairSerializer):
@@ -73,5 +47,9 @@ class TokenRefreshSerializer(JWTRefreshSerializer):
         data.update({
             "msg": "Token Refreshed",
         })
-        print(data)
         return data
+
+class TokenVerifySerializer(JWTVerifySerializer):
+    def validate(self, attrs):
+        super().validate(attrs)
+        return {"msg": "Token Verified."}

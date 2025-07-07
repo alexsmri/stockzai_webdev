@@ -326,7 +326,7 @@ class DB_Handler:
     def dbq_get_company_data(self, ticker):
         company_intel = {}
         latest_entries = {}
-        wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics", "ratios", "valuation"]
+        wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics", "ratios", "valuation", "statistics"]
         
         kpis_df = self.dbu_read("kpi")
         kpis = [(row["id"], row["role"], row["KPI"]) for _, row in kpis_df.iterrows()]

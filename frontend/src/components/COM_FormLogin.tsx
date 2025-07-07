@@ -18,10 +18,7 @@ function COM_FormLogin() {
   useUserStoreSync(utStore, "ActionLogin", setTokens)
 
   useEffect(() => {
-    console.log(tokens)
     if (tokens && tokens["access"] && tokens["refresh"]) {
-    localStorage.setItem(ACCESS_TOKEN, tokens.access);
-    localStorage.setItem(REFRESH_TOKEN, tokens.refresh);
     utStore.get("PropertyCredentials");
     navigate("/");
     }

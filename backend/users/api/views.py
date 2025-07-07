@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from users.models import User, TokenVerification, TokenPasswordReset
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
-from .serializers import UserSerializer, TokenLoginSerializer, TokenRefreshSerializer
+from .serializers import UserSerializer, TokenLoginSerializer, TokenRefreshSerializer, TokenVerifySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -49,7 +49,18 @@ class RefreshTokenView(TokenRefreshView):
             "access": serializer.validated_data["access"],
             }
         return api_json_response(msg=msg)
-    
+
+class VerifyTokenView(TokenVerifyView):
+    serializer_class = TokenVerifySerializer
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return api_json_response(error="Credentials Invalid.", status=400)
+        msg="Credentials valid."
+        return api_json_response(msg=msg)
 
 @csrf_exempt
 def view_verification_token(request):
