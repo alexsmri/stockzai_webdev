@@ -20,7 +20,7 @@ export default function COM_Navbar() {
                 <a href="/companies/compare/" className="look-button-ghost">Compare</a>
                 {loggedIn ?
                 <>
-                    <a href="" className="look-button-ghost">Profile</a>
+                    <a href="/users/edit" className="look-button-ghost">Profile</a>
                 </>
                 : <>
                     <a href="/users/login/" className="look-button-ghost">Log In</a>

@@ -110,8 +110,6 @@ def view_verify(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def view_password_reset_token(request):
-    if request.method != "POST":
-        return api_json_response(error="Only POST requests allowed", status=400)
     try:
         body = json.loads(request.body)
         email = body.get("email")
@@ -133,8 +131,6 @@ def view_password_reset_token(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def view_validate_password_reset_token(request):
-    if request.method != "POST":
-        return api_json_response(error="Only POST requests allowed", status=400)
     try:
         body = json.loads(request.body)
         token = body.get("token")
@@ -157,8 +153,6 @@ def view_validate_password_reset_token(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def view_reset_password(request):
-    if request.method != "POST":
-        return api_json_response(error="Only POST requests allowed", status=400)
     try:
         body = json.loads(request.body)
         token = body.get("token")
@@ -181,22 +175,27 @@ def view_reset_password(request):
             return api_json_response(msg=True)
     
     except Exception as e:
-        traceback.print_exc()
         return api_json_response(error="Something went wrong", status=400)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def view_credentials(request):
-    if request.method != "GET":
-        return api_json_response(error="Only GET requests allowed", status=400)
-    
     user = request.user
     msg = {
-        "uid": user.pk,
         "email": user.email,
         "username": user.username,
-        "is_active": user.is_active,
-        "is_staff": user.is_staff,
-        "is_superuser": user.is_superuser
     }
     return api_json_response(msg=msg)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def view_edit_profile(request):
+    try:
+        body = json.loads(request.body)
+        user = request.user
+        new_username = body.get("username")
+        user.username = new_username
+        user.save()
+        return api_json_response(msg=True)
+    except Exception as e:
+        return api_json_response(error="Something went wrong", status=400)

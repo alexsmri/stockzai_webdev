@@ -1,13 +1,13 @@
 import { createContext, useContext, useState } from "react";
 
-interface LightboxContextType {
+interface ITF_LightboxContext {
   stIsOpen: boolean;
   handleLBOpen: (KPI: string) => void;
   handleClose: () => void;
   stSelectedKPI: string | null;
 }
 
-const LightboxContext = createContext<LightboxContextType | undefined>(
+const CTX_Lightbox = createContext<ITF_LightboxContext | undefined>(
   undefined
 );
 
@@ -30,7 +30,7 @@ export const PRV_Lightbox = ({
   };
 
   return (
-    <LightboxContext.Provider
+    <CTX_Lightbox.Provider
       value={{
         stIsOpen,
         handleLBOpen,
@@ -39,12 +39,12 @@ export const PRV_Lightbox = ({
       }}
     >
       {children}
-    </LightboxContext.Provider>
+    </CTX_Lightbox.Provider>
   );
 };
 
 export const useLightbox = () => {
-  const ctx = useContext(LightboxContext);
-  if (!ctx) throw new Error("useLightbox must be used inside LightboxProvider");
+  const ctx = useContext(CTX_Lightbox);
+  if (!ctx) throw new Error("useLightbox must be used inside PRV_Lightbox");
   return ctx;
 };

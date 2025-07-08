@@ -29,7 +29,7 @@
 }
 
 .look-div-success {
-    @include u.look-glass($color: rgba(0, 210, 109));
+    @include u.look-container($body-color: rgba(0, 210, 109));
     padding-top: u.scale-padding(0.8);
     padding-bottom: u.scale-padding(0.8);
     padding-left: u.scale-padding(1);
@@ -38,7 +38,7 @@
 }
 
 .look-div-neutral {
-    @include u.look-glass($color: rgba(200, 200, 200));
+    @include u.look-container($body-color: rgba(200, 200, 200));
     padding-top: u.scale-padding(0.8);
     padding-bottom: u.scale-padding(0.8);
     padding-left: u.scale-padding(1);
@@ -47,7 +47,7 @@
 }
 
 .look-div-failure {
-    @include u.look-glass($color: rgba(238, 0, 52));
+    @include u.look-container($body-color: rgba(238, 0, 52));
     padding-top: u.scale-padding(0.8);
     padding-bottom: u.scale-padding(0.8);
     padding-left: u.scale-padding(1);
@@ -61,6 +61,30 @@
 
 .look-div-completion {
   top: 100%;
+}
+
+.look-alert-success {
+    @include u.look-alert($color: rgba(0, 210, 109));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
+}
+
+.look-alert-neutral {
+    @include u.look-alert($color: rgba(200, 200, 200));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
+}
+
+.look-alert-failure {
+    @include u.look-alert($color: rgba(238, 0, 52));
+    padding-top: u.scale-padding(0.8);
+    padding-bottom: u.scale-padding(0.8);
+    padding-left: u.scale-padding(1);
+    padding-right: u.scale-padding(1);
 }
 .look-text-x7 {
   font-size: u.scale_font(6);

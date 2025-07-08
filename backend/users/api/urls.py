@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterUserView, LoginUserView, RefreshTokenView, VerifyTokenView, view_password_reset_token, view_reset_password, view_verify, view_verification_token, view_validate_password_reset_token, view_credentials
+from .views import RegisterUserView, LoginUserView, RefreshTokenView, VerifyTokenView, view_password_reset_token, view_reset_password, view_verify, view_verification_token, view_validate_password_reset_token, view_credentials, view_edit_profile
 from django.urls import include
 
 app_name = "users_api"
@@ -15,4 +15,5 @@ urlpatterns = [
     path('verification/', view_verify, name="verification"),
     path('verification/token/', view_verification_token, name="verification_token"),
     path('credentials/', view_credentials, name="credentials"),
+    path('edit/', view_edit_profile, name="edit"),
 ]

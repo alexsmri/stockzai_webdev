@@ -12,6 +12,7 @@ const ROUTE_CONFIG = {
   ActionLogin: "/api/users/token/",
   ActionRefreshToken: "/api/users/token/refresh/",
   TokenLoginValidation: "/api/users/token/validate/",
+  ActionEditProfile: "api/users/edit/"
 } as const;
 
 const PERSISTED_KEYS: ValidKeys[] = [
@@ -92,7 +93,9 @@ export default class STO_Users extends STO_Base {
         return this.data[key];
     }
     update(key: ValidKeys, updateData: Record<any, any>): any {
-        this.data[key] = updateData;
+        Object.keys(updateData).forEach((dataKey) => {
+            this.data[key][dataKey] = updateData[dataKey];
+        })
         this.persist(key);
         this.notify(key);
     }

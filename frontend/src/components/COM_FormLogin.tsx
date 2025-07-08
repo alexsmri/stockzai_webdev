@@ -47,14 +47,14 @@ function COM_FormLogin() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="look-input-primary"
+            className="look-input-secondary"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="look-input-primary"
+            className="look-input-secondary"
           />
           <button className="look-button-primary">{name}</button>
         </form>

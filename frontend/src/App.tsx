@@ -12,6 +12,7 @@ import PAG_VericationRequest from "./pages/PAG_VerificationRequest";
 import PA_PasswordResetRequest from "./pages/PAG_PasswordResetRequest";
 import PAG_PasswordReset from "./pages/PAG_PasswordReset";
 import COM_Loading from "./components/COM_Loading";
+import PAG_EditProfile from "./pages/PAG_EditProfile";
 
 function Logout() {
   localStorage.clear();
@@ -49,6 +50,14 @@ function App() {
             element={
               <COM_ProtectedRoute>
                 <PA_PasswordResetRequest />
+              </COM_ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/users/edit" 
+            element={
+              <COM_ProtectedRoute>
+                <PAG_EditProfile />
               </COM_ProtectedRoute>
             } 
           />

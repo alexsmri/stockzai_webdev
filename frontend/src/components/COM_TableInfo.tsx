@@ -9,11 +9,11 @@ import { getRoleText } from "../utils/functions";
 import { useLightbox } from "../context/CTX_Lightbox";
 import COM_IndicatorChange from "./COM_IndicatorChange";
 
-interface PI_TableInfo {
+interface ITF_TableInfoProps {
   prTableRole: "income_statement" | "balance_sheet" | "cashflow_statement" | "basics" | "ratios" | "valuation";
 }
 
-export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
+export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
   const utCompanyStore = useCompanyStore();
   const utKpiStore = useKPIStore();
   const utText = getRoleText(prTableRole)
@@ -23,7 +23,7 @@ export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKpiStore, setStKPIs);
 
-  const { handleLBOpen: handleLBOpen } = useLightbox();
+  const { handleLBOpen } = useLightbox();
 
   if (!stData || !stData.latest_entries || !stKPIs) return null;
   const table_entries = Object.entries(stKPIs)
@@ -44,6 +44,8 @@ export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
         )
         .map(([key, value]) => (
             <>
+            {stData.latest_entries[value.KPI] &&
+            <>
             {prTableRole !== "basics" ? (
                 <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
                   <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
@@ -60,6 +62,8 @@ export default function COM_TableInfo({ prTableRole }: PI_TableInfo) {
                 <p>{stData.latest_entries[value.KPI]}</p>
               </div>
             )}
+            </>
+            }
             </>
         ))}
     </div>

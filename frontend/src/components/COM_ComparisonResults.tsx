@@ -2,7 +2,7 @@ import { useSearchStore } from "../context/CTX_SearchStore";
 import { useSearchStoreSync } from "../hooks/hooks";
 import { useEffect, useState } from "react";
 
-interface ComparisonResultsProps {
+interface PRI_ComparisonResults {
   submittedQuery: string;
   submitIndex: number;
 }
@@ -10,7 +10,7 @@ interface ComparisonResultsProps {
 export default function COM_ComparisonResults({
   submittedQuery,
   submitIndex,
-}: ComparisonResultsProps) {
+}: PRI_ComparisonResults) {
   const store = useSearchStore();
   const [resultData, setResultData] = useState<Record<string, any> | null>(null);
   const [results, setResults] = useState<Record<string, any>[]>([]);

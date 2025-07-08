@@ -186,3 +186,7 @@ export function getRoleText(role: string) {
   
 return ROLE_TITLE_LOOKUP[role] || null;
 }
+
+export function sleep(milliseconds: number) {
+return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
