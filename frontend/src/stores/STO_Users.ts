@@ -12,7 +12,7 @@ const ROUTE_CONFIG = {
   ActionLogin: "/api/users/token/",
   ActionRefreshToken: "/api/users/token/refresh/",
   TokenLoginValidation: "/api/users/token/validate/",
-  ActionEditProfile: "api/users/edit/"
+  ActionEditProfile: "/api/users/edit/"
 } as const;
 
 const PERSISTED_KEYS: ValidKeys[] = [
