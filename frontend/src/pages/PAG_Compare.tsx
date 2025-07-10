@@ -1,18 +1,19 @@
-import { PRV_SearchStore } from "../context/CTX_SearchStore";
-import { useState } from "react";
-import COM_SearchBar from "../components/COM_SearchBar";
-import COM_ComparisonResults from "../components/COM_ComparisonResults";
-import COM_SearchCompletion from "../components/COM_SearchCompletion";
-import COM_Hero from "../components/COM_Hero";
-import COM_Navbar from "../components/COM_Navbar";
+import { PRV_SearchStore } from '../context/CTX_SearchStore';
+import { useState } from 'react';
+import COM_SearchBar from '../components/COM_SearchBar';
+import COM_ComparisonResults from '../components/COM_ComparisonResults';
+import COM_SearchCompletion from '../components/COM_SearchCompletion';
+import COM_Hero from '../components/COM_Hero';
+import COM_Navbar from '../components/COM_Navbar';
+import COM_Footer from '../components/COM_Footer';
 
 export default function PAG_Compare() {
-  const [submittedQuery, setSubmittedQuery] = useState<string | "">("");
-  const [input, setInput] = useState<string>("");
+  const [submittedQuery, setSubmittedQuery] = useState<string | ''>('');
+  const [input, setInput] = useState<string>('');
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [submitIndex, setSubmitIndex] = useState<number>(0);
-  const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?]
+  const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -21,12 +22,12 @@ export default function PAG_Compare() {
 
   return (
     <>
-     <COM_Navbar />
+      <COM_Navbar />
       <COM_Hero>
-          <h1 className="look-text-x7">Compare Tickers</h1>
+        <h1 className="look-text-x7">Compare Tickers</h1>
         <div className="area-flex-col mod-postion-relative">
           <COM_SearchBar
-            input={input ?? ""}
+            input={input ?? ''}
             submit={false}
             handleChange={handleChange}
           ></COM_SearchBar>
@@ -59,13 +60,11 @@ export default function PAG_Compare() {
         </div>
         {showResults && (
           <PRV_SearchStore args={[submittedQuery, true]}>
-            <COM_ComparisonResults
-              submittedQuery={submittedQuery}
-              submitIndex={submitIndex}
-            />
+            <COM_ComparisonResults submittedQuery={submittedQuery} submitIndex={submitIndex} />
           </PRV_SearchStore>
         )}
       </div>
+      <COM_Footer />
     </>
   );
 }

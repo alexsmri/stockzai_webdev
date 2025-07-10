@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import COM_Navbar from '../components/COM_Navbar';
+import COM_Footer from '../components/COM_Footer';
 
 export default function PAG_Verication() {
   const [searchParams] = useSearchParams();
@@ -37,6 +38,7 @@ export default function PAG_Verication() {
     <>
       <COM_Navbar />
       <div className="look-text-x4">{message}</div>
+      <COM_Footer />
     </>
   );
 }

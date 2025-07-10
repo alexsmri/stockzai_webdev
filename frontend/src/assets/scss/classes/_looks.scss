@@ -20,10 +20,21 @@
     cursor: pointer;
 }
 .look-button-ghost {
+    color: var(--color-wa80);
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      color: var(--color-wa80);
+      color: var(--color-white);
+      transition: all 0.2s ease-in-out;
+    }
+}
+.look-button-subtle {
+    font-size: u.scale-font(-1);
+    color: var(--color-wa40);
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      color: var(--color-wa60);
       transition: all 0.2s ease-in-out;
     }
 }

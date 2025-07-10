@@ -1,13 +1,14 @@
-import { useParams } from "react-router-dom";
-import COM_SectionInfo from "../components/COM_SectionInfo";
-import COM_ScoreRadial from "../components/COM_ScoreRadial";
-import COM_Navbar from "../components/COM_Navbar";
-import { PRV_CompanyStore } from "../context/CTX_CompanyStore";
-import { PRV_KPIStore } from "../context/CTX_KPIStore";
-import NotFound from "./PAG_404";
-import COM_KPILightbox from "../components/COM_LightboxKPI";
-import COM_TableInfo from "../components/COM_TableInfo";
-import { PRV_Lightbox } from "../context/CTX_Lightbox";
+import { useParams } from 'react-router-dom';
+import COM_SectionInfo from '../components/COM_SectionInfo';
+import COM_ScoreRadial from '../components/COM_ScoreRadial';
+import COM_Navbar from '../components/COM_Navbar';
+import { PRV_CompanyStore } from '../context/CTX_CompanyStore';
+import { PRV_KPIStore } from '../context/CTX_KPIStore';
+import NotFound from './PAG_404';
+import COM_KPILightbox from '../components/COM_LightboxKPI';
+import COM_TableInfo from '../components/COM_TableInfo';
+import { PRV_Lightbox } from '../context/CTX_Lightbox';
+import COM_Footer from '../components/COM_Footer';
 
 function PAG_Companies() {
   const { symbol } = useParams<{ symbol: string }>();
@@ -44,6 +45,7 @@ function PAG_Companies() {
                 <COM_TableInfo prTableRole="cashflow_statement" />
               </COM_SectionInfo>
             </div>
+            <COM_Footer />
           </PRV_CompanyStore>
         </PRV_KPIStore>
       </PRV_Lightbox>

@@ -77,7 +77,13 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
     </div>
   );
   return (
-    <>{prShowDiv ? <div className={getChangeDivClass(utChange)}>{utChildren}</div> : utChildren}</>
+    <>
+      {prShowDiv ? (
+        <div className={getChangeDivClass(utChange * utKPIScoring)}>{utChildren}</div>
+      ) : (
+        utChildren
+      )}
+    </>
   );
 }
 
