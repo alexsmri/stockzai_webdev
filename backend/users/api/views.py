@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from users.models import User, TokenVerification, TokenPasswordReset
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 from .serializers import UserSerializer, TokenLoginSerializer, TokenRefreshSerializer, TokenVerifySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
@@ -18,6 +19,18 @@ class RegisterUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return api_json_response(msg=serializer.data, status=200)
+        except ValidationError as e:
+            error = ""
+            for _, errs in e.detail.items():
+                for err in errs:
+                    error += f"{str(err)} "
+            return api_json_response(error=error, status=200)
 
 class LoginUserView(TokenObtainPairView):
     serializer_class = TokenLoginSerializer
@@ -28,7 +41,7 @@ class LoginUserView(TokenObtainPairView):
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
-            return api_json_response(error="Credentials Invalid.", status=400)
+            return api_json_response(error="Credentials Invalid.", status=200)
         msg={
             "access": serializer.validated_data["access"],
             "refresh": serializer.validated_data["refresh"],
@@ -104,11 +117,10 @@ def view_verify(request):
             return api_json_response(msg=True)
     
     except Exception as e:
-        print(e)
         return api_json_response(error="Something went wrong", status=400)
     
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def view_password_reset_token(request):
     try:
         body = json.loads(request.body)
@@ -117,19 +129,15 @@ def view_password_reset_token(request):
         if user:
             token = password_reset_token.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            print("A")
             TokenPasswordReset.objects.filter(user=user).delete()
-            print("B")
             token_obj = TokenPasswordReset(user=user, token=token, uid=uid)
-            print("token_obj.uid type:", type(token_obj.uid))
             token_obj.save()
             return api_json_response(msg=True)
     except Exception as e:
-        traceback.print_exc()
         return api_json_response(error="Something went wrong", status=400)
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def view_validate_password_reset_token(request):
     try:
         body = json.loads(request.body)
@@ -147,11 +155,10 @@ def view_validate_password_reset_token(request):
             return api_json_response(msg=True)
         
     except Exception as e:
-        traceback.print_exc()
-        return api_json_response(error="Something went wrong", status=400)
+        return api_json_response(msg=False, error="Something went wrong", status=200)
     
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def view_reset_password(request):
     try:
         body = json.loads(request.body)
@@ -194,8 +201,12 @@ def view_edit_profile(request):
         body = json.loads(request.body)
         user = request.user
         new_username = body.get("username")
+
+        if User.objects.filter(username=new_username):
+            return api_json_response(error="Username already taken")
+        
         user.username = new_username
         user.save()
         return api_json_response(msg=True)
     except Exception as e:
-        return api_json_response(error="Something went wrong", status=400)
+        return api_json_response(error=str(e))

@@ -63,7 +63,7 @@
     box-shadow: 0.5rem 0.5rem 3rem var(--color-ba20);
     backdrop-filter: blur(0.2rem);
 }
-@mixin look-container-hover($scale: 1.1) {
+@mixin look-container-hover($scale: 1.05) {
     cursor: pointer;
     &:hover {
         transform: scale($scale);
@@ -72,9 +72,26 @@
     }
 }
 
-@mixin look-alert($color: rgba(180, 180, 180)) {
-    border-radius: 0.8rem;
-    border: solid 0.08rem rgba($color, 0.7);
-    background: rgba($color, 0.4);
-    backdrop-filter: blur(0.2rem);
+@mixin area-alert($color: var(--color-info)) {
+  display: flex;
+  flex-direction: row;
+  column-gap: f.scale-gap(1);
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  margin: f.scale-margin(3);
+  padding: f.scale-padding(1);
+  border-radius: 0.8rem;
+  background: $color;
+  opacity: 0;
+  transform: translateY(0.5rem);
+}
+
+.fade-in-alert {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.fade-out-alert {
+  animation: fadeOutDown 0.3s ease-in forwards;
 }

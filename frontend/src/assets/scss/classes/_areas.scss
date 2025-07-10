@@ -64,3 +64,19 @@
     justify-items: center;
     padding: u.scale-padding(1);
 }
+
+.area-alert-success {
+    @include u.area-alert(var(--color-success))
+}
+
+.area-alert-info {
+    @include u.area-alert(var(--color-info))
+}
+
+.area-alert-warning {
+    @include u.area-alert(var(--color-warning))
+}
+
+.area-alert-failure {
+    @include u.area-alert(var(--color-failure))
+}

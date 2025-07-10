@@ -40,47 +40,46 @@ export default class STO_Users extends STO_Base {
         return store;
     }
 
-    async fetch(key: ValidKeys): Promise<any> {
-        const value = await api.get(this.routes[key]);
-        return value
-    }
-
     async get(key: ValidKeys): Promise<any> {
         try {
-        this.status[key] = "loading"
-        const value = await this.fetch(key)
-        if (value instanceof Object) {
-            this.data[key] = value.data.msg
-            this.persist(key)
-            this.status[key] = "success"
-        } else {
-            this.status[key] = "error"
-            return false
-        }
+            this.status[key] = "loading"
+            const value = await api.get(this.routes[key]);
+            if (value.data.msg) {
+                this.data[key] = value.data.msg
+                this.persist(key)
+                this.status[key] = "success"
+                return this.data[key];
+            } else {
+                this.status[key] = "error"
+                this.error[key] = value.data.error
+                return false
+            }
         } catch (error) {
+            console.log(`Error: ${error}`)
             this.error[key] = error;
             this.status[key] = "error";
             return false
         } finally {
             this.notify(key);
         }
-        return this.data[key]
     }
 
     async post(key: ValidKeys, postData: any): Promise<any> {
         try {
             this.status[key] = "loading";
             const value = await api.post(this.routes[key], postData)
-            if (value instanceof Object) {
+            if (value.data.msg) {
                 this.data[key] = value.data.msg
                 this.persist(key)
                 this.status[key] = "success"
                 return true
             } else {
                 this.status[key] = "error"
+                this.error[key] = value.data.error
                 return false
             }
         } catch (error) {
+            console.log(`Error: ${error}`)
             this.error[key] = error;
             this.status[key] = "error";
             return false
@@ -90,6 +89,7 @@ export default class STO_Users extends STO_Base {
     }
 
     read(key: ValidKeys): any {
+        this.data[key] = this.hydrate(key)
         return this.data[key];
     }
     update(key: ValidKeys, updateData: Record<any, any>): any {

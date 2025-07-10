@@ -1,38 +1,63 @@
-import { useEffect, useState } from "react";
-import { sleep } from "../utils/functions";
+import { useEffect, useState } from 'react';
+import { sleep } from '../utils/functions';
 
-// I need an AlertStore to manage Alerts across my Site
+const ALERT_DIV_LOOKUP = {
+  s: 'area-alert-success',
+  i: 'area-alert-info',
+  w: 'area-alert-warning',
+  f: 'area-alert-failure',
+};
+const ALERT_FADEOUT_DURATION = 300;
 
-interface PRI_Alert {
-    prSignal: boolean
-    prMessage: string;
-    prType?: "success" | "neutral" | "failure";
-
+interface ITF_AlertProps {
+  prId: number;
+  prSignal: boolean;
+  prMessage: string;
+  prType: 's' | 'i' | 'w' | 'f';
+  prTimeout: number;
 }
 
-function COM_Alert({prSignal, prMessage, prType = "neutral"}: PRI_Alert) {
+function COM_Alert({ prId, prSignal, prMessage, prType }: ITF_AlertProps) {
+  const [stIsOpen, setStIsOpen] = useState(prSignal);
+  const [stAnimating, setStAnimating] = useState(prSignal);
 
-    const [stIsOpen, setStIsOpen] = useState(false)
+  useEffect(() => {
+    let cancelled = false;
 
-    useEffect(() => {
     if (prSignal) {
-        (async () => {
-            setStIsOpen(true);
-            await sleep(3000);
-            setStIsOpen(false);
-        })();
-    }
-    }, [prSignal]);
-
-    return (
-        <>
-        {stIsOpen && 
-        <div className={`look-alert-${prType} mod-z-top`}>
-            <p>{prMessage}</p>
-        </div>
+      setStAnimating(true);
+      setStIsOpen(true);
+    } else {
+      (async () => {
+        setStAnimating(false);
+        await sleep(ALERT_FADEOUT_DURATION);
+        if (!cancelled) {
+          setStIsOpen(false);
         }
-        </>
-    )
+      })();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [prId, prSignal]);
+
+  return (
+    <>
+      {stIsOpen && (
+        <div
+          className={`${ALERT_DIV_LOOKUP[prType]} mod-z-top ${
+            stAnimating ? 'fade-in-alert' : 'fade-out-alert'
+          }`}
+        >
+          <p>{prMessage}</p>
+          <p className="mod-cursor-pointer" onClick={() => setStIsOpen(false)}>
+            <strong>x</strong>
+          </p>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default COM_Alert;

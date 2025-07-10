@@ -65,8 +65,6 @@ export abstract class STO_Base {
 
     protected constructor() {}
 
-    abstract fetch(key?: string | null): Promise<any>
-
     init() {}
 
     getStatus(key: string) {
