@@ -13,6 +13,7 @@ import PAG_PasswordReset from './pages/PAG_PasswordReset';
 import COM_Loading from './components/COM_Loading';
 import PAG_EditProfile from './pages/PAG_EditProfile';
 import { PRV_Alert } from './context/CTX_Alert';
+import PAG_Legal from './pages/PAG_Legal';
 
 function Logout() {
   localStorage.clear();
@@ -38,6 +39,7 @@ function App() {
                 </COM_ProtectedRoute>
               }
             />
+            <Route path="/legal/:page" element={<PAG_Legal />} />
             <Route path="/users/login" element={<PAG_Login />} />
             <Route path="/users/logout" element={<Logout />} />
             <Route path="/users/register" element={<CreateAndLogout />} />
