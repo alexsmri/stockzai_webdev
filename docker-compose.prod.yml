@@ -73,6 +73,7 @@ volumes:
   frontend_build:
   certbot-var:
   certbot-webroot:
+  certbot-etc:
 
 networks:
   SA-network:
