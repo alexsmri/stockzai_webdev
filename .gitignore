@@ -29,9 +29,8 @@ Thumbs.db
 .env.*
 !.env.example  # optional: allow a template for env vars
 
-# Django specific (optional, if using static/media dirs)
+# Django specific
 staticfiles/
-media/
 db.sqlite3
 
 # Logs
