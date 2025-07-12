@@ -22,8 +22,8 @@ const LEGAL_PAGE_ROUTES = {
 
 const LEGAL_PAGE_CONTENTS: Record<string, Record<string, string>> = {
   contact: {
-    '#dispute_resolution': 'Dispute Resolution',
     '#identification': 'Identification',
+    '#dispute_resolution': 'Dispute Resolution',
   },
   data: {
     '#server_log': 'Server Log',
