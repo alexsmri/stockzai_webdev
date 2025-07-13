@@ -17,18 +17,17 @@
 **pr**: Props
 **st**: State
 
-
-# REACT / TSX:**
+# REACT / TSX:
 
 ## Class / File Names (PascalCase):
 
-**UTI_**: Utility
-**COM_**: React Component
-**PAG:**: React Page
-**PRV_**: React Provider
-**CTX_**: React Context
-**STO_**: React Store
-**PRI_**: React Props Interface
+**UTI\_**: Utility
+**COM\_**: React Component
+**PAG\_**: React Page
+**PRV\_**: React Provider
+**CTX\_**: React Context
+**STO\_**: React Store
+**ITF\_**: React Props Interface
 
 ## Function Names (camelCase):
 
@@ -43,7 +42,6 @@
 **set**: Set State
 
 **handle**: Handle Event
-
 
 ## Variable Names (camelCase):
 

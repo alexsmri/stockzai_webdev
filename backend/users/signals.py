@@ -4,8 +4,6 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.conf import settings
-from urllib.parse import urlencode
-from base64 import b64encode
 
 from .models import TokenPasswordReset, TokenVerification
 
