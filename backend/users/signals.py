@@ -17,15 +17,14 @@ def password_reset_token_created(sender, instance, created, **kwargs):
         link = f"{base_url}users/password-reset/?uid={uid}&token={token}"
         
         context = {
-            'link': link,
-            'email_adress': user_email
+            'reset_link': link
         }
 
         html_message = render_to_string("email_pwreset.html", context=context)
         plain_message = strip_tags(html_message)
 
         msg = EmailMultiAlternatives(
-            subject = "Reqest for resetting password for {title}".format(title=user_email),
+            subject = "Reset your password - Stockz.ai",
             body = plain_message,
             from_email = "alex@stockz.ai",
             to=[user_email]
@@ -38,26 +37,23 @@ def password_reset_token_created(sender, instance, created, **kwargs):
 def verification_token_created(sender, instance, created, **kwargs):
     if created:
         user_email = instance.user.email
+        user_name = instance.user.username
         base_url = settings.FRONTEND_URL
         uid = instance.uid
         token = instance.token
 
         link = f"{base_url}users/verification/?uid={uid}&token={token}"
         context = {
-            'link': link,
-            'email_adress': user_email
+            'username': user_name,
+            'verification_link': link,
         }
-        print("Email context:", context)
-        print(f"Sending link: {link}")
         
 
         html_message = render_to_string("email_verification.html", context=context)
-        print("Email HTML:", html_message)
-        print("Email context:", context)
         plain_message = strip_tags(html_message)
 
         msg = EmailMultiAlternatives(
-            subject = "Verify your Account",
+            subject = "Verify your account - stockz.ai",
             body = plain_message,
             from_email = "alex@stockz.ai",
             to=[user_email]
