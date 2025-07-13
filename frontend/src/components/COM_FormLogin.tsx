@@ -19,11 +19,16 @@ function COM_FormLogin() {
   useUserStoreSync(utStore, 'ActionLogin', setTokens);
 
   useEffect(() => {
-    if (tokens && tokens['access'] && tokens['refresh']) {
-      utStore.get('PropertyCredentials');
-      handleAlertClose();
-      navigate('/');
-    }
+    (async () => {
+      if (tokens && tokens['access'] && tokens['refresh']) {
+        const utValid = await utStore.post('TokenLoginValidation', { token: tokens['access'] });
+        if (utValid) {
+          utStore.get('PropertyCredentials');
+          handleAlertClose();
+          navigate('/');
+        }
+      }
+    })();
   }, [tokens]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { APIResponse } from "../types/types";
 import STO_Companies from "../stores/STO_Companies";
 import STO_KPI from "../stores/STO_KPI";
@@ -68,4 +68,26 @@ export function useUserStoreSync(
 
     return () => store.unsubscribe(key, subscriber);
   }, [store])
+}
+
+function getWindowDimensions() {
+  const {innerWidth: width, innerHeight: height} = window;
+  return {
+
+    width,
+    height
+  };
+}
+export function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [])
+
+  return windowDimensions;
 }

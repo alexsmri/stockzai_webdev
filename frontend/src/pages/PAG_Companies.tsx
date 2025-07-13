@@ -25,7 +25,7 @@ function PAG_Companies() {
             <COM_Navbar />
             <h1 className="look-text-x7">{symbol}</h1>
             <div className="area-flex-col mod-gap-xl mod-padding-xl">
-              <div className="area-flex-row mod-flex-grow-children">
+              <div className="area-flex-wrap mod-flex-grow-children">
                 <COM_KPILightbox />
                 <COM_SectionInfo title="Scores." prShowChange={true}>
                   <COM_ScoreRadial KPI="financial_score" />
