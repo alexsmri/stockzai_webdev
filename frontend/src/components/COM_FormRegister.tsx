@@ -64,6 +64,9 @@ function COM_FormRegister() {
         />
         <button className="look-button-primary">{name}</button>
       </form>
+      <a href="/users/login/" className="look-button-subtle">
+        Log In Instead
+      </a>
     </>
   );
 }

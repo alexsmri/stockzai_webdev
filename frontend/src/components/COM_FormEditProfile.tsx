@@ -72,6 +72,12 @@ function COM_FormEditProfile() {
             />
             <button className="look-button-primary">Save</button>
           </form>
+          <a href="/users/password-reset/token/request" className="look-button-subtle">
+            Forgot Password?
+          </a>
+          <a href="/users/logout/" className="look-button-subtle">
+            Logout
+          </a>
         </>
       ) : (
         <COM_Loading />

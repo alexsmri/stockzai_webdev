@@ -63,6 +63,12 @@ function COM_FormLogin() {
         />
         <button className="look-button-primary">{name}</button>
       </form>
+      <a href="/users/register/" className="look-button-subtle">
+        Sign Up Instead
+      </a>
+      <a href="/users/password-reset/token/request" className="look-button-subtle">
+        Forgot Password?
+      </a>
     </>
   );
 }

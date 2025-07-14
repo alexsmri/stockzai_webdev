@@ -31,14 +31,7 @@ function App() {
       <PRV_Alert>
         <BrowserRouter>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <COM_ProtectedRoute>
-                  <PAG_Home />
-                </COM_ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<PAG_Home />} />
             <Route path="/legal/:page" element={<PAG_Legal />} />
             <Route path="/users/login" element={<PAG_Login />} />
             <Route path="/users/logout" element={<Logout />} />
