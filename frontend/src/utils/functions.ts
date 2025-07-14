@@ -1,7 +1,7 @@
 export function getScoreColor(score: number): string {
-  if (score >= 8) {
+  if (score >= 6.6) {
     return "#00D26D";
-  } else if (score >= 5) {
+  } else if (score >= 3.3) {
     return "#D0D0D0";
   } else {
     return "#EE0034";

@@ -48,3 +48,15 @@ class CompanySearchView(APIView):
         except Exception as e:
             print(type(e))
         return api_json_response(msg={"query": query, "results": results})
+    
+class CompanyWinnersView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None
+
+    def get(self, request):
+
+        try:
+            results = db.dbq_get_company_winners()
+        except Exception as e:
+            return api_json_response(error=str(e))
+        return api_json_response(msg=results)

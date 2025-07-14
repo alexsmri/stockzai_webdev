@@ -1,8 +1,8 @@
-import { Line } from "react-chartjs-2";
-import { useCompanyStore } from "../context/CTX_CompanyStore";
-import { useCompanyStoreSync } from "../hooks/hooks";
-import { useState } from "react";
-import { getKPIText } from "../utils/functions";
+import { Line } from 'react-chartjs-2';
+import { useCompanyStore } from '../context/CTX_CompanyStore';
+import { useCompanyStoreSync } from '../hooks/hooks';
+import { useState } from 'react';
+import { getKPIText } from '../utils/functions';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
   PointElement,
-} from "chart.js";
+} from 'chart.js';
 
 interface ChartLineProps {
   KPI: string;
@@ -22,15 +22,7 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const store = useCompanyStore();
   const [data, setData] = useState<Record<string, any> | null>(null);
   useCompanyStoreSync(store, setData);
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-  );
+  ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
   const text = getKPIText(KPI);
   if (!data) return null;
   const KPIData = data.company_intel?.[KPI];
@@ -47,7 +39,7 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const dataValues = Object.values(KPIData);
   const chartData = {
     labels,
-    datasets: [{ label: `${text}`, data: dataValues, borderColor: "white" }],
+    datasets: [{ label: `${text}`, data: dataValues, borderColor: 'white' }],
   };
 
   return <Line datasetIdKey={KPI} data={chartData}></Line>;

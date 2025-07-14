@@ -365,7 +365,6 @@ class DB_Handler:
                         "FROM basics b "
                         "WHERE (b.KPI = 90) AND b.SYMBOL = :request;")
             results_raw = self.dbu_read_execute(sql_query, params={"request": search_request})
-            print(search_request)
         
         for (name, symbol) in results_raw:
             results_dic = {"name": name}
@@ -380,3 +379,29 @@ class DB_Handler:
             results[symbol] = results_dic
 
         return results
+    
+    def dbq_get_company_winners(self, result_count: int = 3):
+        results = {}
+
+        sql_query = (
+            "SELECT " 
+                "s1.SYMBOL as SYMBOL, "
+                "MAX(s1.value) AS priceChange, "
+                "MAX(s2.value) AS totalScore, "
+                "(MAX(s1.value) * MAX(s2.value)) AS calculation "
+            "FROM statistics s1 "
+            "INNER JOIN statistics s2 "
+            "ON s1.SYMBOL = s2.SYMBOL "
+            "WHERE s1.KPI = 111 AND s2.KPI = 112 "
+            "GROUP BY s1.SYMBOL "
+            "ORDER BY calculation DESC "
+            f"LIMIT {str(result_count)}; "
+            )
+        
+        results_raw = self.dbu_read_execute(sql_query)
+
+        for (symbol, price_change, total_score, _) in results_raw:
+            results[symbol] = {"priceChange": price_change, "totalScore": total_score}
+            
+        return results
+        

@@ -12,7 +12,6 @@ from stockzAI.response import api_json_response
 from users.tokens import verification_token, password_reset_token
 from rest_framework.decorators import permission_classes, api_view
 import json
-import traceback
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()

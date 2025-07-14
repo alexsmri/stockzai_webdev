@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useCompanyStore } from "../context/CTX_CompanyStore";
-import { useCompanyStoreSync } from "../hooks/hooks";
-import { getKPIText } from "../utils/functions";
+import { useState } from 'react';
+import { useCompanyStore } from '../context/CTX_CompanyStore';
+import { useCompanyStoreSync } from '../hooks/hooks';
+import { getKPIText } from '../utils/functions';
 
 export default function COM_CardInfo({ KPI }: { KPI: string }) {
   const store = useCompanyStore();
