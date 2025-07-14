@@ -5,7 +5,6 @@ import { useWinnerStore } from '../context/CTX_WinnerStore';
 import { useWinnerStoreSync } from '../hooks/hooks';
 import { useState } from 'react';
 import COM_Loading from '../components/COM_Loading';
-import COM_ScoreRadial from '../components/COM_ScoreRadial';
 import DCOM_IndicatorChange from '../components/dumb/DCOM_IndicatorChange';
 import DCOM_ScoreRadial from '../components/dumb/DCOM_ScoreRadial';
 
