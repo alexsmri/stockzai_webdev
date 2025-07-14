@@ -6,8 +6,6 @@ app_name = "stockzAI"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('companies/', include('companies.urls')),
-    path('users/', include('users.urls')),
     path('api/users/', include('users.api.urls')),
     path('api/companies/', include('companies.api.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
