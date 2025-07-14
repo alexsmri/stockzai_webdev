@@ -18,7 +18,6 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
 
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKPIStore, setStKPIs);
-
   if (!stData || !stData.company_intel[prKPI] || !stKPIs) return null;
   const utKPIId = Object.keys(stKPIs).find((key) => {
     if (stKPIs[key]['KPI'] === prKPI) return key;
@@ -31,7 +30,6 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
         : 1
       : 1;
 
-  typeof utKPIScoring === 'number' && console.log(prKPI, utKPIScoring);
   const utKPIIntel: Record<any, number> = stData.company_intel[prKPI];
   const utDates = Object.keys(utKPIIntel).sort((a, b) => (Date.parse(a) > Date.parse(b) ? -1 : 1));
   const utChildrenEmpty = (

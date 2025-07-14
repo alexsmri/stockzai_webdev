@@ -1,5 +1,9 @@
 import COM_IndicatorChange from './COM_IndicatorChange';
 
+const ROLE_CHANGE_KPIS: Record<string, string> = {
+  'Scores.': 'totalScore',
+};
+
 interface InfoSectionProps {
   title: string;
   subitle?: string;
@@ -14,7 +18,9 @@ function COM_SectionInfo(props: InfoSectionProps) {
       <div className="area-flex-col look-div-container mod-gap-l">
         <div className="area-flex-row">
           <h3 className="look-text-x5">{props.title}</h3>
-          {prShowChange && <COM_IndicatorChange prKPI="financial_score" prShowDiv={true} />}
+          {prShowChange && props.title && (
+            <COM_IndicatorChange prKPI={ROLE_CHANGE_KPIS[props.title]} prShowDiv={true} />
+          )}
         </div>
         {props.subitle && <p>{props.subitle}</p>}
         <div className="area-flex-wrap mod-space-around mod-gap-l mod-flex-grow-children">
