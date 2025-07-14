@@ -6,6 +6,13 @@ import COM_SearchCompletion from '../components/COM_SearchCompletion';
 import COM_Hero from '../components/COM_Hero';
 import COM_Navbar from '../components/COM_Navbar';
 import COM_Footer from '../components/COM_Footer';
+import { MOBILE_BREAKPOINT } from '../constants';
+import { useWindowDimensions } from '../hooks/hooks';
+
+const DIV_CLASS_NAMES = {
+  mobile: 'area-flex-col',
+  desktop: 'area-flex-col mod-margin-xl',
+};
 
 export default function PAG_Compare() {
   const [submittedQuery, setSubmittedQuery] = useState<string | ''>('');
@@ -14,6 +21,8 @@ export default function PAG_Compare() {
   const [showResults, setShowResults] = useState<boolean>(false);
   const [submitIndex, setSubmitIndex] = useState<number>(0);
   const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?];
+
+  const { width } = useWindowDimensions();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -48,7 +57,9 @@ export default function PAG_Compare() {
           )}
         </div>
       </COM_Hero>
-      <div className="area-flex-col mod-margin-xl">
+      <div
+        className={width <= MOBILE_BREAKPOINT ? DIV_CLASS_NAMES.mobile : DIV_CLASS_NAMES.desktop}
+      >
         <div className="area-grid-comparison mod-w-full">
           <p></p>
           <p className="look-text-x0">Symbol</p>

@@ -53,6 +53,34 @@ export default function COM_Navbar() {
     </>
   );
 
+  const utMenuRight = (
+    <>
+      {width <= MOBILE_BREAKPOINT ? (
+        <>
+          {stIsOpen ? (
+            <>
+              <HamburgerClose
+                className="img-hamburger mod-cursor-pointer"
+                onClick={() => {
+                  toggleMenu();
+                }}
+              />
+              {utMenuLinks}
+            </>
+          ) : (
+            <Hamburger
+              className="img-hamburger mod-cursor-pointer"
+              onClick={() => {
+                toggleMenu();
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <>{utMenuLinks}</>
+      )}
+    </>
+  );
   return (
     <>
       <nav className="area-flex-row mod-space-between">
@@ -62,32 +90,16 @@ export default function COM_Navbar() {
             navigate('/');
           }}
         />
-        <div className={stIsOpen ? MENU_CLASS_NAMES.open : MENU_CLASS_NAMES.closed}>
-          {width <= MOBILE_BREAKPOINT ? (
-            <>
-              {stIsOpen ? (
-                <>
-                  <HamburgerClose
-                    className="img-hamburger mod-cursor-pointer"
-                    onClick={() => {
-                      toggleMenu();
-                    }}
-                  />
-                  {utMenuLinks}
-                </>
-              ) : (
-                <Hamburger
-                  className="img-hamburger mod-cursor-pointer"
-                  onClick={() => {
-                    toggleMenu();
-                  }}
-                />
-              )}
-            </>
-          ) : (
-            <>{utMenuLinks}</>
-          )}
-        </div>
+        {stIsOpen ? (
+          <>
+            <div className={MENU_CLASS_NAMES.closed}>
+              <Hamburger className="img-hamburger" visibility={'hidden'} />
+            </div>
+            <div className={MENU_CLASS_NAMES.open}>{utMenuRight}</div>
+          </>
+        ) : (
+          <div className={MENU_CLASS_NAMES.closed}>{utMenuRight}</div>
+        )}
       </nav>
     </>
   );
