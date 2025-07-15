@@ -381,7 +381,10 @@ class DB_Handler:
         return results
     
     def dbq_get_company_winners(self, result_count: int = 3):
-        results = {}
+        winner_calulcations = {}
+
+        display_kpis = ["totalScore", "priceChange"]
+        display_kpis_info = {kpi: self.dbq_get_kpi_info(kpi) for kpi in display_kpis}
 
         sql_query = (
             "SELECT s1.SYMBOL, s1.value "
@@ -389,50 +392,37 @@ class DB_Handler:
             "JOIN ( "
                 "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
                 "FROM statistics s_inner "
-                "WHERE s_inner.KPI = 113 "
+                "WHERE s_inner.KPI = 116 "
                 "GROUP BY s_inner.SYMBOL "
             ") latest "
             "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
-            "WHERE s1.KPI = 113; "
+            "WHERE s1.KPI = 116; "
             )
         
-        price_change_raw = self.dbu_read_execute(sql_query)
+        calculation_raw = self.dbu_read_execute(sql_query)
 
-        for (symbol, price_change) in price_change_raw:
-            results[symbol] = {"priceChange": price_change}
-
-        sql_query = (
-            "SELECT s1.SYMBOL, s1.value "
-            "FROM statistics s1 "
-            "JOIN ( "
-                "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
-                "FROM statistics s_inner "
-                "WHERE s_inner.KPI = 114 "
-                "GROUP BY s_inner.SYMBOL "
-            ") latest "
-            "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
-            "WHERE s1.KPI = 114; "
-            )
-
-        total_score_raw = self.dbu_read_execute(sql_query)
-
-        for (symbol, total_score) in total_score_raw:
-            symbol_dict = results.get(symbol)
-            if symbol_dict:
-                symbol_dict["totalScore"] = total_score
-                if isinstance(price_change, (int, float)) and isinstance(total_score, (int, float)):
-                    symbol_dict["calculation"] = total_score * symbol_dict["priceChange"]
-            
-                results[symbol] = symbol_dict
+        for (symbol, calculation) in calculation_raw:
+            winner_calulcations[symbol] = {"winnerCalculation": calculation}
         
         winners = sorted(
-            [symbol for symbol in results if "calculation" in results[symbol]],
-            key=lambda symbol: results[symbol]["calculation"],
+            [symbol for symbol in winner_calulcations if "calculation" in winner_calulcations[symbol]],
+            key=lambda symbol: winner_calulcations[symbol]["calculation"],
             reverse=True
         )
 
         winners = winners[:result_count]
-        
-        out = {winner: results[winner] for winner in winners}
+
+        out = {}
+        for winner in winners:
+            winner_dict = {}
+            for kpi in display_kpis:
+                winner_kpi = self.dbq_get_kpi(
+                    winner, 
+                    display_kpis_info[kpi]["id"],
+                    display_kpis_info[kpi]["role"],
+                    )
+                winner_dict[kpi] = winner_kpi
+            out[winner] = winner_dict
+
         return out
         

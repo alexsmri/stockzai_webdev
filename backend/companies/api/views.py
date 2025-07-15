@@ -57,7 +57,7 @@ class CompanyWinnersView(APIView):
     def get(self, request):
 
         try:
-            fetch_company_winners.delay()
+            results = db.dbq_get_company_winners()
         except Exception as e:
             return api_json_response(error=str(e))
-        return api_json_response(msg="Task Delayed")
+        return api_json_response(msg=results)
