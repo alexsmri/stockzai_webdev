@@ -1,3 +1,4 @@
+'''
 import os
 
 from celery import Celery
@@ -29,3 +30,5 @@ def fetch_company_winners(self):
     results = db.dbq_get_company_winners()
     logger.info(results)
     return results
+
+'''

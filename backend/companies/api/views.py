@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from ..db.DB_Handler import DB_Handler
 from stockzAI.response import api_json_response
 from django.http import Http404
-from stockzAI.celery import fetch_company_winners
 
 db = DB_Handler("companies")
 
