@@ -384,24 +384,55 @@ class DB_Handler:
         results = {}
 
         sql_query = (
-            "SELECT " 
-                "s1.SYMBOL as SYMBOL, "
-                "MAX(s1.value) AS priceChange, "
-                "MAX(s2.value) AS totalScore, "
-                "(MAX(s1.value) * MAX(s2.value)) AS calculation "
+            "SELECT s1.SYMBOL, s1.value "
             "FROM statistics s1 "
-            "INNER JOIN statistics s2 "
-            "ON s1.SYMBOL = s2.SYMBOL "
-            "WHERE s1.KPI = 111 AND s2.KPI = 112 "
-            "GROUP BY s1.SYMBOL "
-            "ORDER BY calculation DESC "
-            f"LIMIT {str(result_count)}; "
+            "JOIN ( "
+                "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
+                "FROM statistics s_inner "
+                "WHERE s_inner.KPI = 113 "
+                "GROUP BY s_inner.SYMBOL "
+            ") latest "
+            "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
+            "WHERE s1.KPI = 113; "
             )
         
-        results_raw = self.dbu_read_execute(sql_query)
+        price_change_raw = self.dbu_read_execute(sql_query)
 
-        for (symbol, price_change, total_score, _) in results_raw:
-            results[symbol] = {"priceChange": price_change, "totalScore": total_score}
+        for (symbol, price_change) in price_change_raw:
+            results[symbol] = {"priceChange": price_change}
+
+        sql_query = (
+            "SELECT s1.SYMBOL, s1.value "
+            "FROM statistics s1 "
+            "JOIN ( "
+                "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
+                "FROM statistics s_inner "
+                "WHERE s_inner.KPI = 114 "
+                "GROUP BY s_inner.SYMBOL "
+            ") latest "
+            "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
+            "WHERE s1.KPI = 114; "
+            )
+
+        total_score_raw = self.dbu_read_execute(sql_query)
+
+        for (symbol, total_score) in total_score_raw:
+            symbol_dict = results.get(symbol)
+            if symbol_dict:
+                symbol_dict["totalScore"] = total_score
+                if isinstance(price_change, (int, float)) and isinstance(total_score, (int, float)):
+                    symbol_dict["calculation"] = total_score * symbol_dict["priceChange"]
             
-        return results
+                results[symbol] = symbol_dict
+        
+        winners = sorted(
+            [symbol for symbol in results if "calculation" in results[symbol]],
+            key=lambda symbol: results[symbol]["calculation"],
+            reverse=True
+        )
+
+        winners = winners[:result_count]
+        
+        out = {winner: results[winner] for winner in winners}
+        return out
         
