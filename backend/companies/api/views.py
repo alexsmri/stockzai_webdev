@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from ..db.DB_Handler import DB_Handler
 from stockzAI.response import api_json_response
 from django.http import Http404
+from stockzAI.celery import fetch_company_winners
 
 db = DB_Handler("companies")
 
@@ -56,7 +57,7 @@ class CompanyWinnersView(APIView):
     def get(self, request):
 
         try:
-            results = db.dbq_get_company_winners()
+            fetch_company_winners.delay()
         except Exception as e:
             return api_json_response(error=str(e))
-        return api_json_response(msg=results)
+        return api_json_response(msg="Task Delayed")
