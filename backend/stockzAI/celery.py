@@ -2,7 +2,7 @@ import os
 
 from celery import Celery
 
-from ..companies.db.DB_Handler import DB_Handler
+from companies.db.DB_Handler import DB_Handler
 
 import logging
 
