@@ -20,6 +20,9 @@ docker compose -f docker-compose.prod.yml build backend frontend
 echo "$(date): Running frontend copy..."
 docker compose -f docker-compose.prod.yml run --rm frontend
 
+echo "$(date): Making migrations..."
+docker compose -f docker-compose.prod.yml run --rm backend python manage.py makemigrations
+
 echo "$(date): Running migrations..."
 docker compose -f docker-compose.prod.yml run --rm backend python manage.py migrate
 
