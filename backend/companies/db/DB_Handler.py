@@ -405,8 +405,8 @@ class DB_Handler:
             winner_calulcations[symbol] = {"winnerCalculation": calculation}
         
         winners = sorted(
-            [symbol for symbol in winner_calulcations if "calculation" in winner_calulcations[symbol]],
-            key=lambda symbol: winner_calulcations[symbol]["calculation"],
+            [symbol for symbol in winner_calulcations if "winnerCalculation" in winner_calulcations[symbol]],
+            key=lambda symbol: winner_calulcations[symbol]["winnerCalculation"],
             reverse=True
         )
 
