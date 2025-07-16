@@ -411,10 +411,12 @@ class DB_Handler:
             reverse=True
         )
 
-        winners = winners[:result_count]
-
         out = {}
+        winners_count = 0
         for winner in winners:
+            if winners_count >= result_count:
+                break
+
             winner_dict = {}
             for kpi in display_kpis:
                 winner_kpi = self.dbq_get_kpi(
@@ -423,7 +425,9 @@ class DB_Handler:
                     display_kpis_info[kpi]["role"],
                     )
                 winner_dict[kpi] = winner_kpi
-            out[winner] = winner_dict
+                if "value" in winner_dict:
+                    out[winner] = winner_dict["value"]
+                    winners_count += 1
 
         return out
         
