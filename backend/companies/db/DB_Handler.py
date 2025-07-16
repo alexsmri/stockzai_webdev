@@ -424,10 +424,13 @@ class DB_Handler:
                     display_kpis_info[kpi]["id"],
                     display_kpis_info[kpi]["role"],
                     )
-                winner_dict[kpi] = winner_kpi
-                if "value" in winner_dict:
-                    out[winner] = winner_dict["value"]
-                    winners_count += 1
+                
+                if "value" in winner_kpi:
+                    winner_dict[kpi] = winner_kpi["value"]
+            
+            if len(winner_dict.keys() == display_kpis):
+                out[winner] = winner_dict
+                winners_count += 1
 
         return out
         
