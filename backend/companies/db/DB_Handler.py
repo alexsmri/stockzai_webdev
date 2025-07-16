@@ -428,7 +428,7 @@ class DB_Handler:
                 if "value" in winner_kpi:
                     winner_dict[kpi] = winner_kpi["value"]
             
-            if len(winner_dict.keys() == display_kpis):
+            if len(winner_dict.keys()) == display_kpis:
                 out[winner] = winner_dict
                 winners_count += 1
 
