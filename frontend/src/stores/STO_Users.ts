@@ -99,6 +99,11 @@ export default class STO_Users extends STO_Base {
         this.persist(key);
         this.notify(key);
     }
+    
+    clear(key: ValidKeys): void {
+        this.data[key] = {}
+        this.persist(key)
+    }
 
     persist(key: ValidKeys): void {
         if (PERSISTED_KEYS.includes(key)) {
