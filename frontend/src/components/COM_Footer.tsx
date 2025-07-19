@@ -5,7 +5,7 @@ export default function COM_Footer() {
   const navigate = useNavigate();
   return (
     <>
-      <div className="area-flex-col mod-bottom look-footer">
+      <div className="area-flex-col mod-bottom">
         <Logo
           className="img-logo mod-cursor-pointer"
           onClick={() => {

@@ -1,20 +1,19 @@
-import { Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { useState, useEffect, type JSX } from 'react';
 import COM_Loading from './COM_Loading';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
-
-interface ITF_ProtectedRouteProps {
-  children: JSX.Element;
-}
+import PAG_Login from '../pages/PAG_Login';
 
 interface DecodedToken {
   exp?: number;
   [key: string]: unknown;
 }
 
-function COM_ProtectedRoute(props: ITF_ProtectedRouteProps) {
+function COM_ProtectedRoute({ children }: { children: JSX.Element }) {
+  const utLocation = useLocation();
+  const utRedirect = utLocation.pathname;
   const utStore = useUserStore();
 
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
@@ -86,7 +85,7 @@ function COM_ProtectedRoute(props: ITF_ProtectedRouteProps) {
     return <COM_Loading />;
   }
 
-  return isAuthorized ? props.children : <Navigate to="/users/login/" replace />;
+  return isAuthorized ? children : <PAG_Login prRedirect={utRedirect} />;
 }
 
 export default COM_ProtectedRoute;

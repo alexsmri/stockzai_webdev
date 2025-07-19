@@ -5,7 +5,7 @@ import { useUserStoreSync } from '../hooks/hooks';
 import { useEffect } from 'react';
 import { useAlert } from '../context/CTX_Alert';
 
-function COM_FormLogin() {
+function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const utStore = useUserStore();
@@ -25,7 +25,7 @@ function COM_FormLogin() {
         if (utValid) {
           utStore.get('PropertyCredentials');
           handleAlertClose();
-          navigate('/');
+          navigate(prRedirect);
         }
       }
     })();

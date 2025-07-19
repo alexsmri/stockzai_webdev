@@ -16,16 +16,19 @@ interface DecodedToken {
 function COM_HandleTokens(props: ITF_HandleTokenProps) {
   const utStore = useUserStore();
 
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const [stValid, setStValid] = useState<boolean | null>(null);
   const [tokens, setTokens] = useState<any>(utStore.read('ActionLogin'));
   useUserStoreSync(utStore, 'ActionLogin', setTokens);
 
   useEffect(() => {
+    if (!tokens) {
+      setStValid(true);
+    }
     (async () => {
       try {
         await auth();
       } catch {
-        setIsAuthorized(false);
+        return;
       }
     })();
   }, [tokens]);
@@ -46,24 +49,18 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
             refresh: refreshToken,
             access: utStore.read('ActionRefreshToken')['access'],
           });
-          setIsAuthorized(true);
+          setStValid(true);
         } else {
-          setIsAuthorized(false);
+          setStValid(false);
         }
       } catch (error) {
-        setIsAuthorized(false);
+        setStValid(false);
       }
-    } else {
-      setIsAuthorized(false);
-      return;
     }
   };
 
   const auth = async () => {
-    if (!tokens) {
-      setIsAuthorized(false);
-      return;
-    } else {
+    if (tokens) {
       const decoded = jwtDecode<DecodedToken>(tokens['access']);
       const tokenExpiration = decoded.exp;
 
@@ -71,21 +68,23 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
       if (typeof tokenExpiration === 'number' && tokenExpiration < now) {
         await refreshToken();
       } else {
-        const tokenValid = await utStore.post('TokenLoginValidation', { token: tokens['access'] });
+        const tokenValid = await utStore.post('TokenLoginValidation', {
+          token: tokens['access'],
+        });
         if (tokenValid) {
-          setIsAuthorized(true);
+          setStValid(true);
         } else {
-          setIsAuthorized(false);
+          setStValid(false);
         }
       }
     }
   };
 
-  if (isAuthorized === null) {
+  if (stValid === null) {
     return <COM_Loading />;
   }
 
-  if (!isAuthorized) {
+  if (!stValid) {
     utStore.clear('ActionLogin');
     utStore.clear('PropertyCredentials');
   }

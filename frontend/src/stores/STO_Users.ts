@@ -99,7 +99,7 @@ export default class STO_Users extends STO_Base {
         this.persist(key);
         this.notify(key);
     }
-    
+
     clear(key: ValidKeys): void {
         this.data[key] = {}
         this.persist(key)
@@ -107,7 +107,11 @@ export default class STO_Users extends STO_Base {
 
     persist(key: ValidKeys): void {
         if (PERSISTED_KEYS.includes(key)) {
-            localStorage.setItem(`userStore:${key}`, JSON.stringify(this.data[key]))
+            if (Object.keys(this.data[key]).length !== 0) {
+                localStorage.setItem(`userStore:${key}`, JSON.stringify(this.data[key]))
+            } else {
+                localStorage.removeItem(`userStore:${key}`)
+            }
         }
     }
 
