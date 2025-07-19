@@ -5,6 +5,7 @@ import COM_Loading from '../components/COM_Loading';
 import DCOM_IndicatorChange from '../components/dumb/DCOM_IndicatorChange';
 import DCOM_ScoreRadial from '../components/dumb/DCOM_ScoreRadial';
 import { PRV_WinnerStore } from '../context/CTX_WinnerStore';
+import { COM_ButtonDiscover } from './COM_ButtonDiscover';
 
 function COM_Winners() {
   const [stWinners, setStWinners] = useState<Record<string, any> | null>(null);
@@ -25,9 +26,12 @@ function COM_Winners() {
                 const utChange = stWinners[key]['priceChange'];
                 return (
                   <div className="area-flex-col look-div-container">
-                    <DCOM_IndicatorChange prChange={utChange} prShowDiv={true} />
+                    <div className="mod-right">
+                      <DCOM_IndicatorChange prChange={utChange} prShowDiv={true} />
+                    </div>
                     <p className="look-text-x4">{key}</p>
                     <DCOM_ScoreRadial prScore={utScore} />
+                    <COM_ButtonDiscover prHref={`/companies/page/${key}`} />
                   </div>
                 );
               })}
