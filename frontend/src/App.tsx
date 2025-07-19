@@ -14,7 +14,6 @@ import COM_Loading from './components/COM_Loading';
 import PAG_EditProfile from './pages/PAG_EditProfile';
 import { PRV_Alert } from './context/CTX_Alert';
 import PAG_Legal from './pages/PAG_Legal';
-import { PRV_WinnerStore } from './context/CTX_WinnerStore';
 import COM_HandleTokens from './components/COM_HandleTokens';
 
 function Logout() {
@@ -32,56 +31,54 @@ function App() {
     <PRV_UserStore args={[]}>
       <COM_HandleTokens>
         <PRV_Alert>
-          <PRV_WinnerStore args={[]}>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<PAG_Home />} />
-                <Route path="/legal/:page" element={<PAG_Legal />} />
-                <Route path="/users/login" element={<PAG_Login />} />
-                <Route path="/users/logout" element={<Logout />} />
-                <Route path="/users/register" element={<CreateAndLogout />} />
-                <Route path="/users/verification" element={<PAG_Verication />} />
-                <Route
-                  path="/users/password-reset/token/request"
-                  element={<PA_PasswordResetRequest />}
-                />
-                <Route
-                  path="/users/edit"
-                  element={
-                    <COM_ProtectedRoute>
-                      <PAG_EditProfile />
-                    </COM_ProtectedRoute>
-                  }
-                />
-                <Route path="/users/password-reset" element={<PAG_PasswordReset />} />
-                <Route
-                  path="/companies/search/"
-                  element={
-                    <COM_ProtectedRoute>
-                      <PAG_Search />
-                    </COM_ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/companies/page/:symbol"
-                  element={
-                    <COM_ProtectedRoute>
-                      <PAG_Companies />
-                    </COM_ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/companies/compare/"
-                  element={
-                    <COM_ProtectedRoute>
-                      <ComparisonPage />
-                    </COM_ProtectedRoute>
-                  }
-                />
-                <Route path="/loading/" element={<COM_Loading />} />
-              </Routes>
-            </BrowserRouter>
-          </PRV_WinnerStore>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<PAG_Home />} />
+              <Route path="/legal/:page" element={<PAG_Legal />} />
+              <Route path="/users/login" element={<PAG_Login />} />
+              <Route path="/users/logout" element={<Logout />} />
+              <Route path="/users/register" element={<CreateAndLogout />} />
+              <Route path="/users/verification" element={<PAG_Verication />} />
+              <Route
+                path="/users/password-reset/token/request"
+                element={<PA_PasswordResetRequest />}
+              />
+              <Route
+                path="/users/edit"
+                element={
+                  <COM_ProtectedRoute>
+                    <PAG_EditProfile />
+                  </COM_ProtectedRoute>
+                }
+              />
+              <Route path="/users/password-reset" element={<PAG_PasswordReset />} />
+              <Route
+                path="/companies/search/"
+                element={
+                  <COM_ProtectedRoute>
+                    <PAG_Search />
+                  </COM_ProtectedRoute>
+                }
+              />
+              <Route
+                path="/companies/page/:symbol"
+                element={
+                  <COM_ProtectedRoute>
+                    <PAG_Companies />
+                  </COM_ProtectedRoute>
+                }
+              />
+              <Route
+                path="/companies/compare/"
+                element={
+                  <COM_ProtectedRoute>
+                    <ComparisonPage />
+                  </COM_ProtectedRoute>
+                }
+              />
+              <Route path="/loading/" element={<COM_Loading />} />
+            </Routes>
+          </BrowserRouter>
         </PRV_Alert>
       </COM_HandleTokens>
     </PRV_UserStore>
