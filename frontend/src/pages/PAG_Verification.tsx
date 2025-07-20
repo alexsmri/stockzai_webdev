@@ -28,7 +28,7 @@ export default function PAG_Verication() {
         navigate('/users/login');
       } else {
         setMessage('Invalid Verification Attempt');
-        navigate('/');
+        navigate('/users/login');
       }
     };
     verify();
