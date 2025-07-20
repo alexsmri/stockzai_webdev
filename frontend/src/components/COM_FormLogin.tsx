@@ -63,7 +63,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
         />
         <button className="look-button-primary">{name}</button>
       </form>
-      <a href="/users/register/" className="look-button-subtle">
+      <a href="/users/register" className="look-button-subtle">
         Sign Up Instead
       </a>
       <a href="/users/password-reset/token/request" className="look-button-subtle">

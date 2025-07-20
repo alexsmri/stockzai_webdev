@@ -27,10 +27,10 @@ export default function COM_Navbar() {
 
   const utMenuLinks = (
     <>
-      <a href="/companies/search/" className={utLinkClasses}>
+      <a href="/companies/search" className={utLinkClasses}>
         Search
       </a>
-      <a href="/companies/compare/" className={utLinkClasses}>
+      <a href="/companies/compare" className={utLinkClasses}>
         Compare
       </a>
       {loggedIn ? (
@@ -41,11 +41,11 @@ export default function COM_Navbar() {
         </>
       ) : (
         <>
-          <a href="/users/login/" className={utLinkClasses}>
+          <a href="/users/login" className={utLinkClasses}>
             Log In{' '}
           </a>
 
-          <a href="/users/register/" className={utLinkClasses}>
+          <a href="/users/register" className={utLinkClasses}>
             Sign Up{' '}
           </a>
         </>

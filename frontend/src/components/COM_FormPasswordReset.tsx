@@ -51,7 +51,7 @@ export default function COM_FormPasswordReset() {
   useEffect(() => {
     if (success) {
       handleAlertOpen('Password Reset successful!', 's');
-      navigate('/users/login/');
+      navigate('/users/login');
       setValid(false);
     }
   }, [success]);

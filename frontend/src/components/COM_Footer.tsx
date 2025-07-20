@@ -12,16 +12,16 @@ export default function COM_Footer() {
             navigate('/');
           }}
         />
-        <a href="/companies/search/" className="look-button-subtle">
+        <a href="/companies/search" className="look-button-subtle">
           Search
         </a>
-        <a href="/companies/compare/" className="look-button-subtle">
+        <a href="/companies/compare" className="look-button-subtle">
           Compare
         </a>
-        <a href="/legal/data/" className="look-button-subtle">
+        <a href="/legal/data" className="look-button-subtle">
           Data Protection
         </a>
-        <a href="/legal/contact/" className="look-button-subtle">
+        <a href="/legal/contact" className="look-button-subtle">
           Contact
         </a>
       </div>

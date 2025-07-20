@@ -53,7 +53,7 @@ function App() {
               />
               <Route path="/users/password-reset" element={<PAG_PasswordReset />} />
               <Route
-                path="/companies/search/"
+                path="/companies/search"
                 element={
                   <COM_ProtectedRoute>
                     <PAG_Search />
@@ -69,14 +69,14 @@ function App() {
                 }
               />
               <Route
-                path="/companies/compare/"
+                path="/companies/compare"
                 element={
                   <COM_ProtectedRoute>
                     <ComparisonPage />
                   </COM_ProtectedRoute>
                 }
               />
-              <Route path="/loading/" element={<COM_Loading />} />
+              <Route path="/loading" element={<COM_Loading />} />
             </Routes>
           </BrowserRouter>
         </PRV_Alert>

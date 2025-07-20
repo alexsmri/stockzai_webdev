@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PRIMARY_BUTTON_LINKS = {
   login: '/companies/search',
-  anonymous: '/users/register/',
+  anonymous: '/users/register',
 };
 function PAG_Home() {
   const utStore = useUserStore();
