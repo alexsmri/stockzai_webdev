@@ -46,6 +46,9 @@
     min-width: 100%;
     min-height: 100%;
 }
+.mod-mw-14rem {
+    max-width: 14rem;
+}
 .mod-align-left {
     align-items: normal;
     text-align: left;
@@ -70,6 +73,9 @@
 }
 .mod-right {
     margin-left: auto;
+}
+.mod-center {
+    margin: auto;
 }
 .mod-pos-sti {
     position: sticky;

@@ -23,7 +23,7 @@ function COM_SectionInfo(props: InfoSectionProps) {
           )}
         </div>
         {props.subitle && <p>{props.subitle}</p>}
-        <div className="area-flex-wrap mod-space-around mod-gap-l mod-flex-grow-children">
+        <div className="area-flex-wrap mod-space-around mod-gap-l mod-flex-grow-children mod-center">
           {props.children}
         </div>
       </div>
