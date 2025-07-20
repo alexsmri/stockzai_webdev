@@ -16,7 +16,6 @@ function COM_Winners() {
   return (
     <>
       <PRV_WinnerStore args={[]}>
-        <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
         <div className="area-flex-col look-div-container">
           <h3 className="look-text-x4">Last month's best predictions</h3>
           {stWinners ? (
