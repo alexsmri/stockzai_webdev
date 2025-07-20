@@ -32,7 +32,7 @@ function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
   return (
     <>
       <div className="area-flex-col">
-        <svg width="9VW" height="9VW" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <svg width="8REM" height="8REM" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle
             cx="50"
             cy="50"
