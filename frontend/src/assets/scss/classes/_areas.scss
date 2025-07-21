@@ -101,19 +101,15 @@
 
 .area-menu-mobile {
     position: absolute;
+    top: 110%;
     z-index: 1;
     right: 0;
     margin: 0;
-    padding: u.scale-gap(1);
-    padding-right: u.scale-gap(2);
     display: flex;
     flex-direction: column;
     row-gap: u.scale-gap(3);
-    backdrop-filter: blur(0.3rem);
-    background-color: var(--color-ba70);
-    min-width: 100vw;
-    min-height: 100vh;
     align-items: flex-end;
+    background-color: var(--color-ba60);
     text-align: right;
 }
 

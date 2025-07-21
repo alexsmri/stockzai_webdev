@@ -61,15 +61,7 @@ export default function COM_Navbar() {
       {width <= MOBILE_BREAKPOINT ? (
         <>
           {stIsOpen ? (
-            <>
-              <HamburgerClose
-                className="img-hamburger mod-cursor-pointer"
-                onClick={() => {
-                  toggleMenu();
-                }}
-              />
-              {utMenuLinks}
-            </>
+            <>{utMenuLinks}</>
           ) : (
             <Hamburger
               className="img-hamburger mod-cursor-pointer"
@@ -97,9 +89,16 @@ export default function COM_Navbar() {
         {stIsOpen ? (
           <>
             <div className={MENU_CLASS_NAMES.closed}>
-              <Hamburger className="img-hamburger" visibility={'hidden'} />
+              <HamburgerClose
+                className="img-hamburger mod-cursor-pointer"
+                onClick={() => {
+                  toggleMenu();
+                }}
+              />
             </div>
-            <div className={MENU_CLASS_NAMES.open}>{utMenuRight}</div>
+            <div className={MENU_CLASS_NAMES.open}>
+              <div className="area-flex-col look-div-container">{utMenuRight}</div>
+            </div>
           </>
         ) : (
           <div className={MENU_CLASS_NAMES.closed}>{utMenuRight}</div>

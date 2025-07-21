@@ -57,7 +57,7 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
                   <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
                     <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
                       <p
-                        className="look-button-ghost mod-align-left"
+                        className="look-button-ghost mod-align-left mod-text-wrap"
                         onClick={() => handleLBOpen(value.KPI)}
                       >
                         {getKPIText(value.KPI)}
