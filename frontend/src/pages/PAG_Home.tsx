@@ -23,19 +23,23 @@ function PAG_Home() {
     <>
       <COM_Navbar />
       <COM_Hero>
-        <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
-        <h3 className="look-text-x2">All the info you need, none of the noise. 100% Free.</h3>
-        <button
-          className="look-button-primary"
-          onClick={() => {
-            navigate(utLink);
-          }}
-        >
-          {loggedIn ? 'Search Tickers' : 'Create Account'}
-        </button>
-        <PRV_WinnerStore args={[]}>
-          <COM_Winners />
-        </PRV_WinnerStore>
+        <div className="area-flex-col mod-gap-l">
+          <div className="area-flex-col">
+            <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
+            <h3 className="look-text-x2">All the info you need, none of the noise. 100% Free.</h3>
+            <button
+              className="look-button-primary"
+              onClick={() => {
+                navigate(utLink);
+              }}
+            >
+              {loggedIn ? 'Search Tickers' : 'Create Account'}
+            </button>
+          </div>
+          <PRV_WinnerStore args={[]}>
+            <COM_Winners />
+          </PRV_WinnerStore>
+        </div>
       </COM_Hero>
       <COM_Footer />
     </>

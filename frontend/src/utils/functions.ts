@@ -26,7 +26,7 @@ export function getChangeDivClass(utChange: number): string {
   }
 }
 
-export function formatLargeNumber(number: number): string {
+export function formatLargeNumber(number: number | string): string {
   const NUMBER_LOOKUP: Record<number, string> = {
     1000000000000: "T",
     1000000000: "B",
@@ -34,16 +34,27 @@ export function formatLargeNumber(number: number): string {
     1000: "k",
   };
 
+  function cleanInput(input: string | number): number | undefined {
+    const inputCleaned = typeof input === "string" ? Number(input) : input;
+    return Number.isNaN(inputCleaned) ? undefined : inputCleaned;
+  }
+
+  const numberCleaned = cleanInput(number)
+
+  if (numberCleaned === undefined) {
+    return String(number);
+  }
+
   const key = Object.keys(NUMBER_LOOKUP)
     .map(Number)
     .sort((a, b) => b - a) 
-    .find((val) => Math.abs(number) >= val);
+    .find((val) => Math.abs(numberCleaned) >= val);
 
   if (key !== undefined) {
-    return `${(number / key).toFixed(1)}${NUMBER_LOOKUP[key]}`;
+    return `${(numberCleaned / key).toFixed(1)}${NUMBER_LOOKUP[key]}`;
   }
 
-  return `${Math.round(number * 1000) / 1000}`;
+  return `${Math.round(numberCleaned * 1000) / 1000}`;
 }
 
 export function getDashOffset(score: number): string {
@@ -106,7 +117,7 @@ export function getKPIText(KPI: string) {
   NetIncomeCommonStockholders: "Net Income to Common",
   OperatingCashFlow: "Operating Cash Flow",
   NetIncomeFromContinuingOperations: "Net Income (Cont. Ops)",
-  DepreciationAmortizationDepletion: "Depreciation/Amortization/Depletion",
+  DepreciationAmortizationDepletion: "Depreciation / Amortization / Depletion",
   StockBasedCompensation: "Stock-Based Compensation",
   ChangeInWorkingCapital: "Change in Working Capital",
   InterestPaidCFO: "Interest Paid (CFO)",

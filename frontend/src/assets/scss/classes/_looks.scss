@@ -103,11 +103,13 @@
 }
 .look-text-x3 {
   font-size: u.scale_font(2);
+  font-weight: 500;
   font-family: 'Work Sans';
   @include u.remove-margin()
 }
 .look-text-x2 {
   font-size: u.scale_font(1);
+  font-weight: 500;
   font-family: 'Work Sans';
   @include u.remove-margin()
 }

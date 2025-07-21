@@ -110,6 +110,7 @@
     flex-direction: column;
     row-gap: u.scale-gap(3);
     backdrop-filter: blur(0.3rem);
+    background-color: var(--color-ba70);
     min-width: 100vw;
     min-height: 100vh;
     align-items: flex-end;

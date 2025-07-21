@@ -53,7 +53,10 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
                     {prTableRole !== 'basics' ? (
                       <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
                         <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
-                          <p className="look-button-ghost" onClick={() => handleLBOpen(value.KPI)}>
+                          <p
+                            className="look-button-ghost mod-align-left"
+                            onClick={() => handleLBOpen(value.KPI)}
+                          >
                             {getKPIText(value.KPI)}
                           </p>
                           <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
@@ -62,8 +65,10 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
                       </div>
                     ) : (
                       <div key={key} className="area-flex-row mod-space-between">
-                        <p>{getKPIText(value.KPI)}</p>
-                        <p>{stData.latest_entries[value.KPI]}</p>
+                        <p className="mod-align-left">{getKPIText(value.KPI)}</p>
+                        <p className="mod-align-right">
+                          {formatLargeNumber(stData.latest_entries[value.KPI])}
+                        </p>
                       </div>
                     )}
                   </>
