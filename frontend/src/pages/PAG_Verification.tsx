@@ -5,6 +5,7 @@ import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import COM_Navbar from '../components/COM_Navbar';
 import COM_Footer from '../components/COM_Footer';
+import COM_Hero from '../components/COM_Hero';
 
 export default function PAG_Verication() {
   const [searchParams] = useSearchParams();
@@ -37,7 +38,9 @@ export default function PAG_Verication() {
   return (
     <>
       <COM_Navbar />
-      <div className="look-text-x4">{message}</div>
+      <COM_Hero>
+        <div className="look-text-x4">{message}</div>
+      </COM_Hero>
       <COM_Footer />
     </>
   );

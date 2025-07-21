@@ -45,33 +45,34 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
         <h3 className="look-text-x2">{utText}</h3>
         <div className="look-div-container">
           {Object.entries(table_entries)
-            .filter(([_, value]) => Object.keys(stData.latest_entries).includes(value.KPI))
+            .filter(
+              ([_, value]) =>
+                Object.keys(stData.latest_entries).includes(value.KPI) &&
+                stData.latest_entries[value.KPI] !== undefined &&
+                stData.latest_entries[value.KPI] !== null
+            )
             .map(([key, value]) => (
               <>
-                {stData.latest_entries[value.KPI] && (
-                  <>
-                    {prTableRole !== 'basics' ? (
-                      <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
-                        <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
-                          <p
-                            className="look-button-ghost mod-align-left"
-                            onClick={() => handleLBOpen(value.KPI)}
-                          >
-                            {getKPIText(value.KPI)}
-                          </p>
-                          <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
-                        </div>
-                        <COM_IndicatorChange prKPI={value.KPI} />
-                      </div>
-                    ) : (
-                      <div key={key} className="area-flex-row mod-space-between">
-                        <p className="mod-align-left">{getKPIText(value.KPI)}</p>
-                        <p className="mod-align-right">
-                          {formatLargeNumber(stData.latest_entries[value.KPI])}
-                        </p>
-                      </div>
-                    )}
-                  </>
+                {prTableRole !== 'basics' ? (
+                  <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
+                    <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
+                      <p
+                        className="look-button-ghost mod-align-left"
+                        onClick={() => handleLBOpen(value.KPI)}
+                      >
+                        {getKPIText(value.KPI)}
+                      </p>
+                      <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
+                    </div>
+                    <COM_IndicatorChange prKPI={value.KPI} />
+                  </div>
+                ) : (
+                  <div key={key} className="area-flex-row mod-space-between">
+                    <p className="mod-align-left">{getKPIText(value.KPI)}</p>
+                    <p className="mod-align-right">
+                      {formatLargeNumber(stData.latest_entries[value.KPI])}
+                    </p>
+                  </div>
                 )}
               </>
             ))}
