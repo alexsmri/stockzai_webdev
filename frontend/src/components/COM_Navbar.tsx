@@ -2,21 +2,24 @@ import Logo from '@/assets/media/LOGO_schwarzquer.svg?react';
 import Hamburger from '@/assets/media/ICON_Hamburger.svg?react';
 import HamburgerClose from '@/assets/media/ICON_HamburgerClose.svg?react';
 import { useUserStore } from '../context/CTX_UserStore';
-import { useUserStoreSync } from '../hooks/hooks';
-import { useState } from 'react';
+import { useStickyObserver, useUserStoreSync } from '../hooks/hooks';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWindowDimensions } from '../hooks/hooks';
 import { MOBILE_BREAKPOINT } from '../constants';
 
 const MENU_CLASS_NAMES = {
   open: 'area-menu-mobile',
-  closed: 'area-flex-row mod-gap-xl',
+  closed: 'area-flex-row mod-gap-xl mod-padding-none mod-center',
 };
 export default function COM_Navbar() {
   const utStore = useUserStore();
   const [loggedIn, setLoggedIn] = useState(utStore.read('ActionLogin'));
   const [stIsOpen, setStIsOpen] = useState(false);
   const toggleMenu = () => setStIsOpen((prev) => !prev);
+
+  const navRef = useRef<HTMLElement>(null);
+  useStickyObserver(navRef, 'sentinel-nav');
 
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
   const { width } = useWindowDimensions();
@@ -83,7 +86,8 @@ export default function COM_Navbar() {
   );
   return (
     <>
-      <nav className="area-flex-row mod-space-between">
+      <div id="sentinel-nav" style={{ height: '1px', marginTop: '1.5rem' }} />
+      <nav className="area-navbar" ref={navRef}>
         <Logo
           className="img-logo mod-cursor-pointer"
           onClick={() => {

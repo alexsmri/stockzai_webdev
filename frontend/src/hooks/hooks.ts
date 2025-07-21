@@ -107,3 +107,25 @@ export function useWindowDimensions() {
 
   return windowDimensions;
 }
+
+export function useStickyObserver(ref: React.RefObject<HTMLElement | null>, sentinelID: string, stickingClass = "is-sticking") {
+  useEffect(() => {
+    const sentinel = document.getElementById(sentinelID)
+    const el = ref.current;
+    if (!sentinel || !el) return;
+
+    const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.boundingClientRect.y < 0 || !entry.isIntersecting) {
+        el.classList.add(stickingClass);
+      } else {
+        el.classList.remove(stickingClass);
+      }
+    },
+    { threshold: [0] }
+  );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [ref, stickingClass]);
+}

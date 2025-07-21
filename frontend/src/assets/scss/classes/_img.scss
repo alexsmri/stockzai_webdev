@@ -2,8 +2,13 @@
     max-height: var(--height-navbar);
     margin-top: auto;
     margin-bottom: auto;
+    height: 100%;
+    width: 100%;
+    display: block;
+
 }
 .img-hamburger {
     max-height: var(--height-navbar);
     max-width: var(--height-navbar);
+    width: 100%;
 }
