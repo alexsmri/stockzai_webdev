@@ -17,7 +17,6 @@ export default class STO_Companies extends BaseAPIStore<APIResponse> {
     }
     async fetch() {
         const company = await api.get(`/api/companies/${this.symbol}/`);
-        console.log(company);
         return company.data.msg
     }
 

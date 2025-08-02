@@ -7,7 +7,7 @@ from django.http import Http404
 db = DB_Handler("companies")
 
 class CompanyPageView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = None  # This should be set to the appropriate serializer class
 
     def get(self, request, symbol):
