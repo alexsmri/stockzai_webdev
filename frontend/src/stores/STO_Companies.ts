@@ -16,7 +16,7 @@ export default class STO_Companies extends BaseAPIStore<APIResponse> {
         return store;
     }
     async fetch() {
-        const company = await api.get(`/api/companies/${this.symbol}/`);
+        const company = await api.get(`/api/companies/${this.symbol}/`, { responseType: "json" });
         console.log(company)
         return company.data.msg
     }
