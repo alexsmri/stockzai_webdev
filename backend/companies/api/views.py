@@ -19,7 +19,7 @@ class CompanyPageView(APIView):
         if not latest_entries:
             raise Http404("No data found for this symbol.")
         
-        return api_json_response(msg=intel)
+        return api_json_response(msg=type(intel))
 
 class KPIView(APIView):
     permission_classes = [IsAuthenticated]
