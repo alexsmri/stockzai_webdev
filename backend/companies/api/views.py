@@ -18,8 +18,7 @@ class CompanyPageView(APIView):
         latest_entries = intel["latest_entries"]
         if not latest_entries:
             raise Http404("No data found for this symbol.")
-        typ = type(intel)
-        return api_json_response(msg=str(typ))
+        return api_json_response(msg=intel)
 
 class KPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,7 +29,6 @@ class KPIView(APIView):
         # For example, you might use self.request.user.company
         
         kpis = db.dbq_get_kpis()
-        print(kpis)
         return api_json_response(msg=kpis)
 
 class CompanySearchView(APIView):
