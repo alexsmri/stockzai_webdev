@@ -175,7 +175,7 @@ MEDIA_ROOT = BASE_DIR /'media'
 LOGIN_URL = '/users/login/'
 
 CORS_ALLOW_ALL_ORIGINS = True       # FOR NOW ONLY
-CORS_ALLOWS_CREDENTIALS = os.getenv("CORS_ALLOWS_CREDENTIALS")
+CORS_ALLOWS_CREDENTIALS = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.strato.de'
