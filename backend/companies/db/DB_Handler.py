@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
 import pandas as pd
-import math
 import os
 
 
@@ -339,7 +338,7 @@ class DB_Handler:
 
                 # store each value by date
                 for _, row in company_kpis_df.sort_values("date", ascending=True).iterrows():
-                    if not math.isnan(row["value"]):
+                    if not pd.isna(row["value"]):
                         kpi_dictionary[str(row["date"])] = row["value"]
 
                 # store latest entry (most recent date)
