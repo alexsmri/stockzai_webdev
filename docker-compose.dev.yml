@@ -16,6 +16,8 @@ services:
     ports:
       - "8000:8000"
     env_file: ./backend/.env.dev
+    volumes:
+      - ./backend:/backend
     networks:
       - default
       - SA-network-DEV
@@ -35,6 +37,8 @@ services:
     env_file: ./frontend/.env.dev
     ports:
       - 5173:5173
+    volumes:
+      - ./frontend:/frontend
     depends_on:
       - backend
 
