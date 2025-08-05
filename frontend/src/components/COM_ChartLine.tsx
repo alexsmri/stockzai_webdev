@@ -1,8 +1,8 @@
 import { Line } from 'react-chartjs-2';
 import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useCompanyStoreSync } from '../hooks/hooks';
+import { useCompanyStoreSync, useKPIStoreSync } from '../hooks/hooks';
 import { useState } from 'react';
-import { getKPIText } from '../utils/functions';
+import { getKPIScoring, getKPIText } from '../utils/functions';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,19 +13,26 @@ import {
   Legend,
   PointElement,
 } from 'chart.js';
+import { useKPIStore } from '../context/CTX_KPIStore';
 
 interface ChartLineProps {
   KPI: string;
 }
 
 export default function COM_ChartLine({ KPI }: ChartLineProps) {
-  const store = useCompanyStore();
-  const [data, setData] = useState<Record<string, any> | null>(null);
-  useCompanyStoreSync(store, setData);
+  const utCompanyStore = useCompanyStore();
+  const utKPIStore = useKPIStore();
+  const [stData, setStData] = useState<Record<string, any> | null>(null);
+  const [, setStKPIs] = useState<Record<string, any> | null>(null);
+  useCompanyStoreSync(utCompanyStore, setStData);
+  useKPIStoreSync(utKPIStore, setStKPIs);
+
+  const utKPIScoring = getKPIScoring(KPI, utKPIStore);
+
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
   const text = getKPIText(KPI);
-  if (!data) return null;
-  const KPIData = data.company_intel?.[KPI];
+  if (!stData) return null;
+  const KPIData = stData.company_intel?.[KPI];
   if (!KPIData) return null;
 
   const labels = Object.keys(KPIData).map((key) => {

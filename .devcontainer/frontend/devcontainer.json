@@ -1,0 +1,7 @@
+{
+  "name": "SAWEB-frontend-DEV",
+  "dockerComposeFile": "../../docker-compose.dev.yml",
+  "service": "frontend",
+  "workspaceFolder": "/frontend",
+  "shutdownAction": "stopCompose"
+}
