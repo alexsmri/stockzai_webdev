@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { formatLargeNumber } from '../utils/functions';
 import { useCompanyStoreSync } from '../hooks/hooks';
 import { useKPIStore } from '../context/CTX_KPIStore';
 import { useKPIStoreSync } from '../hooks/hooks';
-import { getKPIText } from '../utils/functions';
 import { getRoleText } from '../utils/functions';
-import { useLightbox } from '../context/CTX_Lightbox';
-import COM_IndicatorChange from './COM_IndicatorChange';
+import { flattenObject } from '../utils/formats';
+import COM_KPIInfo from './COM_KPIInfo';
 
 interface ITF_TableInfoProps {
   prTableRole:
@@ -29,8 +27,6 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKpiStore, setStKPIs);
 
-  const { handleLBOpen } = useLightbox();
-
   if (!stData || !stData.latest_entries || !stKPIs) return null;
   const table_entries = Object.entries(stKPIs)
     .filter(([_, value]) => value.role === prTableRole)
@@ -38,43 +34,23 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
       key,
       ...value,
     }));
+  const cleanedData = Object.entries(table_entries).filter(
+    ([_, value]) =>
+      Object.keys(stData.latest_entries).includes(value.KPI) &&
+      stData.latest_entries[value.KPI] !== undefined &&
+      stData.latest_entries[value.KPI] !== null
+  );
+  console.log('cleanedData');
+  console.log(cleanedData);
+  const flattenedData = flattenObject(cleanedData);
   return (
     <>
       <div className="area-flex-col">
         <h3 className="look-text-x2">{utText}</h3>
         <div className="look-div-container">
-          {Object.entries(table_entries)
-            .filter(
-              ([_, value]) =>
-                Object.keys(stData.latest_entries).includes(value.KPI) &&
-                stData.latest_entries[value.KPI] !== undefined &&
-                stData.latest_entries[value.KPI] !== null
-            )
-            .map(([key, value]) => (
-              <>
-                {prTableRole !== 'basics' ? (
-                  <div className="area-flex-col mod-gap-none mod-align-right" key={key}>
-                    <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
-                      <p
-                        className="look-button-ghost mod-align-left mod-text-wrap"
-                        onClick={() => handleLBOpen(value.KPI)}
-                      >
-                        {getKPIText(value.KPI)}
-                      </p>
-                      <p>{formatLargeNumber(stData.latest_entries[value.KPI])}</p>
-                    </div>
-                    <COM_IndicatorChange prKPI={value.KPI} />
-                  </div>
-                ) : (
-                  <div key={key} className="area-flex-row mod-space-between">
-                    <p className="mod-align-left">{getKPIText(value.KPI)}</p>
-                    <p className="mod-align-right">
-                      {formatLargeNumber(stData.latest_entries[value.KPI])}
-                    </p>
-                  </div>
-                )}
-              </>
-            ))}
+          {Object.entries(flattenedData).map(([key, value]) => (
+            <COM_KPIInfo prTableRole={prTableRole} prInfo={value} prKey={key} prValue={1} />
+          ))}
         </div>
       </div>
     </>

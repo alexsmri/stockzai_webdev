@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
 import pandas as pd
 import os
+from .formats import parse_json
 
 
 class DB_Handler:
@@ -326,8 +327,18 @@ class DB_Handler:
     def dbq_get_company_data(self, ticker):
         company_intel = {}
         latest_entries = {}
-        wanted_roles = ["cashflow_statement", "balance_sheet", "income_statement", "scores", "basics", "ratios", "valuation", "statistics"]
-        
+        wanted_roles = [
+            "cashflow_statement", 
+            "balance_sheet", 
+            "income_statement", 
+            "scores", 
+            "basics", 
+            "ratios", 
+            "valuation", 
+            "statistics",
+            "blobs",
+        ]
+
         kpis_df = self.dbu_read("kpi")
         kpis = [(row["id"], row["role"], row["KPI"]) for _, row in kpis_df.iterrows()]
 
@@ -339,12 +350,14 @@ class DB_Handler:
                 # store each value by date
                 for _, row in company_kpis_df.sort_values("date", ascending=True).iterrows():
                     if not pd.isna(row["value"]):
-                        kpi_dictionary[str(row["date"])] = row["value"]
+                        row_value = parse_json(row["value"])
+                        kpi_dictionary[str(row["date"])] = row_value
 
                 # store latest entry (most recent date)
                 if not company_kpis_df.empty:
                     latest_row = company_kpis_df.sort_values("date", ascending=False).iloc[0]
-                    latest_entries[kpi_name] = latest_row["value"]
+                    latest_value = parse_json(latest_row["value"])
+                    latest_entries[kpi_name] = latest_value
 
                 company_intel[kpi_name] = kpi_dictionary
 
@@ -373,9 +386,8 @@ class DB_Handler:
                 symboL_kpi = self.dbq_get_kpi(symbol, 
                                                additional_kpis_info[kpi]["id"], 
                                                additional_kpis_info[kpi]["role"])["value"]
-                print(symboL_kpi)
                 if symboL_kpi:
-                    results_dic[kpi] = symboL_kpi
+                    results_dic[kpi] = parse_json(symboL_kpi)
             
             results[symbol] = results_dic
 

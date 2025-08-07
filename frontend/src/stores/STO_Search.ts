@@ -19,6 +19,7 @@ export default class STO_Search extends BaseAPIStore<APIResponse> {
     }
     async fetch() {
         const company = await api.get(`/api/companies/search/${this.query}/?unique=${this.unique}`);
+        console.log(company)
         return company.data.msg
     }
 
