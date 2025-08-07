@@ -20,6 +20,15 @@ export function getChangeColor(utChange: number): string {
     return "#EE0034";
   }
 }
+export function getChangeBackground(utChange: number): string {
+  if (utChange > 0) {
+    return "rgba(0, 210, 109, 0.2)";
+  } else if (utChange === 0) {
+    return "rgba(255, 255, 255, 0.2)";
+  } else {
+    return "rgba(238, 0, 52, 0.2)";
+  }
+}
 export function getChangeDivClass(utChange: number): string {
   if (utChange > 0) {
     return "look-div-success";
@@ -206,12 +215,12 @@ export function sleep(milliseconds: number) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-export function getKPIScoring(prKPI: string, prStore: VAI_APIStore) {
-  const utKPIS = prStore.get();
-  const utKPIId = Object.keys(utKPIS).find((key) => {
-    if (utKPIS[key]['KPI'] === prKPI) return key;
+export function getKPIScoring(prKPI: string, prKPIs: Record<any, any>) {
+  if (!prKPIs) return KPI_SCORING_ZERO * -1;
+  const utKPIId = Object.keys(prKPIs).find((key) => {
+    if (prKPIs[key]['KPI'] === prKPI) return key;
   });
-  const utKPIInfo = utKPIS[utKPIId as string];
+  const utKPIInfo = prKPIs[utKPIId as string];
   const utKPIScoring =
     typeof utKPIInfo['scoring'] === 'number'
       ? utKPIInfo['scoring'] === 0

@@ -38,7 +38,6 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
       key,
       ...value,
     }));
-
   return (
     <>
       <div className="area-flex-col">

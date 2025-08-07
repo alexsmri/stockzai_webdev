@@ -1,4 +1,4 @@
-import { getChangeColor, formatLargeNumber } from '../utils/functions';
+import { getChangeColor, formatLargeNumber, getKPIScoring } from '../utils/functions';
 import { useCompanyStoreSync } from '../hooks/hooks';
 import { useCompanyStore } from '../context/CTX_CompanyStore';
 import { useState } from 'react';
@@ -23,13 +23,7 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
     if (stKPIs[key]['KPI'] === prKPI) return key;
   });
   const utKPIInfo = stKPIs[utKPIId as string];
-  const utKPIScoring =
-    typeof utKPIInfo['scoring'] === 'number'
-      ? utKPIInfo['scoring'] === 0
-        ? KPI_SCORING_ZERO
-        : 1
-      : 1;
-
+  const utKPIScoring = getKPIScoring(prKPI, stKPIs);
   const utKPIIntel: Record<any, number> = stData.company_intel[prKPI];
   const utDates = Object.keys(utKPIIntel).sort((a, b) => (Date.parse(a) > Date.parse(b) ? -1 : 1));
   const utChildrenEmpty = (
