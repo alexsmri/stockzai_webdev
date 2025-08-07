@@ -1,5 +1,3 @@
-import type { VAI_APIStore } from "../types/interfaces";
-
 const KPI_SCORING_ZERO = -1;
 
 export function getScoreColor(score: number): string {
@@ -196,7 +194,7 @@ export function getKPIText(KPI: string) {
     OrdinarySharesNumber: "Number of Shares",
   };
 
-  return KPI_TITLE_LOOKUP[KPI] || null;
+  return KPI_TITLE_LOOKUP[KPI] || KPI;
 }
 
 export function getRoleText(role: string) {

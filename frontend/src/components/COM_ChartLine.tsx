@@ -91,5 +91,9 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
       },
     },
   };
-  return <Line datasetIdKey={KPI} data={chartData}></Line>;
+  return (
+    <div>
+      <Line datasetIdKey={KPI} data={chartData}></Line>
+    </div>
+  );
 }

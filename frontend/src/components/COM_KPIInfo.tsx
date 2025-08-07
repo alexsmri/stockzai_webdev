@@ -2,6 +2,8 @@ import { useLightbox } from '../context/CTX_Lightbox';
 import { formatLargeNumber, getKPIText } from '../utils/functions';
 import COM_IndicatorChange from './COM_IndicatorChange';
 
+const ROLES_NO_INDICATORS = ['basics', 'blobs'];
+
 interface ITF_KPIInfoProps {
   prTableRole:
     | 'income_statement'
@@ -9,32 +11,32 @@ interface ITF_KPIInfoProps {
     | 'cashflow_statement'
     | 'basics'
     | 'ratios'
-    | 'valuation';
-  prKey: number | string;
-  prInfo: Record<any, any>;
+    | 'valuation'
+    | 'blobs';
+  prKPI: string;
   prValue: number | string;
 }
 
-export default function COM_KPIInfo({ prTableRole, prKey, prInfo }: ITF_KPIInfoProps) {
+export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfoProps) {
   const { handleLBOpen } = useLightbox();
   return (
     <>
-      {prTableRole !== 'basics' ? (
-        <div className="area-flex-col mod-gap-none mod-align-right" key={prKey}>
+      {!ROLES_NO_INDICATORS.includes(prTableRole) ? (
+        <div className="area-flex-col mod-gap-none mod-align-right" key={prKPI}>
           <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
             <p
               className="look-button-ghost mod-align-left mod-text-wrap"
-              onClick={() => handleLBOpen(prInfo.KPI)}
+              onClick={() => handleLBOpen(prKPI)}
             >
-              {getKPIText(prInfo.KPI)}
+              {getKPIText(prKPI)}
             </p>
             <p>{formatLargeNumber(prValue)}</p>
           </div>
-          <COM_IndicatorChange prKPI={prInfo.KPI} />
+          <COM_IndicatorChange prKPI={prKPI} />
         </div>
       ) : (
-        <div key={key} className="area-flex-row mod-space-between">
-          <p className="mod-align-left">{getKPIText(prInfo.KPI)}</p>
+        <div key={prKPI} className="area-flex-row mod-space-between">
+          <p className="mod-align-left">{getKPIText(prKPI)}</p>
           <p className="mod-align-right">{formatLargeNumber(prValue)}</p>
         </div>
       )}
