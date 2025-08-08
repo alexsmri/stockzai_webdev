@@ -15,19 +15,24 @@ export function flattenObject(obj: Record<any, any>, prefix = '') {
   return result;
 }
 
-export function cleanCompanyData() {
+interface ITF_CleanCompanyDataProps {
+  prTableRole: string
+  prKPIs: Record<any, any>
+  prData: Record<any, any>
+}
+export function cleanCompanyData({prTableRole, prKPIs, prData}: ITF_CleanCompanyDataProps) {
 
 let cleanedData: Record<any, any> = {};
   let KPILookup: Record<any, Record<any, any>> = {};
-  for (const [, value] of Object.entries(stKPIs)) {
+  for (const [, value] of Object.entries(prKPIs)) {
     if (
       typeof value === 'object' &&
       value.role === prTableRole &&
-      Object.keys(stData.latest_entries).includes(value.KPI) &&
-      stData.latest_entries[value.KPI] !== undefined &&
-      stData.latest_entries[value.KPI] !== null
+      Object.keys(prData.latest_entries).includes(value.KPI) &&
+      prData.latest_entries[value.KPI] !== undefined &&
+      prData.latest_entries[value.KPI] !== null
     ) {
-      cleanedData[value.KPI] = stData.latest_entries[value.KPI];
+      cleanedData[value.KPI] = prData.latest_entries[value.KPI];
       KPILookup[value.KPI] = value;
     }
   }
@@ -36,4 +41,19 @@ let cleanedData: Record<any, any> = {};
   console.log(KPILookup);
   const flattenedData = flattenObject(cleanedData);
   console.log(flattenedData);
+  return flattenedData
+}
+
+export function getKPIDetails({prKPI, prKPIs}: {prKPI: string, prKPIs: Record<any, any>}) {
+  for (const [, value] of Object.entries(prKPIs)) {
+    if (value.KPI === prKPI) {
+      return value
+    }
+  }
+}
+
+export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, any>}) {
+  let latest_entry = prData.latest_entries[prKPI] || null
+  let data = prData.company_data[prKPI] || null
+  return {latest_entry: latest_entry, data: data}
 }
