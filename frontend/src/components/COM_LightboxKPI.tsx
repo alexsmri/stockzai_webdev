@@ -24,7 +24,7 @@ export default function COM_KPILightbox() {
           <div className="mod-wh-full">
             <COM_Hero>
               <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
-              <div className="area-flex-row">
+              <div className="area-flex-wrap">
                 <COM_TableKPIDetail prKPI={selectedKPI} />
                 <COM_ChartLine KPI={selectedKPI} />
               </div>

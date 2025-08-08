@@ -36,11 +36,7 @@ let cleanedData: Record<any, any> = {};
       KPILookup[value.KPI] = value;
     }
   }
-  console.log('cleanedData');
-  console.log(cleanedData);
-  console.log(KPILookup);
   const flattenedData = flattenObject(cleanedData);
-  console.log(flattenedData);
   return flattenedData
 }
 
@@ -54,6 +50,6 @@ export function getKPIDetails({prKPI, prKPIs}: {prKPI: string, prKPIs: Record<an
 
 export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, any>}) {
   let latest_entry = prData.latest_entries[prKPI] || null
-  let data = prData.company_data[prKPI] || null
+  let data = prData.company_intel[prKPI] || null
   return {latest_entry: latest_entry, data: data}
 }

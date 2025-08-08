@@ -31,11 +31,7 @@
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(0.5rem);
-
-    > * {
-        max-width: 70%;
-        max-height: 70%
-    }
+    padding-top: var(--height-navbar);
 }
 
 .area-flex-wrap {

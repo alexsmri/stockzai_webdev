@@ -92,7 +92,7 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
     },
   };
   return (
-    <div>
+    <div className="area-flex-wrap">
       <Line datasetIdKey={KPI} data={chartData}></Line>
     </div>
   );

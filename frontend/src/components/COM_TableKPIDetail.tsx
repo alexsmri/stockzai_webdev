@@ -29,9 +29,9 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
     prData: stData,
   });
   const utKPIData = getKPIData({ prKPI, prData: stData });
-
-  const utPercentile =
-    utBlob.latest_entry[`${ROLE_BLOB_LOOKUP[utRole]}${prKPI}`] * PERCENTILE_MULTIPLICATION;
+  console.log('Blob');
+  console.log(utBlob);
+  const utPercentile = utBlob.latest_entry[prKPI] * PERCENTILE_MULTIPLICATION;
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
   const utDates = Object.keys(utKPIData.data).sort((a, b) =>
@@ -48,6 +48,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
     'Trailing AVG': utAverage,
     'Sector Percentile': utPercentile,
   };
+  console.log(tableData);
 
-  return <DCOM_TableInfo prTitle="Details" prData={tableData} />;
+  return <DCOM_TableInfo prTitle="Details" prData={tableData} prType="table" />;
 }
