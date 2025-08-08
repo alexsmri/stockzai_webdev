@@ -80,20 +80,23 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
 
   const chartOptions = {
     scales: {
-      xAxes: {
-        display: true,
-        type: 'time',
-        time: {
-          displayFormats: {
-            day: 'MM DD YYYY',
-          },
-        },
+      //xAxes: {
+      //  display: true,
+      //  type: 'time',
+      //  time: {
+      //    displayFormats: {
+      //      day: 'MM DD YYYY',
+      //    },
+      //  },
+      // },
+      yAxes: {
+        display: false,
       },
     },
   };
   return (
     <div className="area-flex-wrap">
-      <Line datasetIdKey={KPI} data={chartData}></Line>
+      <Line datasetIdKey={KPI} data={chartData} options={chartOptions}></Line>
     </div>
   );
 }
