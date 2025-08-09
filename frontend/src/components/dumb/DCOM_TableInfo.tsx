@@ -2,7 +2,7 @@ import DCOM_KPIInfo from './DCOM_KPIInfo';
 
 const TYPE_CLASS_LOOKUP = {
   bar: 'look-div-container area-flex-wrap',
-  table: 'look-div-container area-flex-col',
+  table: 'look-div-container area-flex-col mod-align-stretch',
 };
 
 export default function DCOM_TableInfo({
