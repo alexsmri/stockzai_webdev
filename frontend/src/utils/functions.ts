@@ -18,6 +18,16 @@ export function getChangeColor(utChange: number): string {
     return "#EE0034";
   }
 }
+
+export function getPercentileColor(prPercentile: number) {
+  if (prPercentile < 25) {
+    return "#00D26D";
+  } else if (prPercentile < 75) {
+    return "#D0D0D0";
+  } else {
+    return "#EE0034";
+  }
+}
 export function getChangeBackground(utChange: number): string {
   if (utChange > 0) {
     return "rgba(0, 210, 109, 0.2)";
@@ -227,4 +237,18 @@ export function getKPIScoring(prKPI: string, prKPIs: Record<any, any>) {
       : 1;
 
   return utKPIScoring;
+}
+
+export function getKPIDetails({prKPI, prKPIs}: {prKPI: string, prKPIs: Record<any, any>}) {
+  for (const [, value] of Object.entries(prKPIs)) {
+    if (value.KPI === prKPI) {
+      return value
+    }
+  }
+}
+
+export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, any>}) {
+  let latest_entry = prData.latest_entries[prKPI] || null
+  let data = prData.company_intel[prKPI] || null
+  return {latest_entry: latest_entry, data: data}
 }

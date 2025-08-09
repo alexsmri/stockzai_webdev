@@ -3,14 +3,14 @@ import { useKPIStore } from '../context/CTX_KPIStore';
 import { useCompanyStoreSync, useKPIStoreSync } from '../hooks/hooks';
 import DCOM_TableInfo from './dumb/DCOM_TableInfo';
 import { useState } from 'react';
-import { getKPIData, getKPIDetails } from '../utils/formats';
+import { getKPIData, getKPIDetails, getPercentileColor } from '../utils/functions';
 import { calcAverage } from '../utils/math';
+import { formatPercentile } from '../utils/formats';
 
 const ROLE_BLOB_LOOKUP = {
   ratios: 'finScoresDict',
   valuation: 'valScoresDict',
 };
-const PERCENTILE_MULTIPLICATION = 10;
 
 export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   const utCompanyStore = useCompanyStore();
@@ -29,9 +29,8 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
     prData: stData,
   });
   const utKPIData = getKPIData({ prKPI, prData: stData });
-  console.log('Blob');
-  console.log(utBlob);
-  const utPercentile = utBlob.latest_entry[prKPI] * PERCENTILE_MULTIPLICATION;
+  const utSectorData = getKPIData({ prKPI: 'sector', prData: stData });
+  const utPercentile = utBlob.latest_entry[prKPI];
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
   const utDates = Object.keys(utKPIData.data).sort((a, b) =>
@@ -41,12 +40,18 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   const utNew = utKPIData.data[utDates[0]];
   const utAbsolute = utNew - utOld;
   const utChange = (utAbsolute / Math.abs(utOld)) * 100;
+  const utSector = utSectorData.latest_entry || 'Sector';
 
+  const utPercentileDict = {
+    value: formatPercentile(utPercentile),
+    color: getPercentileColor(utPercentile),
+    text: `Better than ${100 - utPercentile}% of Stocks in ${utSector}`,
+  };
   const tableData = {
     'Current Value': utKPIData.latest_entry,
     'Change 1Y': utChange,
     'Trailing AVG': utAverage,
-    'Sector Percentile': utPercentile,
+    'Sector Percentile': utPercentileDict,
   };
   console.log(tableData);
 

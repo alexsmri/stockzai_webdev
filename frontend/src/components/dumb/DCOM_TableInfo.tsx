@@ -2,7 +2,7 @@ import DCOM_KPIInfo from './DCOM_KPIInfo';
 
 const TYPE_CLASS_LOOKUP = {
   bar: 'look-div-container area-flex-wrap',
-  table: 'look-div-container',
+  table: 'look-div-container area-flex-col',
 };
 
 export default function DCOM_TableInfo({
@@ -11,7 +11,7 @@ export default function DCOM_TableInfo({
   prType = 'table',
 }: {
   prTitle: string;
-  prData: Record<string, string | number>;
+  prData: Record<string, string | number | Record<string, any>>;
   prType: 'bar' | 'table';
 }) {
   return (

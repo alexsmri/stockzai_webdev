@@ -1,7 +1,7 @@
 import { Line } from 'react-chartjs-2';
 import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useCompanyStoreSync, useKPIStoreSync } from '../hooks/hooks';
-import { useState, useEffect } from 'react';
+import { useCompanyStoreSync, useKPIStoreSync, useWindowDimensions } from '../hooks/hooks';
+import { useState } from 'react';
 import { getKPIScoring, getKPIText, getChangeColor, getChangeBackground } from '../utils/functions';
 import {
   Chart as ChartJS,
@@ -15,6 +15,9 @@ import {
 } from 'chart.js';
 import { useKPIStore } from '../context/CTX_KPIStore';
 
+const CHART_WIDTH_VW = 50;
+const CHART_HEIGHT_VH = 50;
+
 interface ChartLineProps {
   KPI: string;
 }
@@ -24,7 +27,6 @@ function getKPIChange(prKPIData: Record<any, any>) {
   if (utDataLen >= 2) {
     const utNew = prKPIData[Object.keys(prKPIData)[utDataLen - 1]];
     const utOld = prKPIData[Object.keys(prKPIData)[0]];
-    console.log(utOld, utNew);
     const utAbsolute = utNew - utOld;
     const utChange = (utAbsolute / Math.abs(utOld)) * 100;
     return utChange;
@@ -36,9 +38,9 @@ function getKPIChange(prKPIData: Record<any, any>) {
 export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const utCompanyStore = useCompanyStore();
   const utKPIStore = useKPIStore();
+  const { width: utWidth, height: utHeight } = useWindowDimensions();
   const [stData, setStData] = useState<Record<string, any> | null>(null);
   const [stKPIs, setStKPIs] = useState<Record<string, any> | null>(null);
-  const [stChange, setStChange] = useState(0);
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKPIStore, setStKPIs);
 
@@ -52,6 +54,8 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const utChange = getKPIChange(KPIData);
   const utLineColor = getChangeColor(utChange * utKPIScoring);
   const utBGColor = getChangeBackground(utChange * utKPIScoring);
+  const utChartWidth = utWidth * (CHART_WIDTH_VW / 100);
+  const utChartHeight = utHeight * (CHART_HEIGHT_VH / 100);
   const labels = Object.keys(KPIData).map((key) => {
     try {
       return new Date(key).toDateString();
@@ -79,6 +83,8 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   };
 
   const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     scales: {
       //xAxes: {
       //  display: true,
@@ -89,14 +95,22 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
       //    },
       //  },
       // },
-      yAxes: {
-        display: false,
+      y: {
+        ticks: {
+          display: false,
+        },
       },
     },
   };
   return (
-    <div className="area-flex-wrap">
-      <Line datasetIdKey={KPI} data={chartData} options={chartOptions}></Line>
+    <div className="area-flex-wrap" style={{ minWidth: '40vw' }}>
+      <Line
+        datasetIdKey={KPI}
+        data={chartData}
+        width={`${utChartWidth}px`}
+        height={`${utChartHeight}px`}
+        options={chartOptions}
+      ></Line>
     </div>
   );
 }

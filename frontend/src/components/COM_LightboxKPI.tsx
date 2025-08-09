@@ -4,32 +4,36 @@ import { useState } from 'react';
 import COM_ChartLine from './COM_ChartLine';
 import { getKPIText } from '../utils/functions';
 import COM_Hero from './COM_Hero';
-import COM_TableInfo from './COM_TableInfo';
-import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useCompanyStoreSync } from '../hooks/hooks';
 import COM_TableKPIDetail from './COM_TableKPIDetail';
+import { getKPIDetails } from '../utils/functions';
+import { useKPIStore } from '../context/CTX_KPIStore';
+import { useKPIStoreSync } from '../hooks/hooks';
+
+const KPI_BLOB_ROLES = ['ratios', 'valuation'];
 
 export default function COM_KPILightbox() {
   const { stIsOpen: isOpen, stSelectedKPI: selectedKPI, handleClose: close } = useLightbox();
   if (!isOpen) return null;
+  const utKPIStore = useKPIStore();
+  const [stKPIs, setStKPIs] = useState<Record<any, any> | null>(null);
+  useKPIStoreSync(utKPIStore, setStKPIs);
 
-  const utStore = useCompanyStore();
-  const [stCompanyData, setStCompanyData] = useState<Record<any, any> | null>(null);
-  useCompanyStoreSync(utStore, setStCompanyData);
+  if (!stKPIs) return null;
+
+  const utKPIDetails = getKPIDetails({ prKPI: selectedKPI, prKPIs: stKPIs });
+  const utRole = utKPIDetails['role'];
 
   return (
     <>
       <COM_Lightbox isOpen={isOpen} onClose={close}>
         {selectedKPI && (
-          <div className="mod-wh-full">
-            <COM_Hero>
-              <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
-              <div className="area-flex-wrap">
-                <COM_TableKPIDetail prKPI={selectedKPI} />
-                <COM_ChartLine KPI={selectedKPI} />
-              </div>
-            </COM_Hero>
-          </div>
+          <COM_Hero>
+            <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
+            <div className="area-flex-wrap mod-flex-grow-children">
+              <COM_ChartLine KPI={selectedKPI} />
+              {KPI_BLOB_ROLES.includes(utRole) && <COM_TableKPIDetail prKPI={selectedKPI} />}
+            </div>
+          </COM_Hero>
         )}
       </COM_Lightbox>
     </>

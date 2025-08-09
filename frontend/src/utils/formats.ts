@@ -1,3 +1,5 @@
+const PERCENTILE_MULTIPLICATION = 10;
+
 export function flattenObject(obj: Record<any, any>, prefix = '') {
   let result: Record<string, string | number> = {};
   for (const [key, value] of Object.entries(obj)) {
@@ -40,16 +42,8 @@ let cleanedData: Record<any, any> = {};
   return flattenedData
 }
 
-export function getKPIDetails({prKPI, prKPIs}: {prKPI: string, prKPIs: Record<any, any>}) {
-  for (const [, value] of Object.entries(prKPIs)) {
-    if (value.KPI === prKPI) {
-      return value
-    }
-  }
-}
-
-export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, any>}) {
-  let latest_entry = prData.latest_entries[prKPI] || null
-  let data = prData.company_intel[prKPI] || null
-  return {latest_entry: latest_entry, data: data}
+export function formatPercentile(prPercentile: number) {
+  let utRes = Math.min(prPercentile, 10)
+  utRes = Math.max(prPercentile, 0.001)
+  return utRes * PERCENTILE_MULTIPLICATION;
 }
