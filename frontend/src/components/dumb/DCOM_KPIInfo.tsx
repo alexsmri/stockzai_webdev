@@ -36,7 +36,7 @@ export default function DCOM_KPIInfo({ prKPI, prValue, prType = 'table' }: ITF_K
   if (value == null) return null;
 
   return (
-    <div className="area-flex-col mod-gap-none mod-padding-none mod-flex-grow-children">
+    <div className="area-flex-col mod-gap-none mod-padding-none mod-align-stretch">
       <div className={TYPE_CLASS_LOOKUP[prType]}>
         <p className="mod-align-left">{getKPIText(prKPI)}</p>
         <p className="mod-align-right" style={{ color }}>

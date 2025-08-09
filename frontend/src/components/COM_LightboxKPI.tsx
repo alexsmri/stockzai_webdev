@@ -3,7 +3,6 @@ import COM_Lightbox from './COM_Lightbox';
 import { useState } from 'react';
 import COM_ChartLine from './COM_ChartLine';
 import { getKPIText } from '../utils/functions';
-import COM_Hero from './COM_Hero';
 import COM_TableKPIDetail from './COM_TableKPIDetail';
 import { getKPIDetails } from '../utils/functions';
 import { useKPIStore } from '../context/CTX_KPIStore';
@@ -27,13 +26,13 @@ export default function COM_KPILightbox() {
     <>
       <COM_Lightbox isOpen={isOpen} onClose={close}>
         {selectedKPI && (
-          <COM_Hero>
+          <div className="area-flex-col mod-center">
             <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
             <div className="area-flex-wrap mod-flex-grow-children">
               <COM_ChartLine KPI={selectedKPI} />
               {KPI_BLOB_ROLES.includes(utRole) && <COM_TableKPIDetail prKPI={selectedKPI} />}
             </div>
-          </COM_Hero>
+          </div>
         )}
       </COM_Lightbox>
     </>
