@@ -30,7 +30,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   });
   const utKPIData = getKPIData({ prKPI, prData: stData });
   const utSectorData = getKPIData({ prKPI: 'sector', prData: stData });
-  const utPercentile = utBlob.latest_entry[prKPI];
+  const utPercentile = formatPercentile(utBlob.latest_entry[prKPI]);
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
   const utDates = Object.keys(utKPIData.data).sort((a, b) =>
@@ -43,7 +43,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   const utSector = utSectorData.latest_entry || 'Sector';
 
   const utPercentileDict = {
-    value: formatPercentile(utPercentile),
+    value: utPercentile,
     color: getPercentileColor(utPercentile),
     text: `Better than ${100 - utPercentile}% of Stocks in ${utSector}`,
   };

@@ -3,6 +3,7 @@ import { useCompanyStore } from '../context/CTX_CompanyStore';
 import { useCompanyStoreSync, useKPIStoreSync, useWindowDimensions } from '../hooks/hooks';
 import { useState } from 'react';
 import { getKPIScoring, getKPIText, getChangeColor, getChangeBackground } from '../utils/functions';
+import { MOBILE_BREAKPOINT } from '../constants';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,7 +17,8 @@ import {
 import { useKPIStore } from '../context/CTX_KPIStore';
 
 const CHART_WIDTH_VW = 50;
-const CHART_HEIGHT_VH = 50;
+const CHART_HEIGHT_VH_DESKTOP = 50;
+const CHART_HEIGHT_VH_MOBILE = 20;
 
 interface ChartLineProps {
   KPI: string;
@@ -55,7 +57,10 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const utLineColor = getChangeColor(utChange * utKPIScoring);
   const utBGColor = getChangeBackground(utChange * utKPIScoring);
   const utChartWidth = utWidth * (CHART_WIDTH_VW / 100);
-  const utChartHeight = utHeight * (CHART_HEIGHT_VH / 100);
+  const utChartHeight =
+    utWidth > MOBILE_BREAKPOINT
+      ? utHeight * (CHART_HEIGHT_VH_DESKTOP / 100)
+      : utHeight * (CHART_HEIGHT_VH_MOBILE / 100);
   const labels = Object.keys(KPIData).map((key) => {
     try {
       return new Date(key).toDateString();

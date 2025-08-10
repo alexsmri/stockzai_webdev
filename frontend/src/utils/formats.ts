@@ -44,6 +44,6 @@ let cleanedData: Record<any, any> = {};
 
 export function formatPercentile(prPercentile: number) {
   let utRes = Math.min(prPercentile, 10)
-  utRes = Math.max(prPercentile, 0.001)
+  utRes = Math.max(utRes, 0.001)
   return utRes * PERCENTILE_MULTIPLICATION;
 }
