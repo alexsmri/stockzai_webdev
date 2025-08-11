@@ -17,7 +17,7 @@ function COM_Winners() {
     <>
       <PRV_WinnerStore args={[]}>
         <div className="area-flex-col look-div-container">
-          <h3 className="look-text-x4">Last month's best predictions</h3>
+          <h3 className="look-text-x4">This week's best predictions</h3>
           {stWinners ? (
             <div className="area-flex-wrap mod-flex-grow-children">
               {Object.keys(stWinners).map((key) => {
