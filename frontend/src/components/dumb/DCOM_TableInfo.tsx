@@ -1,4 +1,5 @@
 import DCOM_KPIInfo from './DCOM_KPIInfo';
+import type { TYP_KPIObject } from '../../types/types';
 
 const TYPE_CLASS_LOOKUP = {
   bar: 'look-div-container area-flex-wrap',
@@ -11,7 +12,7 @@ export default function DCOM_TableInfo({
   prType = 'table',
 }: {
   prTitle: string;
-  prData: Record<string, string | number | Record<string, any>>;
+  prData: Record<string, string | number | TYP_KPIObject>;
   prType: 'bar' | 'table';
 }) {
   return (

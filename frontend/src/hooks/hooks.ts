@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { APIResponse } from "../types/types";
+import type { TYP_APIResponse } from "../types/types";
 import STO_Companies from "../stores/STO_Companies";
 import STO_KPI from "../stores/STO_KPI";
 import STO_Search from "../stores/STO_Search";
@@ -9,7 +9,7 @@ import STO_Winners from "../stores/STO_Winners";
 
 export function useCompanyStoreSync(
     store: STO_Companies, 
-    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
 ) {
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function useCompanyStoreSync(
 
 export function useKPIStoreSync(
     store: STO_KPI, 
-    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
 ) {
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function useKPIStoreSync(
 
 export function useSearchStoreSync(
     store: STO_Search, 
-    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
 ) {
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function useSearchStoreSync(
 
 export function useWinnerStoreSync(
     store: STO_Winners, 
-    setData: React.Dispatch<React.SetStateAction<APIResponse | null>>
+    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
 ) {
 
   useEffect(() => {

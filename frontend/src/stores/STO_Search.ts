@@ -1,8 +1,8 @@
 import api from "../api"
-import type { APIResponse } from "../types/types";
+import type { TYP_APIResponse } from "../types/types";
 import { BaseAPIStore } from "./STO_Base";
 
-export default class STO_Search extends BaseAPIStore<APIResponse> {
+export default class STO_Search extends BaseAPIStore<TYP_APIResponse> {
 
     private query: string
     private unique?: boolean

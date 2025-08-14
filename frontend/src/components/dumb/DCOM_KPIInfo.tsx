@@ -1,9 +1,5 @@
 import { formatLargeNumber, getKPIText } from '../../utils/functions';
-type TYP_KPIObject = {
-  value: number | string;
-  text?: string;
-  color?: string;
-};
+import type { TYP_KPIObject } from '../../types/types';
 
 const TYPE_CLASS_LOOKUP = {
   bar: 'area-flex-row',
@@ -40,7 +36,7 @@ export default function DCOM_KPIInfo({ prKPI, prValue, prType = 'table' }: ITF_K
       <div className={TYPE_CLASS_LOOKUP[prType]}>
         <p className="mod-align-left">{getKPIText(prKPI)}</p>
         <p className="mod-align-right" style={{ color }}>
-          {formatLargeNumber(value)}
+          {formatLargeNumber(value as string | number)}
         </p>
       </div>
       {text && <p className="look-text-x0">{text}</p>}

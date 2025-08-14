@@ -6,7 +6,7 @@ import { useKPIStoreSync } from '../hooks/hooks';
 import { getRoleText } from '../utils/functions';
 import { cleanCompanyData } from '../utils/formats';
 import COM_KPIInfo from './COM_KPIInfo';
-import type { APIResponseKPI } from '../types/types';
+import type { TYP_APIResponseKPI } from '../types/types';
 import type { Dispatch } from 'react';
 
 interface ITF_TableInfoProps {
@@ -24,7 +24,7 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
   const utCompanyStore = useCompanyStore();
   const utKpiStore = useKPIStore();
   const utText = getRoleText(prTableRole);
-  const [stKPIs, setStKPIs] = useState<APIResponseKPI | null>(null);
+  const [stKPIs, setStKPIs] = useState<TYP_APIResponseKPI | null>(null);
   const [stData, setStData] = useState<Record<string, any> | null>(null);
 
   useCompanyStoreSync(utCompanyStore, setStData);
