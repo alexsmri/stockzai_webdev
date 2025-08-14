@@ -47,6 +47,16 @@ export function getChangeDivClass(utChange: number): string {
   }
 }
 
+export function toNumber(v: unknown): number | null {
+  if (v == null) return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v === 'string') {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
 export function formatLargeNumber(number: number | string): string {
   const NUMBER_LOOKUP: Record<number, string> = {
     1000000000000: "T",

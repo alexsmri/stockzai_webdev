@@ -3,8 +3,13 @@ import { useKPIStore } from '../context/CTX_KPIStore';
 import { useCompanyStoreSync, useKPIStoreSync } from '../hooks/hooks';
 import DCOM_TableInfo from './dumb/DCOM_TableInfo';
 import { useState } from 'react';
-import { getKPIData, getKPIDetails, getPercentileColor } from '../utils/functions';
-import { calcAverage } from '../utils/math';
+import {
+  formatLargeNumber,
+  getKPIData,
+  getKPIDetails,
+  getPercentileColor,
+} from '../utils/functions';
+import { calcAverage, calcChange1Y } from '../utils/math';
 import { formatPercentile } from '../utils/formats';
 
 const ROLE_BLOB_LOOKUP = {
@@ -37,16 +42,9 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   let utPercentileDict = null;
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
-  const utDates = Object.keys(utKPIData.data).sort((a, b) =>
-    Date.parse(a) > Date.parse(b) ? -1 : 1
-  );
-  const utOld = utKPIData.data[utDates[1]];
-  const utNew = utKPIData.data[utDates[0]];
-  const utAbsolute = utNew - utOld;
-  const utChange = (utAbsolute / Math.abs(utOld)) * 100;
+  const utChange = calcChange1Y(utKPIData.data).changePct;
   let tableData: Record<string, any> = {
     'Current Value': utKPIData.latest_entry,
-    'Change 1Y': utChange,
     'Trailing AVG': utAverage,
   };
 
@@ -58,6 +56,10 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
       text: `Better than ${100 - utPercentile}% of Stocks in ${utSector}`,
     };
     tableData['Sector Percentile'] = utPercentileDict;
+  }
+
+  if (utChange !== null) {
+    tableData['Change 1Y'] = `${formatLargeNumber(utChange)}%`;
   }
 
   return <DCOM_TableInfo prTitle="Details" prData={tableData} prType="table" />;
