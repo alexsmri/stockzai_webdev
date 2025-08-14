@@ -48,9 +48,9 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
 
   ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
   const text = getKPIText(KPI);
-  if (!stData) return null;
+
+  if (!stData || !stKPIs) return null;
   const KPIData = stData.company_intel?.[KPI];
-  if (!KPIData) return null;
 
   const utKPIScoring = getKPIScoring(KPI, stKPIs);
   const utChange = getKPIChange(KPIData);

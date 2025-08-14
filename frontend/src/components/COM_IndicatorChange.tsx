@@ -7,8 +7,6 @@ import { getChangeDivClass } from '../utils/functions';
 import { useKPIStore } from '../context/CTX_KPIStore';
 import { useKPIStoreSync } from '../hooks/hooks';
 
-const KPI_SCORING_ZERO = -1;
-
 function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: boolean }) {
   const utCompanyStore = useCompanyStore();
   const utKPIStore = useKPIStore();
@@ -19,10 +17,6 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKPIStore, setStKPIs);
   if (!stData || !stData.company_intel[prKPI] || !stKPIs) return null;
-  const utKPIId = Object.keys(stKPIs).find((key) => {
-    if (stKPIs[key]['KPI'] === prKPI) return key;
-  });
-  const utKPIInfo = stKPIs[utKPIId as string];
   const utKPIScoring = getKPIScoring(prKPI, stKPIs);
   const utKPIIntel: Record<any, number> = stData.company_intel[prKPI];
   const utDates = Object.keys(utKPIIntel).sort((a, b) => (Date.parse(a) > Date.parse(b) ? -1 : 1));

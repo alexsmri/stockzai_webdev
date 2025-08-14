@@ -20,7 +20,7 @@ export default function COM_KPILightbox() {
   useKPIStoreSync(utKPIStore, setStKPIs);
   const { width } = useWindowDimensions();
 
-  if (!stKPIs) return null;
+  if (!stKPIs || !selectedKPI) return null;
 
   const utKPIDetails = getKPIDetails({ prKPI: selectedKPI, prKPIs: stKPIs });
   const utRole = utKPIDetails['role'];

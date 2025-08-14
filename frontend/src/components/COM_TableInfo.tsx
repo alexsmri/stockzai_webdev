@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type SetStateAction } from 'react';
 import { useCompanyStore } from '../context/CTX_CompanyStore';
 import { useCompanyStoreSync } from '../hooks/hooks';
 import { useKPIStore } from '../context/CTX_KPIStore';
@@ -7,6 +7,7 @@ import { getRoleText } from '../utils/functions';
 import { cleanCompanyData } from '../utils/formats';
 import COM_KPIInfo from './COM_KPIInfo';
 import type { APIResponseKPI } from '../types/types';
+import type { Dispatch } from 'react';
 
 interface ITF_TableInfoProps {
   prTableRole:
@@ -17,10 +18,9 @@ interface ITF_TableInfoProps {
     | 'ratios'
     | 'valuation'
     | 'blobs';
-  prTableType?: 'bar' | 'table';
 }
 
-export default function COM_TableInfo({ prTableRole, prTableType = 'table' }: ITF_TableInfoProps) {
+export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
   const utCompanyStore = useCompanyStore();
   const utKpiStore = useKPIStore();
   const utText = getRoleText(prTableRole);
@@ -28,7 +28,7 @@ export default function COM_TableInfo({ prTableRole, prTableType = 'table' }: IT
   const [stData, setStData] = useState<Record<string, any> | null>(null);
 
   useCompanyStoreSync(utCompanyStore, setStData);
-  useKPIStoreSync(utKpiStore, setStKPIs);
+  useKPIStoreSync(utKpiStore, setStKPIs as Dispatch<SetStateAction<Record<string, any> | null>>);
 
   if (!stData || !stData.latest_entries || !stKPIs) return null;
   const flattenedData = cleanCompanyData({ prTableRole, prKPIs: stKPIs, prData: stData });
