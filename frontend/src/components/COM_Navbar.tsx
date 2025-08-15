@@ -32,7 +32,7 @@ export default function COM_Navbar() {
     <>
       {loggedIn ? (
         <>
-          <a href="/users/edit" className={utLinkClasses}>
+          <a href="/users/edit" className="look-button-ghost">
             Profile
           </a>
         </>
