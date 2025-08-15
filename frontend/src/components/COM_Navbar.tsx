@@ -77,7 +77,7 @@ export default function COM_Navbar() {
     </>
   );
   return (
-    <>
+    <div className="area-flex-row">
       <div id="sentinel-nav" style={{ height: '1px', marginTop: '1.5rem' }} />
       <nav className="area-navbar" ref={navRef}>
         <Logo
@@ -104,6 +104,6 @@ export default function COM_Navbar() {
           <div className={MENU_CLASS_NAMES.closed}>{utMenuRight}</div>
         )}
       </nav>
-    </>
+    </div>
   );
 }
