@@ -30,12 +30,6 @@ export default function COM_Navbar() {
 
   const utMenuLinks = (
     <>
-      <a href="/companies/search" className={utLinkClasses}>
-        Search
-      </a>
-      <a href="/companies/compare" className={utLinkClasses}>
-        Compare
-      </a>
       {loggedIn ? (
         <>
           <a href="/users/edit" className={utLinkClasses}>
@@ -58,7 +52,7 @@ export default function COM_Navbar() {
 
   const utMenuRight = (
     <>
-      {width <= MOBILE_BREAKPOINT ? (
+      {width <= MOBILE_BREAKPOINT && !loggedIn ? (
         <>
           {stIsOpen ? (
             <>{utMenuLinks}</>
