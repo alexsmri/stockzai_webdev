@@ -10,15 +10,17 @@ import {
   LineElement,
   Title,
   LinearScale,
+  TimeScale,
   Tooltip,
   PointElement,
   Filler,
 } from 'chart.js';
 import { useKPIStore } from '../context/CTX_KPIStore';
 
-const CHART_WIDTH_VW = 50;
+const CHART_WIDTH_VW_DESKTOP = 50;
 const CHART_HEIGHT_VH_DESKTOP = 50;
 const CHART_HEIGHT_VH_MOBILE = 20;
+const CHART_WIDTH_VW_MOBILE = 75;
 
 interface ChartLineProps {
   KPI: string;
@@ -46,7 +48,16 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   useCompanyStoreSync(utCompanyStore, setStData);
   useKPIStoreSync(utKPIStore, setStKPIs);
 
-  ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Filler,
+    TimeScale
+  );
   const text = getKPIText(KPI);
 
   if (!stData || !stKPIs) return null;
@@ -56,14 +67,17 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const utChange = getKPIChange(KPIData);
   const utLineColor = getChangeColor(utChange * utKPIScoring);
   const utBGColor = getChangeBackground(utChange * utKPIScoring);
-  const utChartWidth = utWidth * (CHART_WIDTH_VW / 100);
+  const utChartWidth =
+    utWidth > MOBILE_BREAKPOINT
+      ? utWidth * (CHART_WIDTH_VW_DESKTOP / 100)
+      : utWidth * (CHART_WIDTH_VW_MOBILE / 100);
   const utChartHeight =
     utWidth > MOBILE_BREAKPOINT
       ? utHeight * (CHART_HEIGHT_VH_DESKTOP / 100)
       : utHeight * (CHART_HEIGHT_VH_MOBILE / 100);
   const labels = Object.keys(KPIData).map((key) => {
     try {
-      return new Date(key).toDateString();
+      return new Date(key).toLocaleDateString('en-US');
     } catch {
       return key;
     }
@@ -90,25 +104,10 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: {
-      //xAxes: {
-      //  display: true,
-      //  type: 'time',
-      //  time: {
-      //    displayFormats: {
-      //      day: 'MM DD YYYY',
-      //    },
-      //  },
-      // },
-      y: {
-        ticks: {
-          display: false,
-        },
-      },
-    },
   };
+
   return (
-    <div className="area-flex-wrap" style={{ minWidth: '40vw' }}>
+    <div>
       <Line
         datasetIdKey={KPI}
         data={chartData}
