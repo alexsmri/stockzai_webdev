@@ -21,7 +21,7 @@ function PAG_Home() {
     <>
       <COM_Navbar />
       <COM_Hero>
-        <div className="area-flex-col">
+        <div className="area-flex-col mod-gap-l">
           <h1 className="look-text-x7">Only the bold become pioneers</h1>
           <p className="mod-align-center">
             Lock in your Pre-Beta access today. Get the perks others will miss.
