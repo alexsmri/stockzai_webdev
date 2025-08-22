@@ -1,4 +1,4 @@
-const PERCENTILE_MULTIPLICATION = 10;
+const PERCENTILE_MULTIPLICATION = 1;
 
 export function flattenObject(obj: Record<any, any>, prefix = '') {
   let result: Record<string, string | number> = {};
@@ -46,4 +46,13 @@ export function formatPercentile(prPercentile: number) {
   let utRes = Math.min(prPercentile, 10)
   utRes = Math.max(utRes, 0.001)
   return utRes * PERCENTILE_MULTIPLICATION;
+}
+
+export function formatPercentileEstimate(prPercentile: number) {
+  let utOut = (prPercentile + 1);
+  if (prPercentile <= 2) {
+    utOut = 1
+  }
+  
+  return Math.min(Math.round(utOut) * 10, 95);
 }

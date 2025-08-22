@@ -10,7 +10,7 @@ import {
   getPercentileColor,
 } from '../utils/functions';
 import { calcAverage, calcChange1Y } from '../utils/math';
-import { formatPercentile } from '../utils/formats';
+import { formatPercentile, formatPercentileEstimate } from '../utils/formats';
 
 const ROLE_BLOB_LOOKUP = {
   ratios: 'finScoresDict',
@@ -53,9 +53,9 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
     utPercentileDict = {
       value: utPercentile,
       color: getPercentileColor(utPercentile),
-      text: `Better than ${100 - utPercentile}% of Stocks in ${utSector}`,
+      text: `Better than ~${formatPercentileEstimate(utPercentile)}% of Stocks in ${utSector}`,
     };
-    tableData['Sector Percentile'] = utPercentileDict;
+    tableData['Ratio Score /10'] = utPercentileDict;
   }
 
   if (utChange !== null) {

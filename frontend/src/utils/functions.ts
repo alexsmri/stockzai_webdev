@@ -20,9 +20,9 @@ export function getChangeColor(utChange: number): string {
 }
 
 export function getPercentileColor(prPercentile: number) {
-  if (prPercentile < 25) {
+  if (prPercentile >= 6.6) {
     return "#00D26D";
-  } else if (prPercentile < 75) {
+  } else if (prPercentile >= 3.3) {
     return "#D0D0D0";
   } else {
     return "#EE0034";

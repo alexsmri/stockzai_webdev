@@ -19,10 +19,10 @@ export default function COM_Navbar() {
   const toggleMenu = () => setStIsOpen((prev) => !prev);
 
   const navRef = useRef<HTMLElement>(null);
+  useStickyObserver(navRef, 'sentinel-nav');
 
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
   const { width } = useWindowDimensions();
-  useStickyObserver(navRef, 'sentinel-nav');
   const navigate = useNavigate();
 
   const utLinkClasses =
@@ -30,9 +30,15 @@ export default function COM_Navbar() {
 
   const utMenuLinks = (
     <>
+      <a href="/companies/search" className={utLinkClasses}>
+        Search
+      </a>
+      <a href="/companies/compare" className={utLinkClasses}>
+        Compare
+      </a>
       {loggedIn ? (
         <>
-          <a href="/users/edit" className="look-button-ghost">
+          <a href="/users/edit" className={utLinkClasses}>
             Profile
           </a>
         </>
@@ -52,7 +58,7 @@ export default function COM_Navbar() {
 
   const utMenuRight = (
     <>
-      {width <= MOBILE_BREAKPOINT && !loggedIn ? (
+      {width <= MOBILE_BREAKPOINT ? (
         <>
           {stIsOpen ? (
             <>{utMenuLinks}</>
@@ -82,6 +88,7 @@ export default function COM_Navbar() {
           marginLeft: '1rem',
           marginRight: '1rem',
           alignItems: 'center',
+          zIndex: 10,
         }}
       >
         <nav className="area-navbar" ref={navRef}>
