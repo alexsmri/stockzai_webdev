@@ -53,9 +53,16 @@
     align-items: normal;
     text-align: left;
 }
+.mod-align-center {
+    align-items: normal;
+    text-align: center;
+}
 .mod-align-right {
     align-items: flex-end;
     text-align: right;
+}
+.mod-align-stretch {
+    align-items: stretch;
 }
 .mod-z-1 {
     position: absolute;

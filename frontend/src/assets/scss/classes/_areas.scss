@@ -31,11 +31,8 @@
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(0.5rem);
-
-    > * {
-        width: 70%;
-        height: 70%
-    }
+    padding-top: var(--height-navbar);
+    overflow-y: scroll;
 }
 
 .area-flex-wrap {
@@ -119,9 +116,8 @@
     flex-direction: row;
     flex-shrink: initial;
     align-self: flex-start;
-    padding: u.scale-padding(0.5) u.scale-padding(1.5);
-    margin-left: auto;
-    margin-right: auto;
+    padding: u.scale-padding(0.5) u.scale-padding(2);
+    margin-inline: auto;
     @include u.look-container($radius: 2rem);
     position: sticky;
     top: 0.5rem;

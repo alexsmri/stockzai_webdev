@@ -79,31 +79,44 @@ export default function COM_Navbar() {
   return (
     <>
       <div id="sentinel-nav" style={{ height: '1px', marginTop: '1.5rem' }} />
-      <nav className="area-navbar" ref={navRef}>
-        <Logo
-          className="img-logo mod-cursor-pointer"
-          onClick={() => {
-            navigate('/');
-          }}
-        />
-        {stIsOpen ? (
-          <>
-            <div className={MENU_CLASS_NAMES.closed}>
-              <HamburgerClose
-                className="img-hamburger mod-cursor-pointer"
-                onClick={() => {
-                  toggleMenu();
-                }}
-              />
-            </div>
-            <div className={MENU_CLASS_NAMES.open}>
-              <div className="area-flex-col look-div-container">{utMenuRight}</div>
-            </div>
-          </>
-        ) : (
-          <div className={MENU_CLASS_NAMES.closed}>{utMenuRight}</div>
-        )}
-      </nav>
+      <div
+        style={{
+          position: 'sticky',
+          display: 'flex',
+          flexDirection: 'row',
+          top: '1rem',
+          marginLeft: '1rem',
+          marginRight: '1rem',
+          alignItems: 'center',
+          zIndex: 10,
+        }}
+      >
+        <nav className="area-navbar" ref={navRef}>
+          <Logo
+            className="img-logo mod-cursor-pointer"
+            onClick={() => {
+              navigate('/');
+            }}
+          />
+          {stIsOpen ? (
+            <>
+              <div className={MENU_CLASS_NAMES.closed}>
+                <HamburgerClose
+                  className="img-hamburger mod-cursor-pointer"
+                  onClick={() => {
+                    toggleMenu();
+                  }}
+                />
+              </div>
+              <div className={MENU_CLASS_NAMES.open}>
+                <div className="area-flex-col look-div-container">{utMenuRight}</div>
+              </div>
+            </>
+          ) : (
+            <div className={MENU_CLASS_NAMES.closed}>{utMenuRight}</div>
+          )}
+        </nav>
+      </div>
     </>
   );
 }

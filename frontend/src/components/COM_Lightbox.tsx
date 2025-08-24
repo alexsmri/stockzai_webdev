@@ -10,9 +10,7 @@ export default function COM_Lightbox({ isOpen, onClose, children }: LightboxProp
   return (
     <>
       <div className="area-lightbox" onClick={onClose}>
-        <div className="area-flex-col">
-          {children}
-        </div>
+        <div className="area-flex-col mod-wh-full">{children}</div>
       </div>
     </>
   );

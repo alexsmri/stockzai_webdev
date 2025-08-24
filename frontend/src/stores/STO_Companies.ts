@@ -1,8 +1,8 @@
 import api from "../api"
-import type { APIResponse } from "../types/types";
+import type { TYP_APIResponse } from "../types/types";
 import { BaseAPIStore } from "./STO_Base";
 
-export default class STO_Companies extends BaseAPIStore<APIResponse> {
+export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> {
 
     private symbol: string
 
@@ -17,6 +17,7 @@ export default class STO_Companies extends BaseAPIStore<APIResponse> {
     }
     async fetch() {
         const company = await api.get(`/api/companies/${this.symbol}/`, { responseType: "json" });
+        console.log(company)
         return company.data.msg
     }
 

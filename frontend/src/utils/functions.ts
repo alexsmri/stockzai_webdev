@@ -1,3 +1,5 @@
+const KPI_SCORING_ZERO = -1;
+
 export function getScoreColor(score: number): string {
   if (score >= 6.6) {
     return "#00D26D";
@@ -16,6 +18,25 @@ export function getChangeColor(utChange: number): string {
     return "#EE0034";
   }
 }
+
+export function getPercentileColor(prPercentile: number) {
+  if (prPercentile >= 6.6) {
+    return "#00D26D";
+  } else if (prPercentile >= 3.3) {
+    return "#D0D0D0";
+  } else {
+    return "#EE0034";
+  }
+}
+export function getChangeBackground(utChange: number): string {
+  if (utChange > 0) {
+    return "rgba(0, 210, 109, 0.2)";
+  } else if (utChange === 0) {
+    return "rgba(255, 255, 255, 0.2)";
+  } else {
+    return "rgba(238, 0, 52, 0.2)";
+  }
+}
 export function getChangeDivClass(utChange: number): string {
   if (utChange > 0) {
     return "look-div-success";
@@ -24,6 +45,16 @@ export function getChangeDivClass(utChange: number): string {
   } else {
     return "look-div-failure";
   }
+}
+
+export function toNumber(v: unknown): number | null {
+  if (v == null) return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (typeof v === 'string') {
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
 }
 
 export function formatLargeNumber(number: number | string): string {
@@ -47,7 +78,7 @@ export function formatLargeNumber(number: number | string): string {
 
   const key = Object.keys(NUMBER_LOOKUP)
     .map(Number)
-    .sort((a, b) => b - a) 
+    .sort((a, b) => b - a)
     .find((val) => Math.abs(numberCleaned) >= val);
 
   if (key !== undefined) {
@@ -73,117 +104,117 @@ export function getScoreText(scoreKPI: "financial_score" | "valuation_score"): s
 
 export function getKPIText(KPI: string) {
   const KPI_TITLE_LOOKUP: Record<string, string> = {
-  CashAndCashEquivalents: "Cash & Cash Equivalents",
-  AccountsReceivable: "Accounts Receivable",
-  Inventory: "Inventory",
-  PrepaidAssets: "Prepaid Assets",
-  OtherCurrentAssets: "Other Current Assets",
-  CurrentAssets: "Total Current Assets",
-  Properties: "Properties",
-  MachineryFurnitureEquipment: "Machinery, Furniture & Equipment",
-  GoodwillAndOtherIntangibleAssets: "Goodwill & Intangible Assets",
-  LongTermEquityInvestment: "Long-Term Equity Investments",
-  OtherNonCurrentAssets: "Other Non-Current Assets",
-  TotalNonCurrentAssets: "Total Non-Current Assets",
-  TotalAssets: "Total Assets",
-  AccountsPayable: "Accounts Payable",
-  OtherCurrentLiabilities: "Other Current Liabilities",
-  CurrentLiabilities: "Total Current Liabilities",
-  NonCurrentDeferredTaxesLiabilities: "Deferred Tax Liabilities",
-  OtherNonCurrentLiabilities: "Other Non-Current Liabilities",
-  TotalDebt: "Total Debt",
-  TotalLiabilitiesNetMinorityInterest: "Total Liabilities (net of minority interest)",
-  CommonStock: "Common Stock",
-  RetainedEarnings: "Retained Earnings",
-  AdditionalPaidInCapital: "Additional Paid-in Capital",
-  TreasuryStock: "Treasury Stock",
-  StockholdersEquity: "Stockholders' Equity",
-  TotalEquityGrossMinorityInterest: "Total Equity (gross of minority interest)",
-  TotalRevenue: "Total Revenue",
-  CostOfRevenue: "Cost of Revenue",
-  GrossProfit: "Gross Profit",
-  SellingGeneralAndAdministration: "Selling, General & Admin",
-  ResearchAndDevelopment: "R&D",
-  DepreciationAndAmortizationInIncomeStatement: "Depreciation & Amortization",
-  OperatingExpense: "Operating Expenses",
-  EBIT: "EBIT",
-  InterestIncomeNonOperating: "Interest Income (Non-Op)",
-  InterestExpenseNonOperating: "Interest Expense (Non-Op)",
-  OtherIncomeExpense: "Other Income/Expense",
-  TotalOtherFinanceCost: "Total Other Finance Cost",
-  PretaxIncome: "Pre-Tax Income",
-  TaxProvision: "Tax Provision",
-  NetIncome: "Net Income",
-  NetIncomeCommonStockholders: "Net Income to Common",
-  OperatingCashFlow: "Operating Cash Flow",
-  NetIncomeFromContinuingOperations: "Net Income (Cont. Ops)",
-  DepreciationAmortizationDepletion: "Depreciation / Amortization / Depletion",
-  StockBasedCompensation: "Stock-Based Compensation",
-  ChangeInWorkingCapital: "Change in Working Capital",
-  InterestPaidCFO: "Interest Paid (CFO)",
-  InterestReceivedCFO: "Interest Received (CFO)",
-  IncomeTaxPaidSupplementalData: "Income Tax Paid",
-  InvestingCashFlow: "Investing Cash Flow",
-  CapitalExpenditure: "Capital Expenditures",
-  PurchaseOfInvestment: "Investment Purchases",
-  SaleOfInvestment: "Investment Sales",
-  PurchaseOfPPE: "Purchase of PPE",
-  SaleOfPPE: "Sale of PPE",
-  FinancingCashFlow: "Financing Cash Flow",
-  IssuanceOfDebt: "Debt Issuance",
-  RepaymentOfDebt: "Debt Repayment",
-  IssuanceOfCapitalStock: "Capital Stock Issued",
-  RepurchaseOfCapitalStock: "Capital Stock Repurchased",
-  DividendPaidCFO: "Dividends Paid",
-  ChangesInCash: "Net Cash Change",
-  EffectOfExchangeRateChanges: "FX Effect",
-  BeginningCashPosition: "Cash at Beginning",
-  EndCashPosition: "Cash at End",
-  returnOnAssets: "Return on Assets (ROA)",
-  returnOnEquity: "Return on Equity (ROE)",
-  debtToEquity: "Debt to Equity",
-  grossMargins: "Gross Margin",
-  operatingMargins: "Operating Margin",
-  profitMargins: "Profit Margin",
-  trailingPE: "P/E Ratio (Trailing)",
-  priceToBook: "Price-to-Book Ratio",
-  currentRatio: "Current Ratio",
-  quickRatio: "Quick Ratio",
-  DividendPerShare: "Dividend per Share",
-  sector: "Sector",
-  fullTimeEmployees: "Employees",
-  currency: "Currency",
-  country: "Country",
-  industry: "Industry",
-  website: "Website",
-  webtext: "Website Description",
-  business_summary: "Business Summary",
-  news_link: "News Link",
-  pr_report: "Press Reports",
-  name: "Company Name",
-  strenghts: "Strengths",
-  weaknesses: "Weaknesses",
-  opportunities: "Opportunities",
-  threats: "Threats",
-  innovation_score: "Innovation Score",
-  sustainability_score: "Sustainability Score",
-  risk_score: "Risk Score",
-  pr_score: "PR Score",
-  financial_score: "Financial Score",
-  valuation_score: "Valuation Score",
-  news_plaintext: "News",
-  marketCap: "Market Capitalization",
-  PriceToSales: "Price to Sales",
-  PriceToFreeCashflow: "Price to Free Cash Flow",
-  enterpriseValue: "Enterprise Value",
-  EVtoEBITDA: "EV/EBITDA",
-  EVtoSales: "EV/Sales",
-  EBITDA: "EBITDA",
-  FreeCashFlow: "Free Cash Flow",
-  OrdinarySharesNumber: "Number of Shares",
-};
+    CashAndCashEquivalents: "Cash & Cash Equivalents",
+    AccountsReceivable: "Accounts Receivable",
+    Inventory: "Inventory",
+    PrepaidAssets: "Prepaid Assets",
+    OtherCurrentAssets: "Other Current Assets",
+    CurrentAssets: "Total Current Assets",
+    Properties: "Properties",
+    MachineryFurnitureEquipment: "Machinery, Furniture & Equipment",
+    GoodwillAndOtherIntangibleAssets: "Goodwill & Intangible Assets",
+    LongTermEquityInvestment: "Long-Term Equity Investments",
+    OtherNonCurrentAssets: "Other Non-Current Assets",
+    TotalNonCurrentAssets: "Total Non-Current Assets",
+    TotalAssets: "Total Assets",
+    AccountsPayable: "Accounts Payable",
+    OtherCurrentLiabilities: "Other Current Liabilities",
+    CurrentLiabilities: "Total Current Liabilities",
+    NonCurrentDeferredTaxesLiabilities: "Deferred Tax Liabilities",
+    OtherNonCurrentLiabilities: "Other Non-Current Liabilities",
+    TotalDebt: "Total Debt",
+    TotalLiabilitiesNetMinorityInterest: "Total Liabilities (net of minority interest)",
+    CommonStock: "Common Stock",
+    RetainedEarnings: "Retained Earnings",
+    AdditionalPaidInCapital: "Additional Paid-in Capital",
+    TreasuryStock: "Treasury Stock",
+    StockholdersEquity: "Stockholders' Equity",
+    TotalEquityGrossMinorityInterest: "Total Equity (gross of minority interest)",
+    TotalRevenue: "Total Revenue",
+    CostOfRevenue: "Cost of Revenue",
+    GrossProfit: "Gross Profit",
+    SellingGeneralAndAdministration: "Selling, General & Admin",
+    ResearchAndDevelopment: "R&D",
+    DepreciationAndAmortizationInIncomeStatement: "Depreciation & Amortization",
+    OperatingExpense: "Operating Expenses",
+    EBIT: "EBIT",
+    InterestIncomeNonOperating: "Interest Income (Non-Op)",
+    InterestExpenseNonOperating: "Interest Expense (Non-Op)",
+    OtherIncomeExpense: "Other Income/Expense",
+    TotalOtherFinanceCost: "Total Other Finance Cost",
+    PretaxIncome: "Pre-Tax Income",
+    TaxProvision: "Tax Provision",
+    NetIncome: "Net Income",
+    NetIncomeCommonStockholders: "Net Income to Common",
+    OperatingCashFlow: "Operating Cash Flow",
+    NetIncomeFromContinuingOperations: "Net Income (Cont. Ops)",
+    DepreciationAmortizationDepletion: "Depreciation / Amortization / Depletion",
+    StockBasedCompensation: "Stock-Based Compensation",
+    ChangeInWorkingCapital: "Change in Working Capital",
+    InterestPaidCFO: "Interest Paid (CFO)",
+    InterestReceivedCFO: "Interest Received (CFO)",
+    IncomeTaxPaidSupplementalData: "Income Tax Paid",
+    InvestingCashFlow: "Investing Cash Flow",
+    CapitalExpenditure: "Capital Expenditures",
+    PurchaseOfInvestment: "Investment Purchases",
+    SaleOfInvestment: "Investment Sales",
+    PurchaseOfPPE: "Purchase of PPE",
+    SaleOfPPE: "Sale of PPE",
+    FinancingCashFlow: "Financing Cash Flow",
+    IssuanceOfDebt: "Debt Issuance",
+    RepaymentOfDebt: "Debt Repayment",
+    IssuanceOfCapitalStock: "Capital Stock Issued",
+    RepurchaseOfCapitalStock: "Capital Stock Repurchased",
+    DividendPaidCFO: "Dividends Paid",
+    ChangesInCash: "Net Cash Change",
+    EffectOfExchangeRateChanges: "FX Effect",
+    BeginningCashPosition: "Cash at Beginning",
+    EndCashPosition: "Cash at End",
+    returnOnAssets: "Return on Assets (ROA)",
+    returnOnEquity: "Return on Equity (ROE)",
+    debtToEquity: "Debt to Equity",
+    grossMargins: "Gross Margin",
+    operatingMargins: "Operating Margin",
+    profitMargins: "Profit Margin",
+    trailingPE: "P/E Ratio (Trailing)",
+    priceToBook: "Price-to-Book Ratio",
+    currentRatio: "Current Ratio",
+    quickRatio: "Quick Ratio",
+    DividendPerShare: "Dividend per Share",
+    sector: "Sector",
+    fullTimeEmployees: "Employees",
+    currency: "Currency",
+    country: "Country",
+    industry: "Industry",
+    website: "Website",
+    webtext: "Website Description",
+    business_summary: "Business Summary",
+    news_link: "News Link",
+    pr_report: "Press Reports",
+    name: "Company Name",
+    strenghts: "Strengths",
+    weaknesses: "Weaknesses",
+    opportunities: "Opportunities",
+    threats: "Threats",
+    innovation_score: "Innovation Score",
+    sustainability_score: "Sustainability Score",
+    risk_score: "Risk Score",
+    pr_score: "PR Score",
+    financial_score: "Financial Score",
+    valuation_score: "Valuation Score",
+    news_plaintext: "News",
+    marketCap: "Market Capitalization",
+    PriceToSales: "Price to Sales",
+    PriceToFreeCashflow: "Price to Free Cash Flow",
+    enterpriseValue: "Enterprise Value",
+    EVtoEBITDA: "EV/EBITDA",
+    EVtoSales: "EV/Sales",
+    EBITDA: "EBITDA",
+    FreeCashFlow: "Free Cash Flow",
+    OrdinarySharesNumber: "Number of Shares",
+  };
 
-return KPI_TITLE_LOOKUP[KPI] || null;
+  return KPI_TITLE_LOOKUP[KPI] || KPI;
 }
 
 export function getRoleText(role: string) {
@@ -194,10 +225,40 @@ export function getRoleText(role: string) {
     ratios: "Financial Ratios",
     valuation: "Valuation Ratios",
   }
-  
-return ROLE_TITLE_LOOKUP[role] || null;
+
+  return ROLE_TITLE_LOOKUP[role] || null;
 }
 
 export function sleep(milliseconds: number) {
-return new Promise(resolve => setTimeout(resolve, milliseconds));
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+export function getKPIScoring(prKPI: string, prKPIs: Record<any, any>) {
+  if (!prKPIs) return KPI_SCORING_ZERO * -1;
+  const utKPIId = Object.keys(prKPIs).find((key) => {
+    if (prKPIs[key]['KPI'] === prKPI) return key;
+  });
+  const utKPIInfo = prKPIs[utKPIId as string];
+  const utKPIScoring =
+    typeof utKPIInfo['scoring'] === 'number'
+      ? utKPIInfo['scoring'] === 0
+        ? KPI_SCORING_ZERO
+        : 1
+      : 1;
+
+  return utKPIScoring;
+}
+
+export function getKPIDetails({prKPI, prKPIs}: {prKPI: string, prKPIs: Record<any, any>}) {
+  for (const [, value] of Object.entries(prKPIs)) {
+    if (value.KPI === prKPI) {
+      return value
+    }
+  }
+}
+
+export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, any>}) {
+  let latest_entry = prData.latest_entries[prKPI] || null
+  let data = prData.company_intel[prKPI] || null
+  return {latest_entry: latest_entry, data: data}
 }
