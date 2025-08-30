@@ -84,6 +84,7 @@
 }
 .look-text-x6 {
   font-size: u.scale_font(5);
+  font-weight: 600;
   font-family: 'ClashDisplay';
   text-align: center;
   @include u.remove-margin()

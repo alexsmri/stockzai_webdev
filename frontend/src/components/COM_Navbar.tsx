@@ -36,6 +36,9 @@ export default function COM_Navbar() {
       <a href="/companies/compare" className={utLinkClasses}>
         Compare
       </a>
+      <a href="/feedback" className={utLinkClasses}>
+        Feedback
+      </a>
       {loggedIn ? (
         <>
           <a href="/users/edit" className={utLinkClasses}>

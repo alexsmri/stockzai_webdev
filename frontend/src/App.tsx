@@ -15,6 +15,7 @@ import PAG_EditProfile from './pages/PAG_EditProfile';
 import { PRV_Alert } from './context/CTX_Alert';
 import PAG_Legal from './pages/PAG_Legal';
 import COM_HandleTokens from './components/COM_HandleTokens';
+import PAG_FormFeedback from './pages/PAG_FormFeedback';
 
 function Logout() {
   localStorage.clear();
@@ -76,6 +77,7 @@ function App() {
                   </COM_ProtectedRoute>
                 }
               />
+              <Route path="/feedback" element={<PAG_FormFeedback />} />
               <Route path="/loading" element={<COM_Loading />} />
             </Routes>
           </BrowserRouter>
