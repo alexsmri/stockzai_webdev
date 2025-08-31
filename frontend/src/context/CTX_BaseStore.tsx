@@ -1,17 +1,15 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import COM_Loading from "../components/COM_Loading";
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import COM_Loading from '../components/COM_Loading';
 
-type StoreWithCreate<TStore, TArgs extends any[]> = {
-  create: (...args: TArgs) => Promise<TStore>;
+export interface ITF_Fillable {
+  fill: () => Promise<void>;
+}
+
+type StoreWithCreate<TStore extends ITF_Fillable, TArgs extends any[]> = {
+  create: (...args: TArgs) => TStore;
 };
 
-export function createStoreProvider<TStore, TArgs extends any[]>(
+export function createStoreProvider<TStore extends ITF_Fillable, TArgs extends any[]>(
   StoreClass: StoreWithCreate<TStore, TArgs>,
   storeName: string
 ) {
@@ -28,25 +26,24 @@ export function createStoreProvider<TStore, TArgs extends any[]>(
   const StoreProvider = ({
     args,
     children,
+    showFallback = false,
     fallback,
   }: {
     args: TArgs;
     children: ReactNode;
+    showFallback?: boolean;
     fallback?: ReactNode;
   }) => {
-    const [store, setStore] = useState<TStore | null>(null);
+    const store: TStore = StoreClass.create(...args);
     useEffect(() => {
-      StoreClass.create(...args).then(setStore);
+      store.fill();
     }, [...args]);
-    
 
-    if (!store) return <>{fallback ?? <COM_Loading />}</>;
+    if (!store) {
+      return showFallback ? <>{children}</> : <>{fallback}</> || <COM_Loading />;
+    }
 
-    return (
-      <StoreContext.Provider value={store}>
-        {children}
-      </StoreContext.Provider>
-    );
+    return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
   };
 
   return { useStore, StoreProvider };

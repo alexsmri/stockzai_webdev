@@ -12,7 +12,7 @@ export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> {
     }
     static async create(symbol: string): Promise<STO_Companies> {
         const store = new STO_Companies(symbol);
-        await store.init();
+        store.init();
         return store;
     }
     async fetch() {
