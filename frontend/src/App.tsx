@@ -29,7 +29,7 @@ function CreateAndLogout() {
 
 function App() {
   return (
-    <PRV_UserStore args={[]}>
+    <PRV_UserStore args={[]} showFallback={true}>
       <COM_HandleTokens>
         <PRV_Alert>
           <BrowserRouter>

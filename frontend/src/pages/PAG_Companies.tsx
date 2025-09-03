@@ -20,8 +20,8 @@ function PAG_Companies() {
   return (
     <>
       <PRV_Lightbox>
-        <PRV_KPIStore args={[]}>
-          <PRV_CompanyStore args={[symbol]}>
+        <PRV_KPIStore args={[]} showFallback={true}>
+          <PRV_CompanyStore args={[symbol]} showFallback={true}>
             <COM_Navbar />
             <h1 className="look-text-x7">{symbol}</h1>
             <div className="area-flex-col mod-gap-xl mod-padding-xl">

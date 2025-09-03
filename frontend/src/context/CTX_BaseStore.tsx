@@ -27,7 +27,7 @@ export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extend
     args,
     children,
     showFallback = false,
-    fallback,
+    fallback = <COM_Loading />,
   }: {
     args: TArgs;
     children: ReactNode;
@@ -36,13 +36,11 @@ export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extend
   }) => {
     const store: TStore = StoreClass.create(...args);
     useEffect(() => {
-      if ('fill' in store) {
-        store.fill();
-      }
+      store.fill();
     }, [...args]);
 
     if (!store) {
-      return showFallback ? <>{children}</> : <>{fallback}</> || <COM_Loading />;
+      return showFallback ? fallback : <>{children}</>;
     }
 
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
@@ -72,7 +70,8 @@ export function createStoreProvider<TStore, TArgs extends any[]>(
   const StoreProvider = ({
     args,
     children,
-    fallback,
+    showFallback = false,
+    fallback = <COM_Loading />,
   }: {
     args: TArgs;
     children: ReactNode;
@@ -85,7 +84,7 @@ export function createStoreProvider<TStore, TArgs extends any[]>(
     }, [...args]);
 
     if (!store) {
-      return fallback || <COM_Loading />;
+      return showFallback ? fallback : <>{children}</>;
     }
 
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;

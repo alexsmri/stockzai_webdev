@@ -1,7 +1,6 @@
 import { useWinnerStore } from '../context/CTX_WinnerStore';
 import { useWinnerStoreSync } from '../hooks/hooks';
 import { useState } from 'react';
-import COM_Loading from '../components/COM_Loading';
 import DCOM_IndicatorChange from '../components/dumb/DCOM_IndicatorChange';
 import DCOM_ScoreRadial from '../components/dumb/DCOM_ScoreRadial';
 import { PRV_WinnerStore } from '../context/CTX_WinnerStore';
@@ -15,7 +14,7 @@ function COM_Winners() {
 
   return (
     <>
-      <PRV_WinnerStore args={[]}>
+      <PRV_WinnerStore args={[]} showFallback={true}>
         <div className="area-flex-col look-div-container">
           {(
             <>
