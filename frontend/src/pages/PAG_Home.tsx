@@ -19,13 +19,12 @@ function PAG_Home() {
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
   const navigate = useNavigate();
   const utLink = loggedIn ? PRIMARY_BUTTON_LINKS.login : PRIMARY_BUTTON_LINKS.anonymous;
-  const utFeedbackLink = '/feedback';
   return (
     <>
       <COM_Navbar />
       <COM_Hero>
         <div className="area-flex-col mod-gap-l">
-          <div className="area-flex-col">
+          <div className="area-flex-col mod-gap-l">
             <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
             <h3 className="look-text-x2">All the info you need, none of the noise. 100% Free.</h3>
             <button
@@ -41,21 +40,6 @@ function PAG_Home() {
             <COM_Winners />
           </PRV_WinnerStore>
         </div>
-      </COM_Hero>
-      <COM_Hero>
-        <h1 className="look-text-x6">Your input matters.</h1>
-        <p>
-          With your feedback, you can help improve stockz.ai in its earliest days! Wouldn't that be
-          great?
-        </p>
-        <button
-          className="look-button-primary"
-          onClick={() => {
-            navigate(utFeedbackLink);
-          }}
-        >
-          Give Feedback
-        </button>
       </COM_Hero>
       <COM_Footer />
     </>
