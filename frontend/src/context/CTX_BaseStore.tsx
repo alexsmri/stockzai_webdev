@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import COM_Loading from '../components/COM_Loading';
 
 export interface ITF_Fillable {
@@ -34,14 +34,27 @@ export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extend
     showFallback?: boolean;
     fallback?: ReactNode;
   }) => {
-    const store: TStore = StoreClass.create(...args);
-    useEffect(() => {
-      store.fill();
-    }, [...args]);
+    const store = useMemo(() => StoreClass.create(...args), [...args]);
 
-    if (!store) {
-      return showFallback ? fallback : <>{children}</>;
-    }
+    const [storeFilled, setStoreFilled] = useState(false);
+
+    useEffect(() => {
+      let alive = true;
+      (async () => {
+        try {
+          await store.fill();
+          if (alive) setStoreFilled(true);
+        } catch {
+          if (alive) setStoreFilled(true);
+        }
+      })();
+      return () => {
+        alive = false;
+        setStoreFilled(false);
+      };
+    }, [store]);
+
+    if (showFallback && !storeFilled) return <>{fallback}</>;
 
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
   };
