@@ -7,9 +7,9 @@ export default class STO_KPI extends BaseAPIStore<TYP_APIResponse>{
         super()
     }
 
-    static async create(): Promise<STO_KPI> {
+    static create(): STO_KPI {
         const store = new STO_KPI();
-        await store.init();
+        store.init();
         return store;
     }
 

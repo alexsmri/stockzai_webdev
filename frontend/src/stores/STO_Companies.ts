@@ -1,8 +1,9 @@
 import api from "../api"
+import type { ITF_Fillable } from "../context/CTX_BaseStore";
 import type { TYP_APIResponse } from "../types/types";
 import { BaseAPIStore } from "./STO_Base";
 
-export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> {
+export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> implements ITF_Fillable {
 
     private symbol: string
 
@@ -10,7 +11,7 @@ export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> {
         super();
         this.symbol = symbol;
     }
-    static async create(symbol: string): Promise<STO_Companies> {
+    static create(symbol: string): STO_Companies {
         const store = new STO_Companies(symbol);
         store.init();
         return store;
