@@ -66,6 +66,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
+    "django_celery_beat",
 
     'companies', 
     'users'
@@ -186,7 +187,18 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 FRONTEND_URL=os.getenv('FRONTEND_URL')
-'''
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
-'''
+
+CELERY_BROKER_URL = "redis://redis:6379/1" 
+CELERY_RESULT_BACKEND = "redis://redis:6379/2"
+
+CELERY_TASK_DEFAULT_QUEUE = "web"
+CELERY_TASK_QUEUES = {
+    "web": {"exchange": "web", "routing_key": "web.#"},
+}
+CELERY_TASK_ROUTES = {
+    "app.tasks.heavy_*": {"queue": "compute", "routing_key": "compute.heavy"},
+}
+CELERYD_PREFETCH_MULTIPLIER = 1
+CELERY_ACKS_LATE = True
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
