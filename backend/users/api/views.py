@@ -12,6 +12,9 @@ from stockzAI.response import api_json_response
 from users.tokens import verification_token, password_reset_token
 from rest_framework.decorators import permission_classes, api_view
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -133,6 +136,7 @@ def view_password_reset_token(request):
             token_obj.save()
             return api_json_response(msg=True)
     except Exception as e:
+        logger.exception(e)
         return api_json_response(error="Something went wrong", status=400)
 
 @api_view(["POST"])
