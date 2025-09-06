@@ -12,9 +12,9 @@ export default class STO_Search extends BaseAPIStore<TYP_APIResponse> {
         this.query = query;
         this.unique = unique;
     }
-    static async create(query: string, unique: boolean = false): Promise<STO_Search> {
+    static create(query: string, unique: boolean = false): STO_Search {
         const store = new STO_Search(query, unique);
-        await store.init();
+        store.init();
         return store;
     }
     async fetch() {

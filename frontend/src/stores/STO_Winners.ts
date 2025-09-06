@@ -7,9 +7,9 @@ export default class STO_Winners extends BaseAPIStore<TYP_APIResponse> {
     private constructor() {
         super();
     }
-    static async create(): Promise<STO_Winners> {
+    static create(): STO_Winners {
         const store = new STO_Winners();
-        await store.init();
+        store.init();
         return store;
     }
     async fetch() {

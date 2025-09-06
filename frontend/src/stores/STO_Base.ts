@@ -9,8 +9,11 @@ export abstract class BaseAPIStore<T> {
 
     abstract fetch(): Promise<T>
 
-    async init() {
+    init() {
         this.status = "loading"
+    }
+
+    async fill(): Promise<void> {
         try {
         this.data = await this.fetch();
         this.status = "success"

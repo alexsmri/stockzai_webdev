@@ -45,7 +45,7 @@ export default function PAG_Search() {
           ></COM_SearchBar>
           {input && showCompletions && (
             <div className="look-div-completion mod-z-1">
-              <PRV_SearchStore args={utStoreArgs}>
+              <PRV_SearchStore args={utStoreArgs} showFallback={true}>
                 <COM_SearchCompletion
                   onSelect={(val) => {
                     navigate(`/companies/page/${val}`);
@@ -58,7 +58,7 @@ export default function PAG_Search() {
         </div>
       </COM_Hero>
       {showResults && (
-        <PRV_SearchStore args={[submittedQuery]}>
+        <PRV_SearchStore args={[submittedQuery]} showFallback={true}>
           <COM_SearchResults />
         </PRV_SearchStore>
       )}

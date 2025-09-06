@@ -1,7 +1,7 @@
 @use "../util/index" as u;
 
 .look-input-primary {
-    @include u.look-transparent($color: rgba(0, 210, 109));
+    @include u.look-transparent($color: rgba(190, 190, 190));
     padding: u.scale-padding(0.8);
     color: var(--color-white);
 }
@@ -11,13 +11,25 @@
     color: var(--color-white);
 }
 .look-button-primary {
-    @include u.look-glass($color: rgba(0, 210, 109));
+    //@include u.look-glass($color: rgba(0, 210, 109));
+    background-image: linear-gradient(45deg, var(--color-green), #01D294);
+    box-shadow: 0 0 0.5rem var(--color-green);
+    border-width: 0;
+    border-radius: 1rem;
     padding-top: u.scale-padding(0.8);
     padding-bottom: u.scale-padding(0.8);
     padding-left: u.scale-padding(2);
     padding-right: u.scale-padding(2);
-    color: rgba(0, 210, 109, 0.9);
+    color: var(--color-black);
+    font-family: 'ClashDisplay';
+    font-weight: 500;
+    font-size: u.scale-font(1);
     cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 1rem var(--color-green);
+    }
 }
 .look-button-ghost {
     color: var(--color-wa80);
@@ -84,6 +96,7 @@
 }
 .look-text-x6 {
   font-size: u.scale_font(5);
+  font-weight: 600;
   font-family: 'ClashDisplay';
   text-align: center;
   @include u.remove-margin()
@@ -110,7 +123,7 @@
 }
 .look-text-x2 {
   font-size: u.scale_font(1);
-  font-weight: 500;
+  font-weight: 400;
   font-family: 'Work Sans';
   @include u.remove-margin()
 }

@@ -1,7 +1,7 @@
-import STO_Search from "../stores/STO_Search";
-import { createStoreProvider } from "./CTX_BaseStore";
+import STO_Search from '../stores/STO_Search';
+import { createAPIStoreProvider } from './CTX_BaseStore';
 
-export const {
-  useStore: useSearchStore,
-  StoreProvider: PRV_SearchStore,
-} = createStoreProvider(STO_Search, "SearchStore");
+export const { useStore: useSearchStore, StoreProvider: PRV_SearchStore } = createAPIStoreProvider(
+  STO_Search,
+  'SearchStore'
+);

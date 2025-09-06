@@ -37,8 +37,14 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
       </>
     );
 
-  const utOld = utKPIIntel[utDates[1]];
   const utNew = utKPIIntel[utDates[0]];
+  let utOld = utKPIIntel[utDates[1]];
+  for (let i = 1; i < utDates.length; i++) {
+    if (utKPIIntel[utDates[i]] !== utNew) {
+      utOld = utKPIIntel[utDates[i]];
+      break;
+    }
+  }
   const utAbsolute = utNew - utOld;
   const utChange = (utAbsolute / Math.abs(utOld)) * 100;
   const utColor = getChangeColor(utChange * utKPIScoring);

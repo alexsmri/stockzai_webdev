@@ -1,13 +1,15 @@
 import COM_Navbar from '../components/COM_Navbar';
 import COM_Hero from '../components/COM_Hero';
 import COM_Footer from '../components/COM_Footer';
+import COM_Winners from '../components/COM_Winners';
+import { PRV_WinnerStore } from '../context/CTX_WinnerStore';
 import { useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useNavigate } from 'react-router-dom';
 
 const PRIMARY_BUTTON_LINKS = {
-  login: '/users/edit',
+  login: '/companies/search',
   anonymous: '/users/register',
 };
 function PAG_Home() {
@@ -22,18 +24,21 @@ function PAG_Home() {
       <COM_Navbar />
       <COM_Hero>
         <div className="area-flex-col mod-gap-l">
-          <h1 className="look-text-x7">Only the bold become pioneers</h1>
-          <p className="mod-align-center">
-            Lock in your Pre-Beta access today. Get the perks others will miss.
-          </p>
-          <button
-            className="look-button-primary"
-            onClick={() => {
-              navigate(utLink);
-            }}
-          >
-            {loggedIn ? 'Edit Profile' : 'Claim your spot'}
-          </button>
+          <div className="area-flex-col mod-gap-l">
+            <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
+            <h3 className="look-text-x2">All the info you need, none of the noise. 100% Free.</h3>
+            <button
+              className="look-button-primary"
+              onClick={() => {
+                navigate(utLink);
+              }}
+            >
+              {loggedIn ? 'Search Tickers' : 'Create Account'}
+            </button>
+          </div>
+          <PRV_WinnerStore args={[]}>
+            <COM_Winners />
+          </PRV_WinnerStore>
         </div>
       </COM_Hero>
       <COM_Footer />

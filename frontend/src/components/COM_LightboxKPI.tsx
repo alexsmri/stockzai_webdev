@@ -12,7 +12,7 @@ import { MOBILE_BREAKPOINT } from '../constants';
 
 const KPI_BLOB_ROLES = ['ratios', 'valuation'];
 
-export default function COM_KPILightbox() {
+export default function COM_LightboxKPI() {
   const { stIsOpen: isOpen, stSelectedKPI: selectedKPI, handleClose: close } = useLightbox();
   if (!isOpen) return null;
   const utKPIStore = useKPIStore();

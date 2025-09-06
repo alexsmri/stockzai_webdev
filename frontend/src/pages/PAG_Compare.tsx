@@ -42,7 +42,7 @@ export default function PAG_Compare() {
           ></COM_SearchBar>
           {input && showCompletions && (
             <div className="look-div-completion mod-z-1">
-              <PRV_SearchStore args={utStoreArgs}>
+              <PRV_SearchStore args={utStoreArgs} showFallback={true}>
                 <COM_SearchCompletion
                   onSelect={(val) => {
                     setSubmittedQuery(val);
@@ -70,7 +70,7 @@ export default function PAG_Compare() {
           <p className="look-text-x0">Sector Ranking</p>
         </div>
         {showResults && (
-          <PRV_SearchStore args={[submittedQuery, true]}>
+          <PRV_SearchStore args={[submittedQuery, true]} showFallback={true}>
             <COM_ComparisonResults submittedQuery={submittedQuery} submitIndex={submitIndex} />
           </PRV_SearchStore>
         )}
