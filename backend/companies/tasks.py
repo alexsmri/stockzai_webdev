@@ -8,7 +8,10 @@ logger = logging.getLogger(__name__)
 @shared_task(name="fetch_company_winners")
 def fetch_company_winners():
     db = DB_Handler("companies")
-    winners = db.dbq_get_company_winners()
+    try:
+        winners = db.dbq_get_company_winners()
+    except Exception as e:
+        logger.exception(e)
 
     try:
         last_winners = WinnerEntry.objects.latest("date").winners

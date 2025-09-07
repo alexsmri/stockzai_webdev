@@ -195,7 +195,7 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://SACOM-redis:
 CELERY_BEAT_SCHEDULE = {
     "fetch_company_winners_every_5_min": {
         "task": "fetch_company_winners",
-        "schedule": crontab(minute="*"),
+        "schedule": crontab(minute="*/5"),
     },
 }
 
