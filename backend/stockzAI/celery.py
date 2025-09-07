@@ -3,6 +3,7 @@ import os
 
 from celery import Celery
 from celery.schedules import crontab
+
 from companies.db.DB_Handler import DB_Handler
 
 import logging
@@ -18,9 +19,9 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender: Celery, **kwargs):
     sender.add_periodic_task(
-        crontab(),
+        crontab(minute="*"),
         fetch_company_winners.s(),
-        name="Fetch Company Winners, every 5 minutes"
+        name="Fetch company winners, every 5 minutes"
     )
 
 @app.task

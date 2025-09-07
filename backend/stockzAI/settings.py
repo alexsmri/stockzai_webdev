@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+from celery.schedules import crontab
 load_dotenv(".env.dev")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -173,7 +174,7 @@ MEDIA_ROOT = BASE_DIR /'media'
 
 LOGIN_URL = '/users/login/'
 
-CORS_ALLOW_ALL_ORIGINS = True       # FOR NOW ONLY
+CORS_ALLOW_ALL_ORIGINS = True       # TODO
 CORS_ALLOWS_CREDENTIALS = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -188,17 +189,12 @@ EMAIL_USE_SSL = False
 
 FRONTEND_URL=os.getenv('FRONTEND_URL')
 
-CELERY_BROKER_URL = "redis://redis:6379/1" 
-CELERY_RESULT_BACKEND = "redis://redis:6379/2"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://SACOM-redis:6379/1")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://SACOM-redis:6379/2")
 
 CELERY_TASK_DEFAULT_QUEUE = "web"
-CELERY_TASK_QUEUES = {
-    "web": {"exchange": "web", "routing_key": "web.#"},
-}
-CELERY_TASK_ROUTES = {
-    "app.tasks.heavy_*": {"queue": "compute", "routing_key": "compute.heavy"},
-}
-CELERYD_PREFETCH_MULTIPLIER = 1
+
 CELERY_ACKS_LATE = True
 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
