@@ -32,6 +32,7 @@ services:
       dockerfile: Dockerfile.dev
     command: celery -A stockzAI worker -l info -Q web
     networks:
+      - default
       - SA-network-DEV
     env_file: ./backend/.env.dev
 
@@ -41,6 +42,7 @@ services:
       dockerfile: Dockerfile.dev
     command: celery -A stockzAI beat -l info
     networks:
+      - default
       - SA-network-DEV
     env_file: ./backend/.env.dev
 

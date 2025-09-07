@@ -192,6 +192,13 @@ FRONTEND_URL=os.getenv('FRONTEND_URL')
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://SACOM-redis:6379/1")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://SACOM-redis:6379/2")
 
+CELERY_BEAT_SCHEDULE = {
+    "fetch_company_winners_every_5_min": {
+        "task": "fetch_company_winners",
+        "schedule": crontab(minute="*"),
+    },
+}
+
 CELERY_TASK_DEFAULT_QUEUE = "web"
 
 CELERY_ACKS_LATE = True
