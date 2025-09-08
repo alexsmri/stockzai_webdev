@@ -396,61 +396,56 @@ class DB_Handler:
     
     def dbq_get_company_winners(self, result_count: int = 3):
 
-        out = {}
-        
-        try:
-            out = WinnerEntry.objects.latest("date").winners
-        except WinnerEntry.DoesNotExist:
-            winner_calulcations = {}
+        winner_calulcations = {}
 
-            display_kpis = ["totalScore", "priceChange"]
-            display_kpis_info = {kpi: self.dbq_get_kpi_info(kpi) for kpi in display_kpis}
+        display_kpis = ["totalScore", "priceChange"]
+        display_kpis_info = {kpi: self.dbq_get_kpi_info(kpi) for kpi in display_kpis}
 
-            sql_query = (
-                "SELECT s1.SYMBOL, s1.value "
-                "FROM statistics s1 "
-                "JOIN ( "
-                    "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
-                    "FROM statistics s_inner "
-                    "WHERE s_inner.KPI = 116 "
-                    "GROUP BY s_inner.SYMBOL "
-                ") latest "
-                "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
-                "WHERE s1.KPI = 116; "
-                )
-            
-            calculation_raw = self.dbu_read_execute(sql_query)
-
-            for (symbol, calculation) in calculation_raw:
-                winner_calulcations[symbol] = {"winnerCalculation": calculation}
-            
-            winners = sorted(
-                [symbol for symbol in winner_calulcations 
-                if "winnerCalculation" in winner_calulcations[symbol] and winner_calulcations[symbol]["winnerCalculation"]],
-                key=lambda symbol: winner_calulcations[symbol]["winnerCalculation"],
-                reverse=True
+        sql_query = (
+            "SELECT s1.SYMBOL, s1.value "
+            "FROM statistics s1 "
+            "JOIN ( "
+                "SELECT s_inner.SYMBOL, MAX(s_inner.date) AS max_date "
+                "FROM statistics s_inner "
+                "WHERE s_inner.KPI = 116 "
+                "GROUP BY s_inner.SYMBOL "
+            ") latest "
+            "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
+            "WHERE s1.KPI = 116; "
             )
+        
+        calculation_raw = self.dbu_read_execute(sql_query)
 
-            out = {}
-            winners_count = 0
-            for winner in winners:
-                if winners_count >= result_count:
-                    break
+        for (symbol, calculation) in calculation_raw:
+            winner_calulcations[symbol] = {"winnerCalculation": calculation}
+        
+        winners = sorted(
+            [symbol for symbol in winner_calulcations 
+            if "winnerCalculation" in winner_calulcations[symbol] and winner_calulcations[symbol]["winnerCalculation"]],
+            key=lambda symbol: winner_calulcations[symbol]["winnerCalculation"],
+            reverse=True
+        )
 
-                winner_dict = {}
-                for kpi in display_kpis:
-                    winner_kpi = self.dbq_get_kpi(
-                        winner, 
-                        display_kpis_info[kpi]["id"],
-                        display_kpis_info[kpi]["role"],
-                        )
-                    
-                    if "value" in winner_kpi:
-                        winner_dict[kpi] = winner_kpi["value"]
+        out = {}
+        winners_count = 0
+        for winner in winners:
+            if winners_count >= result_count:
+                break
+
+            winner_dict = {}
+            for kpi in display_kpis:
+                winner_kpi = self.dbq_get_kpi(
+                    winner, 
+                    display_kpis_info[kpi]["id"],
+                    display_kpis_info[kpi]["role"],
+                    )
                 
-                if len(list(winner_dict.keys())) == len(display_kpis):
-                    out[winner] = winner_dict
-                    winners_count += 1
+                if "value" in winner_kpi:
+                    winner_dict[kpi] = winner_kpi["value"]
+            
+            if len(list(winner_dict.keys())) == len(display_kpis):
+                out[winner] = winner_dict
+                winners_count += 1
 
         return out
         
