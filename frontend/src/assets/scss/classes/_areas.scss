@@ -47,18 +47,32 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
     padding: u.scale-padding(1);
+    column-gap: u.scale-gap(1);
+    row-gap: u.scale-gap(1);
 }
 
 .area-grid-col-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: u.scale-padding(1);
+    column-gap: u.scale-gap(1);
+    row-gap: u.scale-gap(1);
+}
+
+.area-grid-col-2a {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    padding: u.scale-padding(1);
+    column-gap: u.scale-gap(1);
+    row-gap: u.scale-gap(1);
 }
 
 .area-grid-col-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     padding: u.scale-padding(1);
+    column-gap: u.scale-gap(1);
+    row-gap: u.scale-gap(1);
 }
 
 .area-grid-col-docs {

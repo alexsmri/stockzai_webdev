@@ -6,29 +6,35 @@
 .mod-space-around {
     justify-content: space-around;
 }
+.mod-padding-none {
+    padding: 0;
+}
 .mod-padding-l {
-    padding: u.scale-padding(2)
+    padding: u.scale-padding(2);
 }
 .mod-padding-xl {
-    padding: u.scale-padding(3)
+    padding: u.scale-padding(3);
+}
+.mod-padding-hero {
+    padding: 0 10%;
+    @media (width <= 768px) {
+        padding: 0 5%;
+    }
 }
 .mod-gap-l {
-    gap: u.scale-gap(2)
+    gap: u.scale-gap(2);
 }
 .mod-gap-xl {
-    gap: u.scale-gap(3)
+    gap: u.scale-gap(3);
 }
 .mod-gap-none {
     gap: 0;
 }
-.mod-padding-none {
-    padding: 0;
-}
 .mod-margin-xl {
-    margin: u.scale-gap(3)
+    margin: u.scale-gap(3);
 }
 .mod-margin-2xl {
-    margin: u.scale-gap(4)
+    margin: u.scale-gap(4);
 }
 .mod-cursor-pointer {
     cursor: pointer;
@@ -80,6 +86,9 @@
 }
 .mod-right {
     margin-left: auto;
+}
+.mod-left {
+    margin-right: auto;
 }
 .mod-center {
     margin: auto;

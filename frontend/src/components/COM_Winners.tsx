@@ -18,7 +18,7 @@ function COM_Winners() {
         {(
           <>
             {stWinners && (
-              <div className="area-flex-row mod-flex-grow-children">
+              <div className="area-flex-wrap mod-flex-grow-children mod-gap-l mod-padding-none">
                 {Object.keys(stWinners).map((key) => {
                   const utScore = stWinners[key]['totalScore'];
                   const utChange = stWinners[key]['priceChange'];

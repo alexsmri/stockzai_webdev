@@ -1,3 +1,12 @@
-export default function COM_Hero({ children }: { children: React.ReactNode }) {
-  return <div className="area-flex-col">{children}</div>;
+export default function COM_Hero({
+  children,
+  prFlex = false,
+}: {
+  children: React.ReactNode;
+  prFlex?: boolean;
+}) {
+  const utClass = prFlex
+    ? 'area-flex-col mod-padding-hero mod-align-stretch'
+    : 'area-flex-col mod-padding-hero';
+  return <div className={utClass}>{children}</div>;
 }
