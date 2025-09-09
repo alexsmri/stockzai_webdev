@@ -1,10 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 export default function COM_LightboxTimed() {
   const [stOpen, setStOpen] = useState(false);
   const utFeedbackLink = '/feedback';
-  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,14 +25,9 @@ export default function COM_LightboxTimed() {
               one minute of your time, you can help me a great deal by filling out the feedback
               form.
             </p>
-            <button
-              className="look-button-primary"
-              onClick={() => {
-                navigate(utFeedbackLink);
-              }}
-            >
+            <a href={utFeedbackLink} className="look-button-primary">
               Give Feedback
-            </button>
+            </a>
           </div>
         </div>
       </div>
