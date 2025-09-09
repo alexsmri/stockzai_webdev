@@ -26,7 +26,7 @@
     position: fixed;
     inset: 0;
     z-index: 1;
-    background-color: var(--color-ba70);
+    background-color: var(--color-primary-a70);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,7 +106,7 @@
     flex-direction: column;
     row-gap: u.scale-gap(3);
     align-items: flex-end;
-    background-color: var(--color-ba60);
+    background-color: var(--color-primary-a60);
     text-align: right;
 }
 

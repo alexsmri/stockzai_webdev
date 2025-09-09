@@ -19,7 +19,7 @@ export default function COM_MenuLegal({
             return (
               <a
                 className="look-button-ghost"
-                style={{ color: 'var(--color-green)', fontWeight: 600 }}
+                style={{ color: 'var(--color-tertiary)', fontWeight: 600 }}
                 href={prLegalPageDict[key]}
               >
                 {prLegalNameDict[key]}

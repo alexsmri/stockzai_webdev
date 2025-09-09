@@ -7,7 +7,7 @@
 }
 
 html {
-  background-color: var(--color-black);
+  background-color: var(--color-primary);
   background-repeat: no-repeat;
   background-size:100%;
   min-height: 100%;
@@ -42,12 +42,12 @@ p {
 }
 
 text {
-    fill: var(--color-white);
+    fill: var(--color-secondary);
     font-size: 60%;
 }
 
 a {
-    color: var(--color-white);
+    color: var(--color-secondary);
 }
 
 strong {

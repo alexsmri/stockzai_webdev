@@ -3,16 +3,16 @@
 .look-input-primary {
     @include u.look-transparent($color: rgba(190, 190, 190));
     padding: u.scale-padding(0.8);
-    color: var(--color-white);
+    color: var(--color-secondary);
 }
 .look-input-secondary {
     @include u.look-transparent();
     padding: u.scale-padding(0.8);
-    color: var(--color-white);
+    color: var(--color-secondary);
 }
 .look-button-primary {
-    background-image: linear-gradient(45deg, var(--color-green), #01D294);
-    box-shadow: 0 0 0.5rem var(--color-green);
+    background-image: linear-gradient(45deg, var(--color-tertiary), #01D294);
+    box-shadow: 0 0 0.5rem var(--color-tertiary);
     font-weight: 500;
     text-decoration: none;
     border-width: 0;
@@ -21,17 +21,17 @@
     padding-bottom: u.scale-padding(0.7);
     padding-left: u.scale-padding(1.5);
     padding-right: u.scale-padding(1.5);
-    color: var(--color-black);
+    color: var(--color-primary);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
     &:hover {
-      box-shadow: 0 0 1rem var(--color-green);
+      box-shadow: 0 0 1rem var(--color-tertiary);
     }
 }
 .look-button-secondary {
-    background-color: var(--color-white);
-    box-shadow: 0 0 0.5rem var(--color-white);
+    background-color: var(--color-secondary);
+    box-shadow: 0 0 0.5rem var(--color-secondary);
     border-width: 0;
     text-decoration: none;
     text-wrap: nowrap;
@@ -40,33 +40,33 @@
     padding-bottom: u.scale-padding(0.5);
     padding-left: u.scale-padding(1);
     padding-right: u.scale-padding(1);
-    color: var(--color-black);
+    color: var(--color-primary);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
     &:hover {
-      box-shadow: 0 0 0.8rem var(--color-white);
+      box-shadow: 0 0 0.8rem var(--color-secondary);
     }
 }
 .look-button-ghost {
-    color: var(--color-wa80);
+    color: var(--color-secondary-a80);
     text-decoration: none;
     text-wrap: nowrap;
     margin-top: auto;
     margin-bottom: auto;
     cursor: pointer;
     &:hover {
-      color: var(--color-white);
+      color: var(--color-secondary);
       transition: all 0.2s ease-in-out;
     }
 }
 .look-button-subtle {
     font-size: u.scale-font(-1);
-    color: var(--color-wa40);
+    color: var(--color-secondary-a40);
     text-decoration: none;
     cursor: pointer;
     &:hover {
-      color: var(--color-wa60);
+      color: var(--color-secondary-a60);
       transition: all 0.2s ease-in-out;
     }
 }
@@ -108,14 +108,14 @@
 
 .look-text-x7 {
   font-size: u.scale_font(6);
-  font-weight: 600;
+  font-weight: 500;
   font-family: 'ClashDisplay';
   text-align: center;
   @include u.remove-margin()
 }
 .look-text-x6 {
   font-size: u.scale_font(5);
-  font-weight: 600;
+  font-weight: 500;
   font-family: 'ClashDisplay';
   text-align: center;
   @include u.remove-margin()
@@ -149,7 +149,7 @@
 .look-text-x0 {
   font-size: u.scale_font(-1);
   font-family: 'Work Sans';
-  color: var(--color-wa60);
+  color: var(--color-secondary-a60);
   @include u.remove-margin()
 }
 .look-text-svg {
@@ -161,12 +161,15 @@
 .look-text-mono {
   font-size: 5.625rem;
 }
+.look-text-hero {
+  background-image: linear-gradient(var(--color-secondary), );
+}
 
 .look-loader {
   margin: auto;
   width: 3rem;
   aspect-ratio: 2;
-  --_g: no-repeat radial-gradient(circle closest-side, var(--color-green) 90%, var(--color-transparent));
+  --_g: no-repeat radial-gradient(circle closest-side, var(--color-tertiary) 90%, var(--color-transparent));
   background: 
     var(--_g) 0%   50%,
     var(--_g) 50%  50%,

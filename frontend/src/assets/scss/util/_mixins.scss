@@ -60,7 +60,7 @@
     border-radius: $radius;
     border: solid 0.08rem $border-color;
     background-image: f.paint-gradient($body-color);
-    box-shadow: 0.5rem 0.5rem 3rem var(--color-ba20);
+    box-shadow: 0.5rem 0.5rem 3rem var(--color-primary-a20);
     backdrop-filter: blur(0.2rem);
 }
 @mixin look-container-hover($scale: 1.05) {
