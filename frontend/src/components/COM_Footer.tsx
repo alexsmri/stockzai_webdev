@@ -15,9 +15,6 @@ export default function COM_Footer() {
         <a href="/companies/search" className="look-button-subtle">
           Search
         </a>
-        <a href="/companies/compare" className="look-button-subtle">
-          Compare
-        </a>
         <a href="/legal/data" className="look-button-subtle">
           Data Protection
         </a>

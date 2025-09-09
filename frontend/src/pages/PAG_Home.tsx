@@ -6,7 +6,6 @@ import { PRV_WinnerStore } from '../context/CTX_WinnerStore';
 import { useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
-import { useNavigate } from 'react-router-dom';
 
 const PRIMARY_BUTTON_LINKS = {
   login: '/companies/search',
@@ -17,7 +16,6 @@ function PAG_Home() {
   const [loggedIn, setLoggedIn] = useState(utStore.read('ActionLogin'));
 
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
-  const navigate = useNavigate();
   const utLink = loggedIn ? PRIMARY_BUTTON_LINKS.login : PRIMARY_BUTTON_LINKS.anonymous;
   return (
     <>
@@ -27,14 +25,9 @@ function PAG_Home() {
           <div className="area-flex-col mod-gap-l">
             <h1 className="look-text-x7">Master the Market. Effortlessly.</h1>
             <h3 className="look-text-x2">All the info you need, none of the noise. 100% Free.</h3>
-            <button
-              className="look-button-primary"
-              onClick={() => {
-                navigate(utLink);
-              }}
-            >
+            <a href={utLink} className="look-button-primary">
               {loggedIn ? 'Search Tickers' : 'Create Account'}
-            </button>
+            </a>
           </div>
           <PRV_WinnerStore args={[]}>
             <COM_Winners />

@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import PAG_Companies from './pages/PAG_Companies';
-import ComparisonPage from './pages/PAG_Compare';
 import PAG_Login from './pages/PAG_Login';
 import PAG_Register from './pages/PAG_Register';
 import PAG_Home from './pages/PAG_Home';
@@ -70,14 +69,6 @@ function App() {
                   element={
                     <COM_ProtectedRoute>
                       <PAG_Companies />
-                    </COM_ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/companies/compare"
-                  element={
-                    <COM_ProtectedRoute>
-                      <ComparisonPage />
                     </COM_ProtectedRoute>
                   }
                 />

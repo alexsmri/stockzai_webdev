@@ -24,18 +24,23 @@ export default function COM_Navbar() {
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
   const { width } = useWindowDimensions();
   const navigate = useNavigate();
+  const utMobileView = width <= MOBILE_BREAKPOINT ? true : false;
 
-  const utLinkClasses =
-    width <= MOBILE_BREAKPOINT ? 'look-button-ghost look-text-x3' : 'look-button-ghost';
+  const utLinkClasses = utMobileView ? 'look-button-ghost look-text-x3' : 'look-button-ghost';
 
+  const utLinkHighlightClasses = utMobileView
+    ? 'look-button-ghost look-text-x3'
+    : 'look-button-secondary';
+
+  //<a href="/companies/compare" className={utLinkClasses}>
+  //  Compare
+  //</a>
   const utMenuLinks = (
     <>
       <a href="/companies/search" className={utLinkClasses}>
         Search
       </a>
-      <a href="/companies/compare" className={utLinkClasses}>
-        Compare
-      </a>
+
       <a href="/feedback" className={utLinkClasses}>
         Feedback
       </a>
@@ -51,7 +56,7 @@ export default function COM_Navbar() {
             Log In{' '}
           </a>
 
-          <a href="/users/register" className={utLinkClasses}>
+          <a href="/users/register" className={utLinkHighlightClasses}>
             Sign Up{' '}
           </a>
         </>
