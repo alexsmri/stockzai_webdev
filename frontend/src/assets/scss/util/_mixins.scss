@@ -1,31 +1,5 @@
 @use './functions' as f;
 
-@mixin look-glass($radius: 0.8rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
-    background-image: f.paint-gradient($color);
-    background-color: transparent;
-    border-radius: $radius;
-    box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.15);
-    border: 0.08rem solid;
-    border-color: rgba($color, 0.2);
-    border-top-color: rgba($color, 0.4);
-    border-right-color: rgba($color, 0.4);
-
-    &:hover {
-        box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.2);
-        border-color: rgba($color, 0.4);
-        border-top-color: rgba($color, 0.6);
-        border-right-color: rgba($color, 0.6);
-        transition: all 0.2s ease-in-out;
-    }
-    &:active {
-        outline:none;
-        box-shadow: inset (-$offset) ($offset) $blur rgba($color, 0.2);
-        border-color: rgba($color, 0.5);
-        border-top-color: rgba($color, 0.7);
-        border-right-color: rgba($color, 0.7);
-        transition: all 0.2s ease-in-out;
-    }
-}
 @mixin look-transparent($radius: 0.8rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
     background-image: f.paint-gradient($color);
     background-color: transparent;
@@ -55,14 +29,13 @@
 
 @mixin look-container(
         $radius: 0.8rem, 
-        $body-color: rgba(180, 180, 180),
         $border-color: rgba(255, 255, 255, 0.2)) {
     border-radius: $radius;
     border: solid 0.08rem $border-color;
-    background-image: f.paint-gradient($body-color);
     box-shadow: 0.5rem 0.5rem 3rem var(--color-primary-a20);
     backdrop-filter: blur(0.2rem);
 }
+
 @mixin look-container-hover($scale: 1.05) {
     cursor: pointer;
     &:hover {
@@ -94,4 +67,12 @@
 
 .fade-out-alert {
   animation: fadeOutDown 0.3s ease-in forwards;
+}
+
+@mixin gradient-hero() {
+    background-image: linear-gradient(90deg, var(--color-secondary), #D3D3D3)
+}
+
+@mixin gradient-backlight() {
+    background-image: radial-gradient(circle, var(--color-tertiary-a5), var(--color-transparent))
 }

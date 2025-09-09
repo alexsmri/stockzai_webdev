@@ -71,41 +71,26 @@
     }
 }
 
-.look-div-success {
-    @include u.look-container($body-color: rgba(0, 210, 109));
-    padding-top: u.scale-padding(0.8);
-    padding-bottom: u.scale-padding(0.8);
-    padding-left: u.scale-padding(1);
-    padding-right: u.scale-padding(1);
-    color: rgba(0, 210, 109, 0.9);
-}
-
-.look-div-neutral {
-    @include u.look-container($body-color: rgba(200, 200, 200));
-    padding-top: u.scale-padding(0.8);
-    padding-bottom: u.scale-padding(0.8);
-    padding-left: u.scale-padding(1);
-    padding-right: u.scale-padding(1);
-    color: rgba(200, 200, 200, 0.9);
-}
-
-.look-div-failure {
-    @include u.look-container($body-color: rgba(238, 0, 52));
-    padding-top: u.scale-padding(0.8);
-    padding-bottom: u.scale-padding(0.8);
-    padding-left: u.scale-padding(1);
-    padding-right: u.scale-padding(1);
-    color: rgba(238, 0, 52, 0.9);
-}
-
 .look-div-container {
   @include u.look-container();
+  background-image: u.paint-gradient(rgba(180, 180, 180));
+}
+
+.look-div-backlight {
+  @include u.look-container();
+  @include u.gradient-backlight();
 }
 
 .look-div-completion {
   top: 100%;
 }
-
+.look-text-x8 {
+  font-size: u.scale_font(7);
+  font-weight: 500;
+  font-family: 'ClashDisplay';
+  text-align: center;
+  @include u.remove-margin()
+}
 .look-text-x7 {
   font-size: u.scale_font(6);
   font-weight: 500;
@@ -162,7 +147,10 @@
   font-size: 5.625rem;
 }
 .look-text-hero {
-  background-image: linear-gradient(var(--color-secondary), );
+  @include u.gradient-hero();
+  color: transparent;
+  background-clip: text;
+  opacity: 0.85;
 }
 
 .look-loader {
