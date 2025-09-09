@@ -15,31 +15,28 @@ function COM_Winners() {
   return (
     <>
       <PRV_WinnerStore args={[]} showFallback={true}>
-        <div className="area-flex-col look-div-container">
-          {(
-            <>
-              <h3 className="look-text-x4">This week's best predictions</h3>
-              {stWinners && (
-                <div className="area-flex-wrap mod-flex-grow-children">
-                  {Object.keys(stWinners).map((key) => {
-                    const utScore = stWinners[key]['totalScore'];
-                    const utChange = stWinners[key]['priceChange'];
-                    return (
-                      <div className="area-flex-col look-div-container">
-                        <div className="mod-right">
-                          <DCOM_IndicatorChange prChange={utChange} prShowDiv={true} />
-                        </div>
-                        <p className="look-text-x4">{key}</p>
-                        <DCOM_ScoreRadial prScore={utScore} />
-                        <COM_ButtonDiscover prHref={`/companies/page/${key}`} />
+        {(
+          <>
+            {stWinners && (
+              <div className="area-flex-row mod-flex-grow-children">
+                {Object.keys(stWinners).map((key) => {
+                  const utScore = stWinners[key]['totalScore'];
+                  const utChange = stWinners[key]['priceChange'];
+                  return (
+                    <div className="area-flex-col look-div-container">
+                      <div className="mod-right">
+                        <DCOM_IndicatorChange prChange={utChange} prShowDiv={true} />
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          ) || <p>Test</p>}
-        </div>
+                      <p className="look-text-x4">{key}</p>
+                      <DCOM_ScoreRadial prScore={utScore} />
+                      <COM_ButtonDiscover prHref={`/companies/page/${key}`} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        ) || <p>Test</p>}
       </PRV_WinnerStore>
     </>
   );

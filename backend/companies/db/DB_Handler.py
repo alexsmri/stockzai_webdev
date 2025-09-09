@@ -394,7 +394,7 @@ class DB_Handler:
 
         return results
     
-    def dbq_get_company_winners(self, result_count: int = 3):
+    def dbq_get_company_winners(self, result_count: int = 2):
 
         winner_calulcations = {}
 
