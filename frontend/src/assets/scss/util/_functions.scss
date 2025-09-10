@@ -1,22 +1,21 @@
 @use "sass:math";
 
-$default-font-size: 1rem;
 $font-size-ratio: 1.219;
 
 @function scale-font($steps) {
-  @return calc($default-font-size * #{math.pow($font-size-ratio, $steps)});
+    @return calc(var(--default-font-size) * #{math.pow($font-size-ratio, $steps)});
 }
 
 @function scale-padding($factor) {
-    @return calc($default-font-size * $factor);
+    @return calc(var(--default-font-size) * $factor);
 }
 
 @function scale-gap($factor) {
-    @return calc($default-font-size * $factor);
+    @return calc(var(--default-font-size) * $factor);
 }
 
 @function scale-margin($factor) {
-    @return calc($default-font-size * $factor);
+    @return calc(var(--default-font-size) * $factor);
 }
 
 @function paint-gradient($color: rgba(255, 255, 255, 1), $transparency: 0.05) {
