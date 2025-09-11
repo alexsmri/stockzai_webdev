@@ -1,5 +1,5 @@
 import { LANDINGPAGE_BUTTON_LINKS } from '../../constants';
-import IMG_HeroScores from '../../assets/media/IMG_HeroScores.png';
+import IMG_HeroScores from '../../assets/media/IMG_HeroScores.webp';
 
 export default function COM_SectionHero({ prLoggedIn }: { prLoggedIn: boolean | null }) {
   const utLink = prLoggedIn ? LANDINGPAGE_BUTTON_LINKS.login : LANDINGPAGE_BUTTON_LINKS.anonymous;

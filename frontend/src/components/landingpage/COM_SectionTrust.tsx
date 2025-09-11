@@ -2,7 +2,7 @@ import { LANDINGPAGE_BUTTON_LINKS, MOBILE_BREAKPOINT } from '../../constants';
 import { PRV_WinnerStore } from '../../context/CTX_WinnerStore';
 import { useWindowDimensions } from '../../hooks/hooks';
 import COM_Winners from '../COM_Winners';
-import IMG_TableRatios from '../../assets/media/IMG_TableRatios.png';
+import IMG_TableRatios from '../../assets/media/IMG_TableRatios.webp';
 
 const SECTION_CLASS_LOOKUP = {
   mobile: 'area-flex-col mod-padding-hero mod-align-stretch',
