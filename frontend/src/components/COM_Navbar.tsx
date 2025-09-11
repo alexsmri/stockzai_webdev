@@ -93,6 +93,7 @@ export default function COM_Navbar() {
           marginLeft: '1rem',
           marginRight: '1rem',
           alignItems: 'center',
+          justifySelf: 'center',
           zIndex: 10,
         }}
       >
