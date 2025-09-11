@@ -4,7 +4,6 @@ import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchResults from '../components/COM_SearchResults';
 import { useNavigate } from 'react-router-dom';
 import COM_SearchCompletion from '../components/COM_SearchCompletion';
-import COM_Hero from '../components/COM_Hero';
 import COM_Navbar from '../components/COM_Navbar';
 import COM_Footer from '../components/COM_Footer';
 
@@ -34,7 +33,7 @@ export default function PAG_Search() {
   return (
     <>
       <COM_Navbar />
-      <COM_Hero>
+      <div className="area-flex-col mod-padding-hero">
         <h1 className="look-text-x7">Search Ticker</h1>
         <div className="area-flex-col mod-postion-relative">
           <COM_SearchBar
@@ -56,7 +55,7 @@ export default function PAG_Search() {
             </div>
           )}
         </div>
-      </COM_Hero>
+      </div>
       {showResults && (
         <PRV_SearchStore args={[submittedQuery]} showFallback={true}>
           <COM_SearchResults />

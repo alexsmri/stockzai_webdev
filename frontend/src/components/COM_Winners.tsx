@@ -6,7 +6,12 @@ import DCOM_ScoreRadial from '../components/dumb/DCOM_ScoreRadial';
 import { PRV_WinnerStore } from '../context/CTX_WinnerStore';
 import { COM_ButtonDiscover } from './COM_ButtonDiscover';
 
-function COM_Winners() {
+const WINNER_CLASSES_LOOKUP = {
+  mobile: 'area-flex-wrap mod-flex-grow-children mod-gap-l mod-padding-none',
+  desktop: 'area-flex-row mod-flex-grow-children mod-gap-l mod-padding-none',
+};
+
+function COM_Winners({ prBreakpoint }: { prBreakpoint: 'mobile' | 'desktop' }) {
   const [stWinners, setStWinners] = useState<Record<string, any> | null>(null);
   const utStore = useWinnerStore();
 
@@ -18,7 +23,7 @@ function COM_Winners() {
         {(
           <>
             {stWinners && (
-              <div className="area-flex-wrap mod-flex-grow-children mod-gap-l mod-padding-none">
+              <div className={WINNER_CLASSES_LOOKUP[prBreakpoint]}>
                 {Object.keys(stWinners).map((key) => {
                   const utScore = stWinners[key]['totalScore'];
                   const utChange = stWinners[key]['priceChange'];

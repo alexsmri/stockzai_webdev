@@ -36,6 +36,12 @@
 .mod-margin-2xl {
     margin: u.scale-gap(4);
 }
+.mod-margin-negative {
+    margin: calc(u.scale-gap(1) * -1);
+}
+.mod-margin-negative-l {
+    margin: calc(u.scale-gap(2) * -1);
+}
 .mod-cursor-pointer {
     cursor: pointer;
 }
