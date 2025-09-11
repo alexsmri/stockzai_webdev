@@ -46,6 +46,7 @@ export default function COM_SectionTrust({ prLoggedIn }: { prLoggedIn: boolean |
           style={{ marginTop: 'auto' }}
           src={IMG_TableRatios}
           alt="Scores"
+          loading="lazy"
         />
       </div>
       <div className="area-flex-col look-div-backlight mod-padding-l">
