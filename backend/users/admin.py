@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import User, TokenPasswordReset, TokenVerification
+from .models import User, TokenPasswordReset, TokenVerification, UserConsents
 
 admin.site.register(User)
 admin.site.register(TokenPasswordReset)
 admin.site.register(TokenVerification)
+admin.site.register(UserConsents)

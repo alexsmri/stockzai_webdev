@@ -7,7 +7,7 @@ export default function COM_LightboxTimed() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setStOpen(true);
-    }, 60000);
+    }, 180000);
 
     return () => clearTimeout(timer);
   }, []);

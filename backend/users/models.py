@@ -52,3 +52,8 @@ class TokenVerification(models.Model):
 
     def is_expired(self):
         return self.created_at < timezone.now() - timedelta(hours=24)
+    
+class UserConsents(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="consents")
+    consents_newsletter = models.BooleanField(default=False)
+    given_at = models.DateTimeField(auto_now_add=True)

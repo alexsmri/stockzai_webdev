@@ -8,6 +8,7 @@ function COM_FormRegister() {
   const [stEmail, setStEmail] = useState('');
   const [stPassword, setPassword] = useState('');
   const [stUsername, setUsername] = useState('');
+  const [stConsentsNewsletter, setStConsentsNewsletter] = useState(false);
   const [stMobileSubmitted, setStMobileSubmitted] = useState(false);
   const utStore = useUserStore();
   const [, setLoading] = useState(false);
@@ -25,6 +26,7 @@ function COM_FormRegister() {
         email: stEmail,
         username: stUsername,
         password: stPassword,
+        consents: { consents_newsletter: stConsentsNewsletter },
       });
       if (utRes) {
         const utTokenRes = await utStore.post('TokenVerificationRequest', { email: stEmail });
@@ -49,7 +51,7 @@ function COM_FormRegister() {
       {!stMobileSubmitted ? (
         <>
           <h1 className="look-text-x7">{name}</h1>
-          <form onSubmit={handleSubmit} className="area-flex-col">
+          <form onSubmit={handleSubmit} className="area-flex-col mod-align-stretch">
             <input
               type="text"
               value={stEmail}
@@ -71,7 +73,19 @@ function COM_FormRegister() {
               placeholder="Password"
               className="look-input-secondary"
             />
-            <button className="look-button-primary">{name}</button>
+            <label
+              className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
+              style={{ maxWidth: '15rem' }}
+            >
+              <input
+                type="checkbox"
+                checked={stConsentsNewsletter}
+                onChange={(e) => setStConsentsNewsletter(e.target.checked)}
+              />
+              Get stockz.ai newsletter for product updates & special offers (can be canceled at any
+              time)
+            </label>
+            <button className="look-button-primary mod-prevent-growth mod-center">{name}</button>
           </form>
           <a href="/users/login" className="look-button-subtle">
             Log In Instead

@@ -21,6 +21,9 @@
         padding: 0 5%;
     }
 }
+.mod-gap-s {
+    gap: u.scale-gap(0.5);
+}
 .mod-gap-l {
     gap: u.scale-gap(2);
 }

@@ -5,7 +5,7 @@ from stockzAI.response import api_json_response
 from django.http import Http404
 from companies.models import WinnerEntry
 
-db = DB_Handler("companies")
+db = DB_Handler('companies')
 
 class CompanyPageView(APIView):
     permission_classes = [IsAuthenticated]

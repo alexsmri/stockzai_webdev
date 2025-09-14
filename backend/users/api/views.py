@@ -1,6 +1,7 @@
 from django.shortcuts import render
+from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
-from users.models import User, TokenVerification, TokenPasswordReset
+from users.models import User, TokenVerification, TokenPasswordReset, UserConsents
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
@@ -21,12 +22,21 @@ class RegisterUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
+    @transaction.atomic
+    def perform_create(self, serializer):
+        user = serializer.save()
+        consents_data = self.request.data.get("consents") or {}
+        if consents_data:
+            UserConsents.objects.create(user=user, **consents_data)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+
         try:
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return api_json_response(msg=serializer.data, status=200)
+        
         except ValidationError as e:
             error = ""
             for _, errs in e.detail.items():
@@ -121,6 +131,9 @@ def view_verify(request):
     except Exception as e:
         return api_json_response(error="Something went wrong", status=400)
     
+    except Exception as e:
+        return api_json_response(error="Something went wrong", status=400)
+    
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def view_password_reset_token(request):
@@ -210,6 +223,18 @@ def view_edit_profile(request):
         
         user.username = new_username
         user.save()
+        return api_json_response(msg=True)
+    except Exception as e:
+        return api_json_response(error=str(e))
+    
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def view_unsubscribe_newsletter(request):
+    try:
+        user = request.user
+        consents = UserConsents.objects.get(user=user)
+        consents.consents_newsletter = False
+        consents.save()
         return api_json_response(msg=True)
     except Exception as e:
         return api_json_response(error=str(e))
