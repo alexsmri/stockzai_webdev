@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterUserView, LoginUserView, RefreshTokenView, VerifyTokenView, view_credentials, view_edit_profile, view_password_reset_token, view_reset_password, view_unsubscribe_newsletter, view_validate_password_reset_token, view_verification_token, view_verify
+from .views import RegisterUserView, LoginUserView, RefreshTokenView, VerifyTokenView, view_credentials, view_consents, view_edit_profile, view_password_reset_token, view_reset_password, view_unsubscribe_newsletter, view_validate_password_reset_token, view_verification_token, view_verify
 from django.urls import include
 
 app_name = "users_api"
@@ -15,6 +15,7 @@ urlpatterns = [
     path('verification/', view_verify, name="verification"),
     path('verification/token/', view_verification_token, name="verification_token"),
     path('credentials/', view_credentials, name="credentials"),
+    path('consents/', view_consents, name="consents"),
     path('edit/', view_edit_profile, name="edit"),
     path('unsubscribe-newsletter/', view_unsubscribe_newsletter, name="unsubscribe_newsletter"),
 ]

@@ -22,14 +22,14 @@ export default function COM_FormUnsubscribe() {
   const { handleAlertOpen } = useAlert();
 
   useEffect(() => {
-    async () => {
+    (async () => {
       const utSubscribed = await utStore.get('PropertyConsents');
       console.log(utSubscribed);
-      if (typeof utSubscribed !== 'object' || !utSubscribed.get('consents_newsletter')) {
+      if (!utSubscribed?.consents_newsletter) {
         navigate('/users/subscribe-newsletter/');
       }
-    };
-  });
+    })();
+  }, []);
 
   const handleCheckboxChange = (other: boolean, reason?: string) => {
     if (other) {

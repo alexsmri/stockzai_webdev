@@ -18,6 +18,7 @@ import PAG_FormFeedback from './pages/PAG_FormFeedback';
 import COM_LightboxTimed from './components/COM_LightboxTimed';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
 import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
+import PAG_Subscribe from './pages/PAG_Subscribe';
 
 function Logout() {
   localStorage.clear();
@@ -77,7 +78,7 @@ function App() {
                   path="/users/subscribe-newsletter"
                   element={
                     <COM_ProtectedRoute>
-                      <PAG_Unsubscribe />
+                      <PAG_Subscribe />
                     </COM_ProtectedRoute>
                   }
                 />

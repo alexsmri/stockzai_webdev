@@ -241,7 +241,7 @@ def view_unsubscribe_newsletter(request):
     
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def view_credentials(request):
+def view_consents(request):
     user = request.user
     try:
         consents = UserConsents.objects.get(user=user)
