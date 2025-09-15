@@ -238,3 +238,19 @@ def view_unsubscribe_newsletter(request):
         return api_json_response(msg=True)
     except Exception as e:
         return api_json_response(error=str(e))
+    
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def view_credentials(request):
+    user = request.user
+    try:
+        consents = UserConsents.objects.get(user=user)
+        if consents:
+            msg = {
+                "consents_newsletter": consents.consents_newsletter,
+            }
+    except UserConsents.DoesNotExist:
+        msg = {}
+    except Exception as e:
+        return api_json_response(error="Something went wrong", status=400)
+    return api_json_response(msg=msg)

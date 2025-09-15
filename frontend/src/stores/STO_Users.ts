@@ -3,6 +3,7 @@ import api from "../api";
 
 const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
+  PropertyConsents: "/api/users/consents/",
   ActionVerification: "/api/users/verification/",
   TokenVerificationRequest: "/api/users/verification/token/",
   TokenPasswordResetRequest: "/api/users/password-reset/token/",

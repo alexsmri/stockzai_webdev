@@ -74,6 +74,14 @@ function App() {
                   }
                 />
                 <Route
+                  path="/users/subscribe-newsletter"
+                  element={
+                    <COM_ProtectedRoute>
+                      <PAG_Unsubscribe />
+                    </COM_ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/users/unsubscribe-newsletter"
                   element={
                     <COM_ProtectedRoute>
