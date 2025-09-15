@@ -19,6 +19,7 @@ import COM_LightboxTimed from './components/COM_LightboxTimed';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
 import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
+import PAG_VericationCode from './pages/PAG_VerificationCode';
 
 function Logout() {
   localStorage.clear();
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/users/logout" element={<Logout />} />
                 <Route path="/users/register" element={<CreateAndLogout />} />
                 <Route path="/users/verification" element={<PAG_Verication />} />
+                <Route path="/users/verification-code" element={<PAG_VericationCode />} />
                 <Route
                   path="/users/password-reset/token/request"
                   element={<PA_PasswordResetRequest />}
