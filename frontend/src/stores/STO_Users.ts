@@ -66,7 +66,7 @@ export default class STO_Users extends STO_Base {
         }
     }
 
-    async post(key: ValidKeys, postData: any): Promise<any> {
+    async post(key: ValidKeys, postData: any, returnData: boolean = false): Promise<any> {
         try {
             this.status[key] = "loading";
             const value = await api.post(this.routes[key], postData)
@@ -74,7 +74,7 @@ export default class STO_Users extends STO_Base {
                 this.data[key] = value.data.msg
                 this.persist(key)
                 this.status[key] = "success"
-                return true
+                return returnData ? value.data.msg : true
             } else {
                 this.status[key] = "error"
                 this.error[key] = value.data.error

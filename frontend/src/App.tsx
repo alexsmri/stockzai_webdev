@@ -5,7 +5,6 @@ import PAG_Register from './pages/PAG_Register';
 import PAG_Home from './pages/PAG_Home';
 import COM_ProtectedRoute from './components/COM_ProtectedRoute';
 import PAG_Search from './pages/PAG_Search';
-import PAG_Verication from './pages/PAG_Verification';
 import { PRV_UserStore } from './context/CTX_UserStore';
 import PA_PasswordResetRequest from './pages/PAG_PasswordResetRequest';
 import PAG_PasswordReset from './pages/PAG_PasswordReset';
@@ -45,8 +44,7 @@ function App() {
                 <Route path="/users/login" element={<PAG_Login />} />
                 <Route path="/users/logout" element={<Logout />} />
                 <Route path="/users/register" element={<CreateAndLogout />} />
-                <Route path="/users/verification" element={<PAG_Verication />} />
-                <Route path="/users/verification-code" element={<PAG_VericationCode />} />
+                <Route path="/users/verification" element={<PAG_VericationCode />} />
                 <Route
                   path="/users/password-reset/token/request"
                   element={<PA_PasswordResetRequest />}

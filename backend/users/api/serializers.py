@@ -5,11 +5,6 @@ from django.utils.encoding import force_bytes
 from django.conf import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenVerifySerializer as JWTVerifySerializer, TokenRefreshSerializer as JWTRefreshSerializer
 
-from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
-from django.utils.html import strip_tags
-from ..tokens import verification_token
-
 User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

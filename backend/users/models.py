@@ -44,9 +44,9 @@ class TokenPasswordReset(models.Model):
         return self.created_at < timezone.now() - timedelta(hours=24)
 
 class TokenVerification(models.Model):
-    uid = models.CharField(max_length=256, editable=False, unique=True)
+    uid = models.CharField(max_length=256, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="verification_token")
-    token = models.CharField(max_length=64, editable=False)
+    token = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 

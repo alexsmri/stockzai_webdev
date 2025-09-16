@@ -10,12 +10,13 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from stockzAI.response import api_json_response
-from users.tokens import verification_token, password_reset_token
+from users.tokens import make_otp, password_reset_token
 from rest_framework.decorators import permission_classes, api_view
 import json
 import logging
 
 logger = logging.getLogger(__name__)
+VERIFICATION_OTP_DIGITS = 6
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -96,11 +97,11 @@ def view_verification_token(request):
         email = body.get('email')
         user = User.objects.get(email=email)
         if user:
-            token = verification_token.make_token(user)
+            token = make_otp(VERIFICATION_OTP_DIGITS)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             TokenVerification.objects.filter(user=user).delete()
             TokenVerification.objects.create(user=user, token=token, uid=uid)
-            return api_json_response(msg=True)
+            return api_json_response(msg={"uid": uid})
     except Exception as e:
         return api_json_response(error="Something went wrong", status=400)
 
@@ -112,6 +113,7 @@ def view_verify(request):
         body = json.loads(request.body)
         token = body.get("token")
         uid = body.get("uid")
+        logger.info(f"Token: {token} UID: {uid}")
         token_obj = TokenVerification.objects.get(token=token, uid=uid)
         user = token_obj.user
         if token_obj:
@@ -129,6 +131,7 @@ def view_verify(request):
             return api_json_response(msg=True)
     
     except Exception as e:
+        logger.exception(e)
         return api_json_response(error="Something went wrong", status=400)
     
     except Exception as e:
