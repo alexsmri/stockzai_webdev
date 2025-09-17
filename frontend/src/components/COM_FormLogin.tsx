@@ -45,30 +45,34 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
 
   return (
     <>
-      <h1 className="look-text-x7">{name}</h1>
-      <form onSubmit={handleSubmit} className="area-flex-col">
-        <input
-          type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="look-input-secondary"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="look-input-secondary"
-        />
-        <button className="look-button-primary">{name}</button>
-      </form>
-      <a href="/users/register" className="look-button-subtle">
-        Sign Up Instead
-      </a>
-      <a href="/users/password-reset/token/request" className="look-button-subtle">
-        Forgot Password?
-      </a>
+      <h1 className="look-text-x4">{name}</h1>
+      <div className="area-flex-col look-div-container mod-padding-xl">
+        <form onSubmit={handleSubmit} className="look-form-auth">
+          <input
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="look-input-secondary"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="look-input-secondary"
+          />
+          <button className="look-button-secondary">Continue</button>
+        </form>
+        <div className="area-form-auth-links">
+          <a href="/users/password-reset/token/request" className="look-button-subtle">
+            Forgot Password?
+          </a>
+          <a href="/users/register" className="look-button-subtle">
+            Don't have an account yet? Sign Up
+          </a>
+        </div>
+      </div>
     </>
   );
 }

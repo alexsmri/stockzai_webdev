@@ -21,7 +21,13 @@ export default function COM_SectionHero({ prLoggedIn }: { prLoggedIn: boolean | 
           <a href={utLink} className="look-button-primary">
             {utText}
           </a>
-          <img className="img-hero" src={IMG_HeroScores} alt="Scores" loading="lazy" />
+          <img
+            className="img-hero"
+            src={IMG_HeroScores}
+            alt="Scores"
+            loading="lazy"
+            fetchPriority="high"
+          />
         </div>
       </div>
       <div className="area-flex-wrap mod-center">

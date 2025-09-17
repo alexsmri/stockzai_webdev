@@ -182,3 +182,12 @@
   transform: rotate(45deg);
 }
 }
+
+.area-form-auth-links {
+    margin-top: u.scale-gap(3);
+    margin-bottom: calc(u.scale-gap(2) * -1);
+    display: flex;
+    flex-direction: column;
+    row-gap: u.scale-gap(0.5);
+    text-align: center;
+}
