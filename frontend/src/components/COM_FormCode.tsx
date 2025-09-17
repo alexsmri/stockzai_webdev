@@ -1,14 +1,37 @@
-import { createRef, useMemo, useRef, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '../context/CTX_Alert';
+import {
+  REGISTRATION_PASSWORD_STORAGE_KEY,
+  REGISTRATION_RESEND_COOLDOWN_SECONDS,
+} from '../constants';
+import { censorEmail } from '../utils/formats';
 
 const CODE_LENGTH = 6;
 
-export default function COM_FormCode(prUid: { prUid: string }) {
+interface ITF_FormCodeProps {
+  prUid: string;
+  prEmail: string;
+  prUsername: string;
+}
+
+const clearTemporaryPassword = () => {
+  try {
+    window.sessionStorage.removeItem(REGISTRATION_PASSWORD_STORAGE_KEY);
+  } catch (error) {
+    console.error('Unable to clear temporary password from sessionStorage', error);
+  }
+};
+
+export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCodeProps) {
   const utStore = useUserStore();
+  const utCensoredEmail = censorEmail(prEmail);
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);
+  const [isResending, setIsResending] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { handleAlertOpen } = useAlert();
 
@@ -22,6 +45,14 @@ export default function COM_FormCode(prUid: { prUid: string }) {
       [...Array(CODE_LENGTH).keys()].every((i) => code[i]?.length === 1),
     [code]
   );
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setTimeout(() => {
+      setCooldown((prev: number) => Math.max(prev - 1, 0));
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldown]);
 
   const setDigit = (pos: number, val: string) => {
     setCode((prev) => ({ ...prev, [pos]: val }));
@@ -39,7 +70,6 @@ export default function COM_FormCode(prUid: { prUid: string }) {
     if (/\d/.test(raw)) {
       setDigit(pos, raw);
       focusIndex(pos + 1);
-    } else {
     }
   };
 
@@ -68,46 +98,122 @@ export default function COM_FormCode(prUid: { prUid: string }) {
     focusIndex(Math.min(startPos + text.length, CODE_LENGTH - 1));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(code);
-    if (!isComplete) return;
-    const value = Array.from({ length: CODE_LENGTH }, (_, i) => code[i]).join('');
-    console.log('Submitting code:', value);
-    const utValid = await utStore.post('ActionVerification', { token: value, uid: prUid.prUid });
-    if (utValid) {
-      navigate('/users/login');
-    } else {
-      handleAlertOpen('Wrong code. Try again.', 'f');
+  const handleResend = async () => {
+    if (cooldown > 0 || isResending) {
+      return;
+    }
+    setIsResending(true);
+    try {
+      const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
+      if (utTokenRes?.uid) {
+        setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
+        handleAlertOpen('A new verification code has been sent.', 's');
+      } else {
+        handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+      }
+    } finally {
+      setIsResending(false);
     }
   };
 
-  return (
-    <form className="area-flex-col" onSubmit={handleSubmit}>
-      <div className="area-flex-row mod-gap-s">
-        {Array.from({ length: CODE_LENGTH }).map((_, i) => (
-          <input
-            key={i}
-            type="text"
-            inputMode="numeric"
-            pattern="\d*"
-            maxLength={1}
-            ref={inputRefs.current[i]}
-            className="look-input-secondary"
-            value={code[i] ?? ''}
-            aria-selected={selectedIdx === i}
-            onFocus={() => setSelectedIdx(i)}
-            onChange={(e) => handleChange(e, i)}
-            onKeyDown={(e) => handleKeyDown(e, i)}
-            onPaste={(e) => handlePaste(e, i)}
-            style={{ width: '2.5rem', textAlign: 'center' }}
-          />
-        ))}
-      </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isComplete || isSubmitting) return;
 
-      <button className="look-button-secondary" disabled={!isComplete}>
-        Verify
-      </button>
-    </form>
+    const value = Array.from({ length: CODE_LENGTH }, (_, i) => code[i]).join('');
+
+    setIsSubmitting(true);
+    try {
+      const utValid = await utStore.post('ActionVerification', { token: value, uid: prUid });
+      if (!utValid) {
+        handleAlertOpen('Wrong code. Try again.', 'f');
+        return;
+      }
+
+      let storedPassword: string | null = null;
+      try {
+        storedPassword = window.sessionStorage.getItem(REGISTRATION_PASSWORD_STORAGE_KEY);
+      } catch (error) {
+        console.error('Unable to read temporary password from sessionStorage', error);
+      }
+
+      if (!storedPassword) {
+        handleAlertOpen('Account verified! Please log in to continue.', 'i');
+        navigate('/users/login');
+        return;
+      }
+
+      const loginRes = await utStore.post('ActionLogin', {
+        email: prEmail,
+        password: storedPassword,
+      });
+      if (!loginRes) {
+        clearTemporaryPassword();
+        handleAlertOpen('Account verified. Please log in manually.', 'w', 5000);
+        navigate('/users/login');
+        return;
+      }
+
+      clearTemporaryPassword();
+      await utStore.get('PropertyCredentials');
+      handleAlertOpen(`Welcome to stockz.ai, ${prUsername}!`, 's');
+      navigate('/companies/search');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resendLabel = (() => {
+    if (cooldown > 0) return `Resend code (${cooldown}s)`;
+    if (isResending) return 'Resending...';
+    return 'Resend code';
+  })();
+
+  return (
+    <>
+      <h1 className="look-text-x4">Verify Email</h1>
+      <div className="area-flex-col look-div-container mod-padding-xl">
+        <form className="look-form-auth" onSubmit={handleSubmit}>
+          <p className="look-text-subtle look-text-x0">
+            An email with a 6-digit code has just been sent to {utCensoredEmail}. Enter the code
+            below.
+          </p>
+          <div className="area-flex-row mod-gap-s">
+            {Array.from({ length: CODE_LENGTH }).map((_, i) => (
+              <input
+                key={i}
+                type="text"
+                inputMode="numeric"
+                pattern="\d*"
+                maxLength={1}
+                ref={inputRefs.current[i]}
+                className="look-input-secondary"
+                value={code[i] ?? ''}
+                aria-selected={selectedIdx === i}
+                onFocus={() => setSelectedIdx(i)}
+                onChange={(e) => handleChange(e, i)}
+                onKeyDown={(e) => handleKeyDown(e, i)}
+                onPaste={(e) => handlePaste(e, i)}
+                style={{ width: '2.5rem', textAlign: 'center' }}
+              />
+            ))}
+          </div>
+
+          <div className="area-flex-col mod-gap-s mod-padding-none mod-align-stretch">
+            <button className="look-button-auth" disabled={!isComplete || isSubmitting}>
+              {isSubmitting ? 'Verifying...' : 'Verify'}
+            </button>
+            <button
+              type="button"
+              className="look-button-ghost"
+              onClick={handleResend}
+              disabled={cooldown > 0 || isResending}
+            >
+              {resendLabel}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

@@ -62,24 +62,26 @@ export default function COM_FormPasswordReset() {
       {valid === false && <div className="look-text-x2">Token Invalid.</div>}
       {valid === true && (
         <>
-          <h1 className="look-text-x7">Reset Password</h1>
-          <form onSubmit={handleSubmit} className="area-flex-col">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="look-input-primary"
-            />
-            <input
-              type="password"
-              value={password2}
-              onChange={(e) => setPassword2(e.target.value)}
-              placeholder="Repeat Password"
-              className="look-input-primary"
-            />
-            <button className="look-button-secondary">Submit</button>
-          </form>
+          <h1 className="look-text-x4">Set New Password</h1>
+          <div className="area-flex-col look-div-container mod-padding-xl">
+            <form onSubmit={handleSubmit} className="look-form-auth">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="look-input-primary"
+              />
+              <input
+                type="password"
+                value={password2}
+                onChange={(e) => setPassword2(e.target.value)}
+                placeholder="Repeat Password"
+                className="look-input-primary"
+              />
+              <button className="look-button-auth">Submit</button>
+            </form>
+          </div>
         </>
       )}
     </>

@@ -1,16 +1,14 @@
-import COM_Footer from '../components/COM_Footer';
+import COM_FooterAuth from '../components/COM_FooterAuth';
 import COM_FormPasswordReset from '../components/COM_FormPasswordReset';
 import COM_Hero from '../components/COM_Hero';
-import COM_Navbar from '../components/COM_Navbar';
 
 function PAG_PasswordReset() {
   return (
     <>
-      <COM_Navbar />
-      <COM_Hero>
+      <COM_Hero prFlex={true}>
         <COM_FormPasswordReset />
       </COM_Hero>
-      <COM_Footer />
+      <COM_FooterAuth />
     </>
   );
 }

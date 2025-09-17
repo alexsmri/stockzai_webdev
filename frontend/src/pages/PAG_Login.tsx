@@ -5,7 +5,7 @@ import COM_FooterAuth from '../components/COM_FooterAuth';
 function PAG_Login({ prRedirect = '/' }: { prRedirect?: string }) {
   return (
     <>
-      <COM_Hero>
+      <COM_Hero prFlex={true}>
         <COM_FormLogin prRedirect={prRedirect} />
       </COM_Hero>
       <COM_FooterAuth />

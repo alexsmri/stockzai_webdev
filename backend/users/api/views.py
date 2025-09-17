@@ -136,7 +136,7 @@ def view_verify(request):
     
     except Exception as e:
         return api_json_response(error="Something went wrong", status=400)
-    
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def view_password_reset_token(request):
@@ -212,6 +212,29 @@ def view_credentials(request):
         "username": user.username,
     }
     return api_json_response(msg=msg)
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_check_new_user(request):
+    try:
+        body = json.loads(request.body)
+        email = body.get("email")
+        username = body.get("username")
+
+        email_taken = User.objects.filter(email=email).exists()
+        username_taken = User.objects.filter(username=username).exists()
+        
+        msg = True if not email_taken and not username_taken else False
+        error = None
+        if username_taken:
+            error = "Username already taken."
+        if email_taken:
+            error = "Email already in use."
+        if username_taken and email_taken:
+            error = "Username already taken, Email already in use."
+        return api_json_response(msg=msg, error=error)
+    except:
+        return api_json_response(error="Something went wrong.", status=400)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

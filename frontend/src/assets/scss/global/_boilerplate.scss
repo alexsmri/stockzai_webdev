@@ -18,11 +18,17 @@ html {
   font-family: 'Work Sans', sans-serif;
   @include u.remove-margin();
 }
+
 input,
 textarea,
 select,
 button {
   font-family: 'Work Sans', sans-serif;
+  font-size: u.scale_font(0);
+
+  &::placeholder {
+    font-size: u.scale_font(0);
+  }
 }
 
 body {
@@ -94,7 +100,7 @@ input[type="checkbox"]:hover{
 }
 
 input[type="checkbox"]:checked{
-    background-color: var(--color-tertiary);
+    background-color: var(--color-secondary);
 }
 input[type="checkbox"]:checked:after{
     opacity: 1;

@@ -62,7 +62,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             placeholder="Password"
             className="look-input-secondary"
           />
-          <button className="look-button-secondary">Continue</button>
+          <button className="look-button-auth">Continue</button>
         </form>
         <div className="area-form-auth-links">
           <a href="/users/password-reset/token/request" className="look-button-subtle">

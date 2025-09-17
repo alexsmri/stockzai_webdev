@@ -42,7 +42,7 @@ def verification_token_created(sender, instance, created, **kwargs):
         uid = instance.uid
         token = instance.token
 
-        link = f"{base_url}users/verification/?uid={uid}"
+        link = f"{base_url}users/verification/?uid={uid}&email={user_email}&username={user_name}"
         context = {
             'username': user_name,
             'verification_link': link,

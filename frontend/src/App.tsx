@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import PAG_Companies from './pages/PAG_Companies';
 import PAG_Login from './pages/PAG_Login';
 import PAG_Register from './pages/PAG_Register';
+import PAG_RegisterPassword from './pages/PAG_RegisterPassword';
 import PAG_Home from './pages/PAG_Home';
 import COM_ProtectedRoute from './components/COM_ProtectedRoute';
 import PAG_Search from './pages/PAG_Search';
@@ -30,6 +31,11 @@ function CreateAndLogout() {
   return <PAG_Register />;
 }
 
+function CreatePasswordAndLogout() {
+  localStorage.clear();
+  return <PAG_RegisterPassword />;
+}
+
 function App() {
   return (
     <PRV_UserStore args={[]} showFallback={true}>
@@ -44,6 +50,7 @@ function App() {
                 <Route path="/users/login" element={<PAG_Login />} />
                 <Route path="/users/logout" element={<Logout />} />
                 <Route path="/users/register" element={<CreateAndLogout />} />
+                <Route path="/users/register/password" element={<CreatePasswordAndLogout />} />
                 <Route path="/users/verification" element={<PAG_VericationCode />} />
                 <Route
                   path="/users/password-reset/token/request"

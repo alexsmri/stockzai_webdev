@@ -38,6 +38,28 @@
     backdrop-filter: blur(0.2rem);
 }
 
+@mixin look-button(
+        $radius: 100rem, 
+        $shadow-size: 0.5rem) {
+    background-color: var(--color-secondary);
+    box-shadow: 0 0 $shadow-size var(--color-secondary);
+    border-width: 0;
+    text-decoration: none;
+    text-wrap: nowrap;
+    border-radius: $radius;
+    padding-top: f.scale-padding(0.5);
+    padding-bottom: f.scale-padding(0.5);
+    padding-left: f.scale-padding(1);
+    padding-right: f.scale-padding(1);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 calc($shadow-size * 1.5) var(--color-secondary);
+    }
+}
+
 @mixin look-container-hover($scale: 1.05) {
     cursor: pointer;
     &:hover {

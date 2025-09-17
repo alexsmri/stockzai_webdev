@@ -24,17 +24,19 @@ export default function COM_FormPasswordResetRequest() {
 
   return (
     <>
-      <h1 className="look-text-x7">Reset Password</h1>
-      <form onSubmit={handleSubmit} className="area-flex-col">
-        <input
-          type="email"
-          value={stEmail}
-          onChange={(e) => setStEmail(e.target.value)}
-          placeholder="Email"
-          className="look-input-secondary"
-        />
-        <button className="look-button-secondary">Submit</button>
-      </form>
+      <h1 className="look-text-x4">Reset Password</h1>
+      <div className="area-flex-col look-div-container mod-padding-xl">
+        <form onSubmit={handleSubmit} className="look-form-auth">
+          <input
+            type="email"
+            value={stEmail}
+            onChange={(e) => setStEmail(e.target.value)}
+            placeholder="Email"
+            className="look-input-secondary"
+          />
+          <button className="look-button-auth">Submit</button>
+        </form>
+      </div>
     </>
   );
 }

@@ -8,6 +8,7 @@
     --padding-xl: calc(var(--padding-l) * 2);
     --height-navbar: 2.5rem;
     --default-font-size: 1rem;
+    --width-form-auth: 20rem;
     @media (max-width: 768px) and (min-width: 425px){
         --default-font-size: 12px;
     }

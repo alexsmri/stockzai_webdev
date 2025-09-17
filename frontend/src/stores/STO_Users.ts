@@ -5,6 +5,7 @@ const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
   PropertyConsents: "/api/users/consents/",
   ActionVerification: "/api/users/verification/",
+  ActionRegistrationCheck: "/api/users/register/check/",
   TokenVerificationRequest: "/api/users/verification/token/",
   TokenPasswordResetRequest: "/api/users/password-reset/token/",
   TokenPasswordResetValidation: "/api/users/password-reset/token/validate/",

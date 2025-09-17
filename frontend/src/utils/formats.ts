@@ -56,3 +56,15 @@ export function formatPercentileEstimate(prPercentile: number) {
   
   return Math.min(Math.round(utOut) * 10, 95);
 }
+
+export function censorEmail(email: string, uncensoredLetters: number = 3) {
+  let formatted = ""
+  if (email.includes("@") && email.includes(".")) {
+    formatted = email.slice(0, uncensoredLetters)
+    const atIndex = email.indexOf("@")
+    const nrStars = Math.max(atIndex - uncensoredLetters, 0)
+    formatted = `${formatted}${"*".repeat(nrStars)}${email.slice(atIndex, email.length)}`
+    return formatted
+  }
+  return email
+}
