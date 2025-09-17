@@ -15,7 +15,9 @@ const ROUTE_CONFIG = {
   ActionRefreshToken: "/api/users/token/refresh/",
   TokenLoginValidation: "/api/users/token/validate/",
   ActionEditProfile: "/api/users/edit/",
-  ActionUnsubscribeNewsletter: "/api/users/unsubscribe-newsletter",
+  ActionUnsubscribeNewsletter: "/api/users/unsubscribe-newsletter/",
+  ActionSubscribeNewsletterRequest: "/api/users/subscribe-newsletter/token/",
+  ActionSubscribeNewsletterVerify: "/api/users/subscribe-newsletter/verify/",
 } as const;
 
 const PERSISTED_KEYS: ValidKeys[] = [

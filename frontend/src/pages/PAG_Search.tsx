@@ -14,7 +14,7 @@ export default function PAG_Search() {
   const [input, setInput] = useState<string>('');
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
-  const utStoreArgs = (input.length <= 2 ? [input, true] : [input, false]) as [string, boolean?];
+  const utStoreArgs = [input, input.length <= 2, "completion"] as [string, boolean, string];
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.length > 0) {
@@ -57,7 +57,7 @@ export default function PAG_Search() {
         </div>
       </div>
       {showResults && (
-        <PRV_SearchStore args={[submittedQuery]} showFallback={true}>
+        <PRV_SearchStore args={[submittedQuery, false, "search"]} showFallback={true}>
           <COM_SearchResults />
         </PRV_SearchStore>
       )}
@@ -65,3 +65,4 @@ export default function PAG_Search() {
     </>
   );
 }
+

@@ -5,7 +5,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
 from django.conf import settings
 
-from .models import TokenPasswordReset, TokenVerification
+from .models import TokenPasswordReset, TokenVerification, TokenNewsletter
+
 
 @receiver(post_save, sender=TokenPasswordReset)
 def password_reset_token_created(sender, instance, created, **kwargs):
@@ -15,23 +16,24 @@ def password_reset_token_created(sender, instance, created, **kwargs):
         uid = instance.uid
         token = instance.token
         link = f"{base_url}users/password-reset/?uid={uid}&token={token}"
-        
+
         context = {
-            'reset_link': link
+            'reset_link': link,
         }
 
-        html_message = render_to_string("email_pwreset.html", context=context)
+        html_message = render_to_string('email_pwreset.html', context=context)
         plain_message = strip_tags(html_message)
 
         msg = EmailMultiAlternatives(
-            subject = "Reset your password - Stockz.ai",
-            body = plain_message,
-            from_email = "alex@stockz.ai",
-            to=[user_email]
+            subject='Reset your password - Stockz.ai',
+            body=plain_message,
+            from_email='alex@stockz.ai',
+            to=[user_email],
         )
 
-        msg.attach_alternative(html_message, "text/html")
+        msg.attach_alternative(html_message, 'text/html')
         msg.send()
+
 
 @receiver(post_save, sender=TokenVerification)
 def verification_token_created(sender, instance, created, **kwargs):
@@ -46,19 +48,49 @@ def verification_token_created(sender, instance, created, **kwargs):
         context = {
             'username': user_name,
             'verification_link': link,
-            'verification_code': token
+            'verification_code': token,
         }
-        
 
-        html_message = render_to_string("email_verification.html", context=context)
+        html_message = render_to_string('email_verification.html', context=context)
         plain_message = strip_tags(html_message)
 
         msg = EmailMultiAlternatives(
-            subject = "Verify your account - stockz.ai",
-            body = plain_message,
-            from_email = "alex@stockz.ai",
-            to=[user_email]
+            subject='Verify your account - stockz.ai',
+            body=plain_message,
+            from_email='alex@stockz.ai',
+            to=[user_email],
         )
 
-        msg.attach_alternative(html_message, "text/html")
+        msg.attach_alternative(html_message, 'text/html')
+        msg.send()
+
+
+@receiver(post_save, sender=TokenNewsletter)
+def newsletter_token_created(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+        user_email = user.email
+        user_name = user.username
+        base_url = settings.FRONTEND_URL
+        uid = instance.uid
+        token = instance.token
+
+        link = f"{base_url}users/subscribe-newsletter/verify?uid={uid}&email={user_email}"
+        context = {
+            'username': user_name,
+            'subscription_link': link,
+            'verification_code': token,
+        }
+
+        html_message = render_to_string('email_newsletter.html', context=context)
+        plain_message = strip_tags(html_message)
+
+        msg = EmailMultiAlternatives(
+            subject='Confirm your newsletter subscription - stockz.ai',
+            body=plain_message,
+            from_email='alex@stockz.ai',
+            to=[user_email],
+        )
+
+        msg.attach_alternative(html_message, 'text/html')
         msg.send()

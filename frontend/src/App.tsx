@@ -19,6 +19,7 @@ import COM_LightboxTimed from './components/COM_LightboxTimed';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
 import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
+import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
 
 function Logout() {
@@ -86,6 +87,14 @@ function App() {
                   element={
                     <COM_ProtectedRoute>
                       <PAG_Subscribe />
+                    </COM_ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/users/subscribe-newsletter/verify"
+                  element={
+                    <COM_ProtectedRoute>
+                      <PAG_SubscribeVerify />
                     </COM_ProtectedRoute>
                   }
                 />

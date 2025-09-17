@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
-from users.models import User, TokenVerification, TokenPasswordReset, UserConsents
+from users.models import User, TokenVerification, TokenPasswordReset, TokenNewsletter, UserConsents, TrackingEvent
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
@@ -11,6 +11,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from stockzAI.response import api_json_response
 from users.tokens import make_otp, password_reset_token
+from users.utils.tracking import track_event
 from rest_framework.decorators import permission_classes, api_view
 import json
 import logging
@@ -37,7 +38,7 @@ class RegisterUserView(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return api_json_response(msg=serializer.data, status=200)
-        
+
         except ValidationError as e:
             error = ""
             for _, errs in e.detail.items():
@@ -60,7 +61,7 @@ class LoginUserView(TokenObtainPairView):
             "refresh": serializer.validated_data["refresh"],
             }
         return api_json_response(msg=msg)
-    
+
 class RefreshTokenView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
 
@@ -121,7 +122,7 @@ def view_verify(request):
                 return api_json_response(error="Token Invalid.", status=400)
             if token_obj.is_used:
                 return api_json_response(error="Token Invalid.", status=400)
-            
+
             token_obj.is_used = True
             token_obj.save()
 
@@ -129,11 +130,11 @@ def view_verify(request):
             user.save()
 
             return api_json_response(msg=True)
-    
+
     except Exception as e:
         logger.exception(e)
         return api_json_response(error="Something went wrong", status=400)
-    
+
     except Exception as e:
         return api_json_response(error="Something went wrong", status=400)
 
@@ -163,19 +164,19 @@ def view_validate_password_reset_token(request):
         token = body.get("token")
         uid = body.get("uid")
         token_obj = TokenPasswordReset.objects.get(token=token, uid=uid)
-        
+
         if token_obj:
-            
+
             if token_obj.is_expired():
                 return api_json_response(msg=False)
             if token_obj.is_used:
                 return api_json_response(msg=False)
-            
+
             return api_json_response(msg=True)
-        
+
     except Exception as e:
         return api_json_response(msg=False, error="Something went wrong", status=200)
-    
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def view_reset_password(request):
@@ -191,7 +192,7 @@ def view_reset_password(request):
                 return api_json_response(msg=False)
             if token_obj.is_used:
                 return api_json_response(msg=False)
-            
+
             token_obj.is_used = True
             token_obj.save()
 
@@ -199,19 +200,72 @@ def view_reset_password(request):
             user.save()
 
             return api_json_response(msg=True)
-    
+
     except Exception as e:
         return api_json_response(error="Something went wrong", status=400)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def view_subscribe_newsletter_token(request):
+    consents, _ = UserConsents.objects.get_or_create(user=request.user)
+    if consents.consents_newsletter:
+        return api_json_response(error="You are already subscribed to the newsletter.", status=400)
+
+    token = make_otp(VERIFICATION_OTP_DIGITS)
+    uid = urlsafe_base64_encode(force_bytes(request.user.pk))
+    TokenNewsletter.objects.filter(user=request.user).delete()
+    TokenNewsletter.objects.create(user=request.user, token=token, uid=uid)
+
+    return api_json_response(msg={"uid": uid})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def view_subscribe_newsletter_verify(request):
+    try:
+        body = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return api_json_response(error="Invalid payload.", status=400)
+
+    token = body.get("token")
+    uid = body.get("uid")
+
+    if not token or not uid:
+        return api_json_response(error="Token and uid are required.", status=400)
+
+    try:
+        token_obj = TokenNewsletter.objects.get(token=token, uid=uid)
+    except TokenNewsletter.DoesNotExist:
+        return api_json_response(error="Verification code invalid.", status=400)
+
+    if token_obj.user_id != request.user.id:
+        return api_json_response(error="Verification code invalid for this user.", status=403)
+
+    if token_obj.is_expired() or token_obj.is_used:
+        return api_json_response(error="Verification code expired.", status=400)
+
+    token_obj.is_used = True
+    token_obj.save(update_fields=["is_used"])
+
+    consents, _ = UserConsents.objects.get_or_create(user=request.user)
+    consents.consents_newsletter = True
+    consents.save(update_fields=["consents_newsletter"])
+
+    return api_json_response(msg=True)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def view_credentials(request):
+    consents = UserConsents.objects.filter(user=request.user).first()
+    msg_consents = {"consents_newsletter": consents.consents_newsletter} if consents else {}
     user = request.user
     msg = {
         "email": user.email,
         "username": user.username,
+        "consents": msg_consents
     }
     return api_json_response(msg=msg)
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -223,18 +277,20 @@ def view_check_new_user(request):
 
         email_taken = User.objects.filter(email=email).exists()
         username_taken = User.objects.filter(username=username).exists()
-        
-        msg = True if not email_taken and not username_taken else False
+
+        msg = not email_taken and not username_taken
         error = None
-        if username_taken:
+        if email_taken and username_taken:
+            error = "Username already taken. Email already in use."
+        elif username_taken:
             error = "Username already taken."
-        if email_taken:
+        elif email_taken:
             error = "Email already in use."
-        if username_taken and email_taken:
-            error = "Username already taken, Email already in use."
+
         return api_json_response(msg=msg, error=error)
-    except:
+    except Exception:
         return api_json_response(error="Something went wrong.", status=400)
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -244,39 +300,71 @@ def view_edit_profile(request):
         user = request.user
         new_username = body.get("username")
 
-        if User.objects.filter(username=new_username):
+        if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
             return api_json_response(error="Username already taken")
-        
+
         user.username = new_username
         user.save()
-        return api_json_response(msg=True)
+
+        msg = {
+            "email": user.email,
+            "username": user.username,
+        }
+
+        return api_json_response(msg=msg)
     except Exception as e:
         return api_json_response(error=str(e))
-    
-@api_view(["GET"])
+
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def view_unsubscribe_newsletter(request):
     try:
-        user = request.user
-        consents = UserConsents.objects.get(user=user)
-        consents.consents_newsletter = False
-        consents.save()
-        return api_json_response(msg=True)
-    except Exception as e:
-        return api_json_response(error=str(e))
-    
+        body = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return api_json_response(error="Invalid payload.", status=400)
+
+    reason = (body.get("reason") or "").strip()
+
+    try:
+        consents = UserConsents.objects.get(user=request.user)
+    except UserConsents.DoesNotExist:
+        return api_json_response(error="No newsletter subscription found.", status=400)
+
+    if not consents.consents_newsletter:
+        return api_json_response(error="You are not subscribed to the newsletter.", status=400)
+
+    consents.consents_newsletter = False
+    consents.save(update_fields=["consents_newsletter"])
+
+    track_event(
+        request,
+        TrackingEvent.EVENT_NEWSLETTER_UNSUB,
+        {
+            "reason": reason or "unspecified",
+        },
+    )
+
+    if reason:
+        logger.info("User %s unsubscribed from newsletter: %s", request.user.pk, reason)
+
+    return api_json_response(msg=True)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def view_consents(request):
-    user = request.user
-    try:
-        consents = UserConsents.objects.get(user=user)
-        if consents:
-            msg = {
-                "consents_newsletter": consents.consents_newsletter,
-            }
-    except UserConsents.DoesNotExist:
-        msg = {}
-    except Exception as e:
-        return api_json_response(error="Something went wrong", status=400)
+    consents = UserConsents.objects.filter(user=request.user).first()
+    msg = {"consents_newsletter": consents.consents_newsletter} if consents else {}
     return api_json_response(msg=msg)
+
+
+
+
+
+
+
+
+
+
+

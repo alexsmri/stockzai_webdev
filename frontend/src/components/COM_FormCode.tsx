@@ -10,10 +10,14 @@ import { censorEmail } from '../utils/formats';
 
 const CODE_LENGTH = 6;
 
+type FormCodeMode = 'registration' | 'newsletter';
+
 interface ITF_FormCodeProps {
   prUid: string;
   prEmail: string;
-  prUsername: string;
+  prUsername?: string;
+  prMode?: FormCodeMode;
+  prRedirect?: string;
 }
 
 const clearTemporaryPassword = () => {
@@ -24,9 +28,16 @@ const clearTemporaryPassword = () => {
   }
 };
 
-export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCodeProps) {
+export default function COM_FormCode({
+  prUid,
+  prEmail,
+  prUsername,
+  prMode = 'registration',
+  prRedirect,
+}: ITF_FormCodeProps) {
   const utStore = useUserStore();
-  const utCensoredEmail = censorEmail(prEmail);
+  const utCensoredEmail = prEmail ? censorEmail(prEmail) : 'your email';
+  const redirectPath = prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);
@@ -104,12 +115,22 @@ export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCod
     }
     setIsResending(true);
     try {
-      const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
-      if (utTokenRes?.uid) {
-        setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
-        handleAlertOpen('A new verification code has been sent.', 's');
+      if (prMode === 'newsletter') {
+        const utTokenRes = await utStore.post('ActionSubscribeNewsletterRequest', {}, true);
+        if (utTokenRes?.uid) {
+          setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
+          handleAlertOpen('A new confirmation code has been sent.', 's');
+        } else {
+          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+        }
       } else {
-        handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+        const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
+        if (utTokenRes?.uid) {
+          setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
+          handleAlertOpen('A new verification code has been sent.', 's');
+        } else {
+          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+        }
       }
     } finally {
       setIsResending(false);
@@ -124,6 +145,24 @@ export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCod
 
     setIsSubmitting(true);
     try {
+      if (prMode === 'newsletter') {
+        const utValid = await utStore.post('ActionSubscribeNewsletterVerify', {
+          token: value,
+          uid: prUid,
+        });
+
+        if (!utValid) {
+          const utError = utStore.getError('ActionSubscribeNewsletterVerify') as string | undefined;
+          handleAlertOpen(utError || 'Wrong code. Try again.', 'f');
+          return;
+        }
+
+        await utStore.get('PropertyConsents');
+        handleAlertOpen('Newsletter subscription confirmed.', 's');
+        navigate(redirectPath);
+        return;
+      }
+
       const utValid = await utStore.post('ActionVerification', { token: value, uid: prUid });
       if (!utValid) {
         handleAlertOpen('Wrong code. Try again.', 'f');
@@ -156,8 +195,8 @@ export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCod
 
       clearTemporaryPassword();
       await utStore.get('PropertyCredentials');
-      handleAlertOpen(`Welcome to stockz.ai, ${prUsername}!`, 's');
-      navigate('/companies/search');
+      handleAlertOpen(`Welcome to stockz.ai, ${prUsername || 'there'}!`, 's');
+      navigate(redirectPath);
     } finally {
       setIsSubmitting(false);
     }
@@ -169,15 +208,18 @@ export default function COM_FormCode({ prUid, prEmail, prUsername }: ITF_FormCod
     return 'Resend code';
   })();
 
+  const heading = prMode === 'newsletter' ? 'Confirm Subscription' : 'Verify Email';
+  const instructions =
+    prMode === 'newsletter'
+      ? `We sent a six-digit code to ${utCensoredEmail}. Enter it below to confirm your subscription.`
+      : `An email with a six-digit code has just been sent to ${utCensoredEmail}. Enter the code below.`;
+
   return (
     <>
-      <h1 className="look-text-x4">Verify Email</h1>
+      <h1 className="look-text-x4">{heading}</h1>
       <div className="area-flex-col look-div-container mod-padding-xl">
         <form className="look-form-auth" onSubmit={handleSubmit}>
-          <p className="look-text-subtle look-text-x0">
-            An email with a 6-digit code has just been sent to {utCensoredEmail}. Enter the code
-            below.
-          </p>
+          <p className="look-text-subtle look-text-x0">{instructions}</p>
           <div className="area-flex-row mod-gap-s">
             {Array.from({ length: CODE_LENGTH }).map((_, i) => (
               <input

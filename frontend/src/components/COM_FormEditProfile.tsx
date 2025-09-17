@@ -1,21 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useAlert } from '../context/CTX_Alert';
 import COM_Loading from './COM_Loading';
 
+interface EditProfileResponse {
+  email: string;
+  username: string;
+  consents?: { consents_newsletter?: boolean } | null;
+}
+
 function COM_FormEditProfile() {
   const utStore = useUserStore();
 
-  const [stCredentials, setStCredentials] = useState<Record<string, any>>(async () => {
-    return await utStore.get('PropertyCredentials');
-  });
+  const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
+    utStore.read('PropertyCredentials') ?? null
+  );
+  const [stConsents, setStConsents] = useState<Record<string, any> | null>(
+    utStore.read('PropertyConsents') ?? null
+  );
   const [, setStLoading] = useState(false);
   const [stSuccess, setStSuccess] = useState(false);
   const [stUsername, setStUsername] = useState<string>('');
 
   const { handleAlertOpen, handleAlertClose } = useAlert();
+
   useUserStoreSync(utStore, 'PropertyCredentials', setStCredentials);
+  useUserStoreSync(utStore, 'PropertyConsents', setStConsents);
+
+  useEffect(() => {
+    void utStore.get('PropertyCredentials');
+    void utStore.get('PropertyConsents');
+  }, [utStore]);
+
   const utInitialUsername = stCredentials ? stCredentials['username'] : '';
   const utName = 'Edit Username';
 
@@ -24,29 +41,57 @@ function COM_FormEditProfile() {
     setStUsername(e.target.value);
     setStSuccess(false);
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     handleAlertClose();
     setStLoading(true);
     e.preventDefault();
-    if (stUsername) {
-      if (stUsername === utInitialUsername) {
-        const utMessage = 'Username is unchanged.';
-        handleAlertOpen(utMessage, 'i');
-        return;
-      }
 
-      const utRes = await utStore.post('ActionEditProfile', {
-        username: stUsername,
-      });
-      setStSuccess(utRes);
+    if (!stUsername) {
+      setStLoading(false);
+      return;
+    }
+
+    if (stUsername === utInitialUsername) {
+      handleAlertOpen('Username is unchanged.', 'i');
+      setStLoading(false);
+      return;
+    }
+
+    try {
+      const utRes = (await utStore.post('ActionEditProfile', { username: stUsername }, true)) as
+        | EditProfileResponse
+        | false;
+
       if (utRes) {
-        const utMessage = 'Username changed successfully.';
-        handleAlertOpen(utMessage, 's');
-        utStore.update('PropertyCredentials', { username: stUsername });
+        setStSuccess(true);
+        handleAlertOpen('Username changed successfully.', 's');
+
+        const nextCredentials: Record<string, any> = {
+          ...(utStore.read('PropertyCredentials') ?? {}),
+          email: utRes.email,
+          username: utRes.username,
+          consents: utRes.consents ?? stConsents ?? {},
+        };
+        utStore.data['PropertyCredentials'] = nextCredentials;
+        utStore.persist('PropertyCredentials');
+        utStore.notify('PropertyCredentials');
+        setStCredentials(nextCredentials);
+
+        if (Object.prototype.hasOwnProperty.call(utRes, 'consents')) {
+          const nextConsents = utRes.consents ?? {};
+          utStore.data['PropertyConsents'] = nextConsents;
+          utStore.persist('PropertyConsents');
+          utStore.notify('PropertyConsents');
+          setStConsents(nextConsents);
+        } else {
+          void utStore.get('PropertyConsents');
+        }
       } else {
         const utMessage = (utStore.getError('ActionEditProfile') as string) || 'An error occured.';
         handleAlertOpen(utMessage, 'f');
       }
+    } finally {
       setStLoading(false);
     }
   };
@@ -57,6 +102,14 @@ function COM_FormEditProfile() {
     }
   }, [stCredentials]);
 
+  const hasNewsletterConsent = Boolean(stCredentials?.consents?.consents_newsletter);
+  const newsletterHref = hasNewsletterConsent
+    ? '/users/unsubscribe-newsletter'
+    : '/users/subscribe-newsletter';
+  const newsletterLabel = hasNewsletterConsent
+    ? 'Unsubscribe from Newsletter'
+    : 'Subscribe to Newsletter';
+
   return (
     <>
       {stCredentials && utInitialUsername ? (
@@ -66,7 +119,7 @@ function COM_FormEditProfile() {
             <input
               type="text"
               value={stUsername}
-              onChange={(e) => handleChange(e)}
+              onChange={handleChange}
               placeholder={stSuccess ? stUsername : utInitialUsername}
               className="look-input-secondary"
             />
@@ -74,6 +127,9 @@ function COM_FormEditProfile() {
           </form>
           <a href="/users/password-reset/token/request" className="look-button-subtle">
             Forgot Password?
+          </a>
+          <a href={newsletterHref} className="look-button-subtle">
+            {newsletterLabel}
           </a>
           <a href="/users/logout" className="look-button-subtle">
             Logout
@@ -87,3 +143,4 @@ function COM_FormEditProfile() {
 }
 
 export default COM_FormEditProfile;
+

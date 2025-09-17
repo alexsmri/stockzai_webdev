@@ -11,9 +11,9 @@ const DEFAULT_REASONS = [
 ];
 
 export default function COM_FormUnsubscribe() {
-  const [utSearchParams] = useSearchParams();
-  const utNext = utSearchParams.get('next') || '/';
-  const [stReason, setStReason] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const utNext = searchParams.get('next') || '/';
+  const [stReason, setStReason] = useState<string>('');
   const [stOtherChecked, setStOtherChecked] = useState(false);
 
   const navigate = useNavigate();
@@ -24,108 +24,107 @@ export default function COM_FormUnsubscribe() {
   useEffect(() => {
     (async () => {
       const utSubscribed = await utStore.get('PropertyConsents');
-      console.log(utSubscribed);
       if (!utSubscribed?.consents_newsletter) {
-        navigate('/users/subscribe-newsletter/');
+        navigate('/users/subscribe-newsletter', { replace: true });
       }
     })();
-  }, []);
+  }, [navigate, utStore]);
 
-  const handleCheckboxChange = (other: boolean, reason?: string) => {
-    if (other) {
-      setStReason('');
-      setStOtherChecked(!stOtherChecked);
+  const handleCheckboxChange = (isOther: boolean, reason?: string) => {
+    if (isOther) {
+      const nextChecked = !stOtherChecked;
+      setStOtherChecked(nextChecked);
+      setStReason(nextChecked ? '' : '');
     } else {
-      setStReason(reason || '');
       setStOtherChecked(false);
+      setStReason(reason ?? '');
     }
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setStReason(e.target.value);
-    setStOtherChecked(true);
-  };
-
-  const formatReason = (reason: string, isLast: boolean) => {
-    let utOut = null;
-    if (!isLast) {
-      utOut = (
-        <>
-          <label
-            className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
-            style={{ maxWidth: '15rem' }}
-          >
-            <input
-              type="checkbox"
-              checked={stReason === reason}
-              onChange={() => handleCheckboxChange(false, reason)}
-            />
-            {reason}
-          </label>
-        </>
-      );
-    } else {
-      utOut = (
-        <>
-          <label
-            className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
-            style={{ maxWidth: '15rem' }}
-          >
-            <div className="area-flex-col mod-align-left mod-padding-none">
-              <div className="area-flex-row mod-padding-none mod-gap-s">
-                <input
-                  type="checkbox"
-                  checked={stOtherChecked}
-                  onChange={() => handleCheckboxChange(true)}
-                />
-                {reason}
-              </div>
-              <input
-                type="text"
-                value={stReason !== null && !DEFAULT_REASONS.includes(stReason) ? stReason : ''}
-                placeholder="Other Reason"
-                onChange={(e) => handleTextChange(e)}
-                className="look-input-secondary"
-              />
-            </div>
-          </label>
-        </>
-      );
+    if (!stOtherChecked) {
+      setStOtherChecked(true);
     }
-    return utOut;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!stReason) {
-      handleAlertOpen('Email not entered', 'f');
+    if (!stReason.trim()) {
+      handleAlertOpen('Please let us know why you are unsubscribing.', 'f');
+      return;
+    }
+
+    const utRes = await utStore.post('ActionUnsubscribeNewsletter', { reason: stReason.trim() });
+    if (utRes) {
+      await utStore.get('PropertyConsents');
+      handleAlertOpen('Newsletter subscription canceled.', 's');
+      navigate(utNext);
     } else {
-      const utRes = await utStore.get('ActionUnsubscribeNewsletter');
-      if (utRes) {
-        navigate(utNext);
-        handleAlertOpen('Newsletter subscription canceled.', 's');
-      } else {
-        handleAlertOpen('An error occured. Please try again.', 'f');
-      }
+      handleAlertOpen('An error occurred. Please try again.', 'f');
     }
   };
 
-  console.log(stReason);
+  const formatReason = (reason: string, isLast: boolean) => {
+    if (!isLast) {
+      return (
+        <label
+          key={reason}
+          className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none mod-flex-grow-children"
+        >
+          <input
+            type="checkbox"
+            checked={!stOtherChecked && stReason === reason}
+            onChange={() => handleCheckboxChange(false, reason)}
+          />
+          {reason}
+        </label>
+      );
+    }
+
+    return (
+      <label
+        key={reason}
+        className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none mod-flex-grow-children"
+      >
+        <div className="area-flex-col mod-align-left mod-padding-none">
+          <div className="area-flex-row mod-padding-none mod-gap-s">
+            <input
+              type="checkbox"
+              checked={stOtherChecked}
+              onChange={() => handleCheckboxChange(true)}
+            />
+            {reason}
+          </div>
+          <input
+            type="text"
+            value={stOtherChecked ? stReason : ''}
+            placeholder="Other Reason"
+            onChange={handleTextChange}
+            className="look-input-secondary"
+            disabled={!stOtherChecked}
+          />
+        </div>
+      </label>
+    );
+  };
 
   return (
     <>
-      <h1 className="look-text-x7">Unsubscribe</h1>
-      <p className="look-text-subtle">
-        Why do you wish to unsubscribe from stockz.ai newsletter? Please provide a reason
-      </p>
-      <form onSubmit={handleSubmit} className="area-flex-col mod-gap-l">
-        <div className="area-flex-col mod-align-left">
-          {DEFAULT_REASONS.map((reason, idx) => {
-            return formatReason(reason, idx === DEFAULT_REASONS.length - 1);
-          })}
-        </div>
-        <button className="look-button-secondary">Confirm</button>
-      </form>
+      <h1 className="look-text-x4">Unsubscribe</h1>
+      <div className="area-flex-col look-div-container mod-padding-xl">
+        <form onSubmit={handleSubmit} className="look-form-auth">
+          <p className="look-text-subtle">
+            Why do you wish to unsubscribe from stockz.ai newsletter? Please provide a reason
+          </p>
+          <div className="look-form-auth">
+            {DEFAULT_REASONS.map((reason, idx) =>
+              formatReason(reason, idx === DEFAULT_REASONS.length - 1)
+            )}
+          </div>
+          <button className="look-button-auth">Confirm</button>
+        </form>
+      </div>
     </>
   );
 }
