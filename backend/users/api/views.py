@@ -119,9 +119,9 @@ def view_verify(request):
         user = token_obj.user
         if token_obj:
             if token_obj.is_expired():
-                return api_json_response(error="Token Invalid.", status=400)
+                return api_json_response(msg=False, error="Code Expired.")
             if token_obj.is_used:
-                return api_json_response(error="Token Invalid.", status=400)
+                return api_json_response(msg=False, error="Code Invalid.")
 
             token_obj.is_used = True
             token_obj.save()
@@ -209,7 +209,7 @@ def view_reset_password(request):
 def view_subscribe_newsletter_token(request):
     consents, _ = UserConsents.objects.get_or_create(user=request.user)
     if consents.consents_newsletter:
-        return api_json_response(error="You are already subscribed to the newsletter.", status=400)
+        return api_json_response(msg=False, error="You are already subscribed to the newsletter.")
 
     token = make_otp(VERIFICATION_OTP_DIGITS)
     uid = urlsafe_base64_encode(force_bytes(request.user.pk))
@@ -231,18 +231,18 @@ def view_subscribe_newsletter_verify(request):
     uid = body.get("uid")
 
     if not token or not uid:
-        return api_json_response(error="Token and uid are required.", status=400)
+        return api_json_response(msg=False, error="Token and uid are required.")
 
     try:
         token_obj = TokenNewsletter.objects.get(token=token, uid=uid)
     except TokenNewsletter.DoesNotExist:
-        return api_json_response(error="Verification code invalid.", status=400)
+        return api_json_response(msg=False, error="Verification code invalid.")
 
     if token_obj.user_id != request.user.id:
-        return api_json_response(error="Verification code invalid for this user.", status=403)
+        return api_json_response(msg=False, error="Verification code invalid for this user.")
 
     if token_obj.is_expired() or token_obj.is_used:
-        return api_json_response(error="Verification code expired.", status=400)
+        return api_json_response(msg=False, error="Verification code expired.")
 
     token_obj.is_used = True
     token_obj.save(update_fields=["is_used"])

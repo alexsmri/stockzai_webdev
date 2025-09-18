@@ -14,8 +14,12 @@ export default class STO_KPI extends BaseAPIStore<TYP_APIResponse>{
     }
 
     async fetch() {
-        const kpis = await api.get(`/api/companies/kpis/`);
-        return kpis.data.msg
+        try {
+            const kpis = await api.get(`/api/companies/kpis/`);
+            return kpis.data.msg
+        } catch {
+            return {}
+        }
 
   };
 }

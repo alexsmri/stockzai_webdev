@@ -20,6 +20,7 @@ export default class STO_Search extends BaseAPIStore<TYP_APIResponse> {
         return store;
     }
     async fetch() {
+        try {
         const params = new URLSearchParams();
         params.set("unique", this.unique ? "true" : "false");
         if (this.variant) {
@@ -28,6 +29,9 @@ export default class STO_Search extends BaseAPIStore<TYP_APIResponse> {
         const company = await api.get(`/api/companies/search/${encodeURIComponent(this.query)}/?${params.toString()}`);
         console.log(company)
         return company.data.msg
+        } catch {
+            return {}
+        }
     }
 
   };

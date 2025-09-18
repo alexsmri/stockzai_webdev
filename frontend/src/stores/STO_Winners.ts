@@ -13,8 +13,12 @@ export default class STO_Winners extends BaseAPIStore<TYP_APIResponse> {
         return store;
     }
     async fetch() {
+        try {
         const winners = await api.get(`/api/companies/winners/`);
         return winners.data.msg
+        } catch {
+            return {}
+        }
     }
 
   };
