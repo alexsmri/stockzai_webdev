@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from .formats import parse_json
 from companies.models import WinnerEntry
+from typing import Any, Dict, Tuple
 
 
 class DB_Handler:
@@ -28,6 +29,38 @@ class DB_Handler:
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
     
+    def _build_conditions(self, conditions: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+        if not conditions:
+            return "", {}
+
+        clauses: list[str] = []
+        params: Dict[str, Any] = {}
+
+        for idx, (column, value) in enumerate(conditions.items()):
+            param_name = f"param_{idx}"
+
+            if isinstance(value, list):
+                clauses.append(f"`{column}` IN :{param_name}")
+                params[param_name] = tuple(value)
+
+            elif isinstance(value, str) and value.endswith("func"):
+                # value like "NOW()func" → drop the suffix, treat as raw SQL function
+                clauses.append(f"`{column}` = {value[:-4]}")
+
+            elif isinstance(value, str) and value[:1] in {">", "<"}:
+                operator, cleaned = value[0], value[1:]
+                clauses.append(f"`{column}` {operator} :{param_name}")
+                params[param_name] = cleaned
+
+            elif value is None:
+                clauses.append(f"`{column}` IS NULL")
+
+            else:
+                clauses.append(f"`{column}` = :{param_name}")
+                params[param_name] = value
+
+        return " WHERE " + " AND ".join(clauses), params
+    
     def dbu_read(self,
              table_name: str,
              column_name: str | bool = False,
@@ -36,47 +69,16 @@ class DB_Handler:
              ascend: bool = False) \
             -> pd.DataFrame:
 
-        query = f"SELECT * FROM {self.database}.{table_name}"
+        column_sql = f"`{column_name}`" if column_name else "*"
+        base_sql = f"SELECT {column_sql} FROM `{self.database}`.`{table_name}`"
 
-        if column_name:
-            query = f"SELECT `{column_name}` FROM {table_name}"
+        where_sql, params = self._build_conditions(conditions or {})
+        order_sql = f" ORDER BY {order_by} {'ASC' if ascend else 'DESC'}" if order_by else ""
 
-        if conditions:
-            operators = ["<", ">"]
-            for idx, condition in enumerate(conditions):
-                condition_value = conditions[condition] if conditions[condition] is not None else "NULL"
-                func = True if isinstance(condition_value, str) and condition_value[-4:] == 'func' else False
-                operator = "=" if not func else ""
-                if isinstance(condition_value, list):
-                    operator = "IN"
-                    condition_value = str(condition_value).replace("[", "(").replace("]", ")")
-                    condition_value = eval(condition_value)
+        query = text(base_sql + where_sql + order_sql)
 
-                elif isinstance(condition_value, str) and condition_value[0] in operators and not func:
-                    operator = condition_value[0]
-                    condition_value = condition_value[1:]
-
-                if idx == 0:
-                    query = f"{query} WHERE `{condition}` {operator} "
-
-                else:
-                    query = f"{query} AND `{condition}` {operator} "
-
-                if isinstance(condition_value, str) and func:
-                    query = f"{query}{condition_value[:-4]}"
-
-                elif isinstance(condition_value, str):
-                    query = f"{query}'{condition_value}'"
-
-                else:
-                    query = f"{query}{condition_value}"
-
-        if order_by:
-            query = f"{query} ORDER BY {order_by}"
-            if not ascend:
-                query = f"{query} DESC"
         with self.engine.connect() as conn:
-            results = conn.execute(text(query)).fetchall()
+            results = conn.execute(query, params).fetchall()
 
             if not column_name:
                 columns = []

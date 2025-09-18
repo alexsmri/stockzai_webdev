@@ -114,7 +114,6 @@ def view_verify(request):
         body = json.loads(request.body)
         token = body.get("token")
         uid = body.get("uid")
-        logger.info(f"Token: {token} UID: {uid}")
         token_obj = TokenVerification.objects.get(token=token, uid=uid)
         user = token_obj.user
         if token_obj:
