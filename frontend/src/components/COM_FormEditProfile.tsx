@@ -16,9 +16,6 @@ function COM_FormEditProfile() {
   const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
     utStore.read('PropertyCredentials') ?? null
   );
-  const [stConsents, setStConsents] = useState<Record<string, any> | null>(
-    utStore.read('PropertyConsents') ?? null
-  );
   const [, setStLoading] = useState(false);
   const [stSuccess, setStSuccess] = useState(false);
   const [stUsername, setStUsername] = useState<string>('');
@@ -26,7 +23,6 @@ function COM_FormEditProfile() {
   const { handleAlertOpen, handleAlertClose } = useAlert();
 
   useUserStoreSync(utStore, 'PropertyCredentials', setStCredentials);
-  useUserStoreSync(utStore, 'PropertyConsents', setStConsents);
 
   useEffect(() => {
     void utStore.get('PropertyCredentials');
@@ -66,27 +62,6 @@ function COM_FormEditProfile() {
       if (utRes) {
         setStSuccess(true);
         handleAlertOpen('Username changed successfully.', 's');
-
-        const nextCredentials: Record<string, any> = {
-          ...(utStore.read('PropertyCredentials') ?? {}),
-          email: utRes.email,
-          username: utRes.username,
-          consents: utRes.consents ?? stConsents ?? {},
-        };
-        utStore.data['PropertyCredentials'] = nextCredentials;
-        utStore.persist('PropertyCredentials');
-        utStore.notify('PropertyCredentials');
-        setStCredentials(nextCredentials);
-
-        if (Object.prototype.hasOwnProperty.call(utRes, 'consents')) {
-          const nextConsents = utRes.consents ?? {};
-          utStore.data['PropertyConsents'] = nextConsents;
-          utStore.persist('PropertyConsents');
-          utStore.notify('PropertyConsents');
-          setStConsents(nextConsents);
-        } else {
-          void utStore.get('PropertyConsents');
-        }
       } else {
         const utMessage = (utStore.getError('ActionEditProfile') as string) || 'An error occured.';
         handleAlertOpen(utMessage, 'f');
@@ -114,7 +89,7 @@ function COM_FormEditProfile() {
     <>
       {stCredentials && utInitialUsername ? (
         <>
-          <h1 className="look-text-x7">{utName}</h1>
+          <h1 className="look-text-x4">{utName}</h1>
           <form onSubmit={handleSubmit} className="area-flex-col">
             <input
               type="text"
@@ -143,4 +118,3 @@ function COM_FormEditProfile() {
 }
 
 export default COM_FormEditProfile;
-

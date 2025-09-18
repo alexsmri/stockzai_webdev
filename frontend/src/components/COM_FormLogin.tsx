@@ -9,7 +9,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const utStore = useUserStore();
-  const [, setLoading] = useState(false);
+  const [stLoading, setStLoading] = useState(false);
   const navigate = useNavigate();
   const [tokens, setTokens] = useState<Record<string, any> | null>(utStore.read('ActionLogin'));
   const { handleAlertOpen, handleAlertClose } = useAlert();
@@ -32,7 +32,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   }, [tokens]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setLoading(true);
+    setStLoading(true);
     e.preventDefault();
 
     const utRes = await utStore.post('ActionLogin', { email, password });
@@ -40,7 +40,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
       const utError = utStore.getError('ActionLogin') as string;
       utError && handleAlertOpen(utError, 'f');
     }
-    setLoading(false);
+    setStLoading(false);
   };
 
   return (
@@ -62,7 +62,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             placeholder="Password"
             className="look-input-secondary"
           />
-          <button className="look-button-auth">Continue</button>
+          <button className="look-button-auth">{stLoading ? 'Logging In...' : 'Continue'}</button>
         </form>
         <div className="area-form-auth-links">
           <a href="/users/password-reset/token/request" className="look-button-subtle">
