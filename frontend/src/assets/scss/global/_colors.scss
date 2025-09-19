@@ -1,8 +1,8 @@
 :root {
-    --color-success: rgba(0, 81, 49);
-    --color-info: rgba(30, 22, 97);
-    --color-warning: rgba(126, 64, 19);
-    --color-failure: rgba(81, 0, 1);
+    --color-success: rgba(0, 210, 109);
+    --color-info: rgba(38, 87, 212);
+    --color-warning: rgba(240, 114, 46);
+    --color-failure: rgba(192, 13, 13);
     --color-primary: #0B0B0B;
     --color-secondary: rgba(255, 255, 255);
     --color-tertiary: rgba(0, 210, 109);
@@ -25,4 +25,5 @@
     --color-secondary-a10: rgba(255, 255, 255, 0.10);
     --color-secondary-a5: rgba(255, 255, 255, 0.05);
     --color-transparent: rgba(0, 0, 0, 0);
+    --color-alert-subtle: rgba(55, 55, 55, 0.08);
 }
