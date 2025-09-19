@@ -70,29 +70,19 @@
 }
 
 @mixin area-alert($color: var(--color-info)) {
-  display: grid;
-  columns: 0.5fr 2fr 0.3fr;
+  display: flex;
+  flex-direction: row;
   column-gap: f.scale-gap(1);
-  width: clamp(15rem, 20rem, 20rem);
-  height: auto;
   position: fixed;
   top: 1rem;
   right: 1rem;
   z-index: 100;
   margin: f.scale-margin(3);
-  padding: f.scale-padding(0.5);
-  border-radius: f.scale-gap(1);
-  background: linear-gradient(rgba($color, 0.05), var(--color-alert-subtle));
+  padding: f.scale-padding(1);
+  border-radius: 0.8rem;
+  background: $color;
   opacity: 0;
   transform: translateY(0.5rem);
-  align-items: baseline;
-  :first {
-    background-color: linear-gradient(rgba($color, 0.1), rgba($color, 0.09));
-    border-radius: f.scale-gap(0.5);
-  }
-  :nth-child(3){
-    margin-left: auto;
-  }
 }
 
 .fade-in-alert {
