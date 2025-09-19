@@ -14,7 +14,6 @@ services:
       dockerfile: Dockerfile.prod
     depends_on:
       - db
-    command: gunicorn stockzAI.wsgi:application --bind 0.0.0.0:8000
     ports:
       - '8000:8000'
     env_file: ./backend/.env.prod
@@ -22,7 +21,7 @@ services:
       - default
       - SA-network
     volumes:
-      - static_volume:/backend/static
+      - static_volume:/backend/staticfiles
       - media_volume:/backend/media
     healthcheck:
       test: ['CMD', 'curl', '--fail', 'http://localhost:8000/health/']
@@ -69,7 +68,7 @@ services:
       - backend
       - frontend
     volumes:
-      - static_volume:/backend/static
+      - static_volume:/backend/staticfiles
       - media_volume:/backend/media
       - frontend_build:/var/www/frontend
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
