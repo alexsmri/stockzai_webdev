@@ -25,14 +25,14 @@ export default function COM_FormPasswordReset() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password !== password2) {
-      handleAlertOpen('Passwords do not match', 'w');
+      handleAlertOpen('Passwords not matching', 'Enter the same password into both inputs', 'w');
     } else {
       const utRes = await utStore.post('ActionPasswordReset', { uid, token, password });
       if (utRes) {
         setSuccess(true);
       } else {
         setSuccess(false);
-        handleAlertOpen(utStore.getError('ActionPasswordReset') as string, 'f');
+        handleAlertOpen('An Error occured', utStore.getError('ActionPasswordReset') as string, 'f');
       }
     }
   };
@@ -50,7 +50,7 @@ export default function COM_FormPasswordReset() {
 
   useEffect(() => {
     if (success) {
-      handleAlertOpen('Password Reset successful!', 's');
+      handleAlertOpen('Success!', 'Your password has been reset.', 's');
       navigate('/users/login');
       setValid(false);
     }

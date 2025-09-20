@@ -24,12 +24,16 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (stPassword !== stPasswordConfirm) {
-      handleAlertOpen('Passwords do not match.', 'f');
+      handleAlertOpen(
+        'Passwords not matching',
+        'Please enter the same password into both inputs',
+        'f'
+      );
       return;
     }
 
     if (!stPassword) {
-      handleAlertOpen('Please choose a password.', 'f');
+      handleAlertOpen('Missing password', 'Please choose a password.', 'f');
       return;
     }
 
@@ -44,13 +48,23 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
 
       if (!utRes) {
         const utError = utStore.getError('ActionRegistration') as string;
-        handleAlertOpen(utError || 'Could not create your account. Please try again.', 'f', 5000);
+        handleAlertOpen(
+          'An Error occured',
+          utError || 'Could not create your account. Please try again.',
+          'f',
+          5000
+        );
         return;
       }
 
       const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
       if (!utTokenRes?.uid) {
-        handleAlertOpen('Unable to send verification code. Please try again.', 'f', 5000);
+        handleAlertOpen(
+          'An Error occured',
+          'Unable to send verification code. Please try again.',
+          'f',
+          5000
+        );
         return;
       }
 

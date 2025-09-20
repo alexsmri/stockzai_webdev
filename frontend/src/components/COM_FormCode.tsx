@@ -37,7 +37,8 @@ export default function COM_FormCode({
 }: ITF_FormCodeProps) {
   const utStore = useUserStore();
   const utCensoredEmail = prEmail ? censorEmail(prEmail) : 'your email';
-  const redirectPath = prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
+  const redirectPath =
+    prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);
@@ -119,17 +120,29 @@ export default function COM_FormCode({
         const utTokenRes = await utStore.post('ActionSubscribeNewsletterRequest', {}, true);
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
-          handleAlertOpen('A new confirmation code has been sent.', 's');
+          handleAlertOpen(
+            'Verification Code sent',
+            'Check your inbox for the verification code.',
+            's'
+          );
         } else {
-          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+          handleAlertOpen(
+            'An Error occured',
+            'Could not resend the code. Please try again shortly.',
+            'f'
+          );
         }
       } else {
         const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
-          handleAlertOpen('A new verification code has been sent.', 's');
+          handleAlertOpen('New Code sent', 'Check your inbox for a new verification code.', 's');
         } else {
-          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+          handleAlertOpen(
+            'An Error occured',
+            'Could not resend the code. Please try again shortly.',
+            'f'
+          );
         }
       }
     } finally {
@@ -153,19 +166,23 @@ export default function COM_FormCode({
 
         if (!utValid) {
           const utError = utStore.getError('ActionSubscribeNewsletterVerify') as string | undefined;
-          handleAlertOpen(utError || 'Wrong code. Try again.', 'f');
+          handleAlertOpen('An Error occured', utError || 'Wrong code. Try again.', 'f');
           return;
         }
 
         await utStore.get('PropertyConsents');
-        handleAlertOpen('Newsletter subscription confirmed.', 's');
+        handleAlertOpen(
+          'Subscription confirmed.',
+          'You can cancel it anytime in your profile settings',
+          's'
+        );
         navigate(redirectPath);
         return;
       }
 
       const utValid = await utStore.post('ActionVerification', { token: value, uid: prUid });
       if (!utValid) {
-        handleAlertOpen('Wrong code. Try again.', 'f');
+        handleAlertOpen('Wrong Code', 'Try again.', 'f');
         return;
       }
 
@@ -177,7 +194,7 @@ export default function COM_FormCode({
       }
 
       if (!storedPassword) {
-        handleAlertOpen('Account verified! Please log in to continue.', 'i');
+        handleAlertOpen('Account verified!', 'Please log in to continue.', 'i');
         navigate('/users/login');
         return;
       }
@@ -188,14 +205,19 @@ export default function COM_FormCode({
       });
       if (!loginRes) {
         clearTemporaryPassword();
-        handleAlertOpen('Account verified. Please log in manually.', 'w', 5000);
+        handleAlertOpen('Account verified!', 'Please log manually.', 'w', 5000);
         navigate('/users/login');
         return;
       }
 
       clearTemporaryPassword();
       await utStore.get('PropertyCredentials');
-      handleAlertOpen(`Welcome to stockz.ai, ${prUsername || 'there'}!`, 's');
+      handleAlertOpen(
+        'Welcome to stockz.ai!',
+        `${prUsername || 'Hey you'}, try and search your first stock!`,
+        's',
+        8000
+      );
       navigate(redirectPath);
     } finally {
       setIsSubmitting(false);

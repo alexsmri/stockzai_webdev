@@ -51,17 +51,21 @@ export default function COM_FormUnsubscribe() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!stReason.trim()) {
-      handleAlertOpen('Please let us know why you are unsubscribing.', 'f');
+      handleAlertOpen('Missing reason', 'Please let us know why you are unsubscribing.', 'f');
       return;
     }
 
     const utRes = await utStore.post('ActionUnsubscribeNewsletter', { reason: stReason.trim() });
     if (utRes) {
       await utStore.get('PropertyConsents');
-      handleAlertOpen('Newsletter subscription canceled.', 's');
+      handleAlertOpen(
+        'Subscription canceled',
+        'You can reactivate your subscription anytime in your profile settings',
+        's'
+      );
       navigate(utNext);
     } else {
-      handleAlertOpen('An error occurred. Please try again.', 'f');
+      handleAlertOpen('An Error occurred', 'Please try again.', 'f');
     }
   };
 

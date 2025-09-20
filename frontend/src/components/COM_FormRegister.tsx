@@ -19,7 +19,11 @@ function COM_FormRegister() {
     const username = stUsername.trim();
 
     if (!email || !username) {
-      handleAlertOpen('Please provide both email and username to continue.', 'f');
+      handleAlertOpen(
+        'Missing details',
+        'Please provide both email and username to continue.',
+        'f'
+      );
       return;
     }
     const utValid = await utStore.post('ActionRegistrationCheck', {
@@ -30,7 +34,11 @@ function COM_FormRegister() {
       const params = new URLSearchParams({ email, username });
       navigate(`/users/register/password?${params.toString()}`);
     } else {
-      handleAlertOpen(utStore.getError('ActionRegistrationCheck') as string, 'f');
+      handleAlertOpen(
+        'An Error occured',
+        utStore.getError('ActionRegistrationCheck') as string,
+        'f'
+      );
     }
   };
 

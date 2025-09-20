@@ -63,13 +63,21 @@ function COM_Alert({ prId, prSignal, prTitle, prMessage, prType }: ITF_AlertProp
             stAnimating ? 'fade-in-alert' : 'fade-out-alert'
           }`}
         >
-          <div>{ICON_LOOKUP[prType]}</div>
+          <div>
+            <img
+              className="img-hero"
+              src={ICON_LOOKUP[prType]}
+              alt="Close Alert"
+              fetchPriority="high"
+              style={{ maxWidth: '1.3rem', height: 'auto', aspectRatio: '1/1' }}
+            />
+          </div>
           <div>
             <p>{prTitle}</p>
             <p>{prMessage}</p>
           </div>
           <div className="mod-cursor-pointer" onClick={() => setStIsOpen(false)}>
-            <ICON_Close />
+            <img className="img-hero" src={ICON_Close} alt="Close Alert" fetchPriority="high" />
           </div>
         </div>
       )}

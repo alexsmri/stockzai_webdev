@@ -49,7 +49,7 @@ function COM_FormEditProfile() {
     }
 
     if (stUsername === utInitialUsername) {
-      handleAlertOpen('Username is unchanged.', 'i');
+      handleAlertOpen('Username unchanged', 'Nice one, though!', 'i');
       setStLoading(false);
       return;
     }
@@ -61,10 +61,10 @@ function COM_FormEditProfile() {
 
       if (utRes) {
         setStSuccess(true);
-        handleAlertOpen('Username changed successfully.', 's');
+        handleAlertOpen('Username changed', 'Good pick!', 's');
       } else {
         const utMessage = (utStore.getError('ActionEditProfile') as string) || 'An error occured.';
-        handleAlertOpen(utMessage, 'f');
+        handleAlertOpen('An Error occured', utMessage, 'f');
       }
     } finally {
       setStLoading(false);
