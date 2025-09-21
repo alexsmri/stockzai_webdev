@@ -1,11 +1,14 @@
 from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
+import decimal
+import numpy
 import pandas as pd
 import os
 from .formats import parse_json
 from companies.models import WinnerEntry
 from typing import Any, Dict, Tuple
 
+NUMERAL_TYPES = (int, float, decimal.Decimal, numpy.int64, numpy.int32, numpy.float64, numpy.float32)
 
 class DB_Handler:
 
@@ -316,7 +319,7 @@ class DB_Handler:
 
                 value = latest_entry["value"] if latest_entry["value"] != "NULL" else None
                 value2 = latest_entry["value2"] if latest_entry["value2"] != "NULL" else None
-                return {"value": value, "value2": value2} if any([value, value2]) else None
+                return {"value": value, "value2": value2} if value is not None or value2 is not None else None
 
             elif limit is None:
                 return kpi_entry
@@ -388,9 +391,9 @@ class DB_Handler:
             for kpi in additional_kpis_info:
                 symboL_kpi = self.dbq_get_kpi(symbol, 
                                                additional_kpis_info[kpi]["id"], 
-                                               additional_kpis_info[kpi]["role"])["value"]
-                if symboL_kpi:
-                    results_dic[kpi] = parse_json(symboL_kpi)
+                                               additional_kpis_info[kpi]["role"])
+                if symboL_kpi is not None:
+                    results_dic[kpi] = parse_json(symboL_kpi["value"])
             
             results[symbol] = results_dic
 
@@ -413,7 +416,9 @@ class DB_Handler:
                 "GROUP BY s_inner.SYMBOL "
             ") latest "
             "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
-            "WHERE s1.KPI = 116; "
+            "WHERE s1.KPI = 116 "
+            "AND s1.value IS NOT NULL "
+            "AND s1.value != 'NULL'; "
             )
         
         calculation_raw = self.dbu_read_execute(sql_query)
@@ -442,8 +447,9 @@ class DB_Handler:
                     display_kpis_info[kpi]["role"],
                     )
                 
-                if "value" in winner_kpi:
-                    winner_dict[kpi] = winner_kpi["value"]
+                if winner_kpi is not None:
+                    if "value" in winner_kpi and isinstance(winner_kpi["value"], NUMERAL_TYPES):
+                        winner_dict[kpi] = float(winner_kpi["value"])
             
             if len(list(winner_dict.keys())) == len(display_kpis):
                 out[winner] = winner_dict
