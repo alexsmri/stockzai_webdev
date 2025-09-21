@@ -19,6 +19,7 @@ def fetch_company_winners():
         last_winners = None
 
     if last_winners != winners:
-        logger.info(f"Winners: {winners}")
-        WinnerEntry.objects.create(winners=winners)
+        if any(list(winners.keys())):
+            logger.info(f"Winners: {winners}")
+            WinnerEntry.objects.create(winners=winners)
     return
