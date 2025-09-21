@@ -6,3 +6,4 @@ export const LANDINGPAGE_BUTTON_LINKS = {
   login: '/companies/search',
   anonymous: '/users/register',
 };
+export const MAX_APP_WIDTH = '1440px'

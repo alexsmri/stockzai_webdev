@@ -33,7 +33,7 @@ export default function COM_FormPasswordResetRequest() {
           placeholder="Email"
           className="look-input-secondary"
         />
-        <button className="look-button-primary">Submit</button>
+        <button className="look-button-secondary">Submit</button>
       </form>
     </>
   );

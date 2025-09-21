@@ -70,7 +70,7 @@ function COM_FormEditProfile() {
               placeholder={stSuccess ? stUsername : utInitialUsername}
               className="look-input-secondary"
             />
-            <button className="look-button-primary">Save</button>
+            <button className="look-button-secondary">Save</button>
           </form>
           <a href="/users/password-reset/token/request" className="look-button-subtle">
             Forgot Password?

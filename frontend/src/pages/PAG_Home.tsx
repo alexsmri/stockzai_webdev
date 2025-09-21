@@ -8,14 +8,16 @@ import { useUserStoreSync } from '../hooks/hooks';
 
 function PAG_Home() {
   const utStore = useUserStore();
-  const [loggedIn, setLoggedIn] = useState(utStore.read('ActionLogin'));
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(utStore.read('ActionLogin'));
 
   useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
   return (
     <>
       <COM_Navbar />
-      <COM_SectionHero prLoggedIn={loggedIn} />
-      <COM_SectionTrust prLoggedIn={loggedIn} />
+      <div className="area-flex-col mod-gap-xl mod-align-stretch">
+        <COM_SectionHero prLoggedIn={loggedIn} />
+        <COM_SectionTrust prLoggedIn={loggedIn} />
+      </div>
       <COM_Footer />
     </>
   );

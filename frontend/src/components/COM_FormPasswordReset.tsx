@@ -78,7 +78,7 @@ export default function COM_FormPasswordReset() {
               placeholder="Repeat Password"
               className="look-input-primary"
             />
-            <button className="look-button-primary">Submit</button>
+            <button className="look-button-secondary">Submit</button>
           </form>
         </>
       )}

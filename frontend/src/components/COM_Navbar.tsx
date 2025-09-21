@@ -32,9 +32,6 @@ export default function COM_Navbar() {
     ? 'look-button-ghost look-text-x3'
     : 'look-button-secondary';
 
-  //<a href="/companies/compare" className={utLinkClasses}>
-  //  Compare
-  //</a>
   const utMenuLinks = (
     <>
       <a href="/companies/search" className={utLinkClasses}>

@@ -76,5 +76,5 @@
 }
 
 @mixin gradient-backlight() {
-    background-image: radial-gradient(circle, var(--color-tertiary-a5), var(--color-transparent))
+    background-image: radial-gradient(var(--color-tertiary-a5), var(--color-transparent) 50%)
 }

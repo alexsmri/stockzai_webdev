@@ -17,6 +17,7 @@ import COM_HandleTokens from './components/COM_HandleTokens';
 import PAG_FormFeedback from './pages/PAG_FormFeedback';
 import COM_LightboxTimed from './components/COM_LightboxTimed';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
+import { MAX_APP_WIDTH } from './constants';
 
 function Logout() {
   localStorage.clear();
