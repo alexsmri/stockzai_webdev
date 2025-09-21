@@ -418,7 +418,8 @@ class DB_Handler:
             "ON s1.SYMBOL = latest.SYMBOL AND s1.date = latest.max_date "
             "WHERE s1.KPI = 116 "
             "AND s1.value IS NOT NULL "
-            "AND s1.value != 'NULL'; "
+            "AND s1.value != 'NULL' "
+            "AND s1.value > 0; "
             )
         
         calculation_raw = self.dbu_read_execute(sql_query)
