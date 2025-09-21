@@ -438,8 +438,6 @@ class DB_Handler:
             reverse=True
         )
 
-        for winner in winners[:100]:
-            logger.info(f"{winner}")
         out = {}
         winners_count = 0
         for winner in winners:
