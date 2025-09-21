@@ -422,8 +422,9 @@ class DB_Handler:
             "WHERE s1.KPI = 116 "
             "AND s1.value IS NOT NULL "
             "AND s1.value != 'NULL' "
-            "AND s1.value > 0; "
-            )
+            "AND s1.value > 0 "
+            "AND s1.date >= NOW() - INTERVAL 2 DAY; "
+        )
         
         calculation_raw = self.dbu_read_execute(sql_query)
 
