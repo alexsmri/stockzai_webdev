@@ -7,6 +7,9 @@ import os
 from .formats import parse_json
 from companies.models import WinnerEntry
 from typing import Any, Dict, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 NUMERAL_TYPES = (int, float, decimal.Decimal, numpy.int64, numpy.int32, numpy.float64, numpy.float32)
 
@@ -434,6 +437,8 @@ class DB_Handler:
             reverse=True
         )
 
+        for winner in winners[:100]:
+            logger.info(f"{winner}")
         out = {}
         winners_count = 0
         for winner in winners:
