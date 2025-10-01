@@ -100,3 +100,35 @@
 @mixin gradient-backlight() {
     background-image: radial-gradient(var(--color-tertiary-a5), var(--color-transparent) 50%)
 }
+
+@mixin stateful-button($color) {
+  background-color: #{$color};
+  color: var(--color-primary);
+  border: 0;
+  box-shadow: 0 0 0.5rem color-mix(in srgb, #{$color} 30%, transparent);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+  &:hover {
+    background-color: color-mix(in srgb, #{$color} 85%, white 15%);
+    box-shadow: 0 0 0.75rem color-mix(in srgb, #{$color} 45%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 0.125rem solid color-mix(in srgb, #{$color} 65%, white 35%);
+    outline-offset: 0.125rem;
+  }
+
+  &:active {
+    background-color: color-mix(in srgb, #{$color} 80%, black 20%);
+    box-shadow: 0 0 0.25rem color-mix(in srgb, #{$color} 40%, transparent);
+    transform: translateY(0.05rem);
+  }
+
+  &:disabled {
+    background-color: color-mix(in srgb, #{$color} 40%, transparent 60%);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

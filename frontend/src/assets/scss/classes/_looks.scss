@@ -24,23 +24,12 @@
 }
 
 .look-button-primary {
-    background-image: linear-gradient(45deg, var(--color-tertiary), #01D294);
-    box-shadow: 0 0 0.5rem var(--color-tertiary);
-    font-weight: 500;
-    text-decoration: none;
-    border-width: 0;
-    border-radius: 100rem;
-    padding-top: u.scale-padding(0.7);
-    padding-bottom: u.scale-padding(0.7);
-    padding-left: u.scale-padding(1.5);
-    padding-right: u.scale-padding(1.5);
-    color: var(--color-primary);
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-      box-shadow: 0 0 1rem var(--color-tertiary);
-    }
+  @include u.stateful-button(var(--color-tertiary));
+  border-radius: 100rem;
+  padding: u.scale-padding(0.7) u.scale-padding(1.5);
+  font-weight: 600;
+  text-decoration: none;
+  text-wrap: nowrap;
 }
 .look-button-secondary {
   @include u.look-button() 
@@ -113,76 +102,132 @@
 .look-div-completion {
   top: 100%;
 }
+
 .look-text-x8 {
+  font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(7);
-  font-weight: 500;
-  font-family: 'ClashDisplay';
+  font-weight: 600;
+  line-height: 1.2;
   text-align: center;
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-text-x7 {
+  font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(6);
-  font-weight: 500;
-  font-family: 'ClashDisplay';
+  font-weight: 600;
+  line-height: 1.2;
   text-align: center;
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-text-x6 {
+  font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(5);
-  font-weight: 500;
-  font-family: 'ClashDisplay';
+  font-weight: 600;
+  line-height: 1.25;
   text-align: center;
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-text-x5 {
+  font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(4);
-  font-weight: 500;
-  font-family: 'ClashDisplay';
+  font-weight: 600;
+  line-height: 1.3;
   text-align: center;
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-text-x4 {
-  font-size: u.scale_font(3);
-  font-weight: 500;
-  font-family: 'ClashDisplay';
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.35;
   text-align: center;
-  @include u.remove-margin()
+  @include u.remove-margin();
 }
+
 .look-text-x3 {
-  font-size: u.scale_font(2);
-  font-weight: 500;
-  font-family: 'Work Sans';
-  @include u.remove-margin()
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  @include u.remove-margin();
 }
+
 .look-text-x2 {
-  font-size: u.scale_font(1);
-  font-weight: 400;
-  font-family: 'Work Sans';
-  @include u.remove-margin()
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  @include u.remove-margin();
 }
+
+.look-text-x1 {
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  @include u.remove-margin();
+}
+
 .look-text-x0 {
-  font-size: u.scale_font(-1);
-  font-family: 'Work Sans';
-  color: var(--color-secondary-a60);
-  @include u.remove-margin()
+  font-family: 'Geist', 'Inter', sans-serif;
+  font-size: 0.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  @include u.remove-margin();
 }
-.look-text-svg {
-  font-size: 5.625rem;
-}
-.look-text-accent {
-  font-size: 5.625rem;
-}
+
+.look-text-svg,
+.look-text-accent,
 .look-text-mono {
+  font-family: 'Geist', 'Inter', sans-serif;
   font-size: 5.625rem;
 }
+
 .look-text-hero {
   @include u.gradient-hero();
   color: transparent;
   background-clip: text;
   opacity: 0.85;
 }
-.look-text-subtle {
+
+.look-text-important {
   color: var(--color-secondary-a80);
+}
+
+.look-text-normal {
+  color: var(--color-secondary-a60);
+}
+
+.look-text-subtle {
+  color: var(--color-secondary-a40);
+}
+
+.look-text-disabled {
+  color: var(--color-primary-a40);
+}
+
+.look-ui-subtle {
+  background-color: var(--color-secondary-ui-subtle);
+}
+
+.look-ui-element {
+  background-color: var(--color-secondary-ui-element);
+}
+
+.look-priority-high {
+  opacity: 0.8;
+}
+
+.look-priority-medium {
+  opacity: 0.6;
+}
+
+.look-priority-low {
+  opacity: 0.4;
 }
 
 .look-loader {

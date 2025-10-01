@@ -3,7 +3,6 @@ import PAG_Companies from './pages/PAG_Companies';
 import PAG_Login from './pages/PAG_Login';
 import PAG_Register from './pages/PAG_Register';
 import PAG_RegisterPassword from './pages/PAG_RegisterPassword';
-import PAG_Home from './pages/PAG_Home';
 import COM_ProtectedRoute from './components/COM_ProtectedRoute';
 import PAG_Search from './pages/PAG_Search';
 import { PRV_UserStore } from './context/CTX_UserStore';
@@ -21,6 +20,7 @@ import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
 import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
+import PAG_404 from './pages/PAG_404';
 
 function Logout() {
   localStorage.clear();
@@ -46,7 +46,7 @@ function App() {
             <BrowserRouter>
               <COM_LightboxTimed />
               <Routes>
-                <Route path="/" element={<PAG_Home />} />
+                <Route path="/" element={<Navigate to="/companies/search" replace />} />
                 <Route path="/legal/:page" element={<PAG_Legal />} />
                 <Route path="/users/login" element={<PAG_Login />} />
                 <Route path="/users/logout" element={<Logout />} />
@@ -108,6 +108,7 @@ function App() {
                 />
                 <Route path="/feedback" element={<PAG_FormFeedback />} />
                 <Route path="/loading" element={<COM_Loading />} />
+                <Route path="*" element={<PAG_404 />} />
               </Routes>
             </BrowserRouter>
           </PRV_Lightbox>
