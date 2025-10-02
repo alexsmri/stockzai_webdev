@@ -21,7 +21,11 @@ export default function COM_SearchBar({
           placeholder="Search for a ticker..."
           className="look-input-primary"
         />
-        {submit && <button type="submit">Submit</button>}
+        {submit && (
+          <button type="submit" className="look-button-secondary mod-button-auth">
+            Submit
+          </button>
+        )}
       </form>
 
       {/* Completions shown while typing */}

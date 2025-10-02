@@ -1,0 +1,245 @@
+import { useEffect, useMemo, useState, type CSSProperties, type FunctionComponent, type SVGProps } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import LogoFull from '@/assets/media/LOGO_schwarzquer.svg?react';
+import ExpandIcon from '@/assets/media/ICON_Expand.svg?react';
+import SearchIcon from '@/assets/media/ICON_Search.svg?react';
+import TrophyIcon from '@/assets/media/ICON_FirstPlace.svg?react';
+import AlertIcon from '@/assets/media/ICON_Alert.svg?react';
+import FeedbackIcon from '@/assets/media/ICON_Feedback.svg?react';
+import { useWindowDimensions, useUserStoreSync } from '../hooks/hooks';
+import { useUserStore } from '../context/CTX_UserStore';
+import { MOBILE_BREAKPOINT } from '../constants';
+
+type NavItem = {
+  label: string;
+  to: string;
+  Icon: FunctionComponent<SVGProps<SVGSVGElement>>;
+  isActive?: (pathname: string) => boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    label: 'Search',
+    to: '/companies/search',
+    Icon: SearchIcon,
+    isActive: (pathname) => pathname.startsWith('/companies/search') || pathname.startsWith('/companies/page'),
+  },
+  {
+    label: 'Top Stocks',
+    to: '/companies/top-stocks',
+    Icon: TrophyIcon,
+    isActive: (pathname) => pathname.startsWith('/companies/top-stocks'),
+  },
+  {
+    label: 'Alerts',
+    to: '/alerts',
+    Icon: AlertIcon,
+    isActive: (pathname) => pathname.startsWith('/alerts'),
+  },
+  {
+    label: 'Feedback',
+    to: '/feedback',
+    Icon: FeedbackIcon,
+    isActive: (pathname) => pathname.startsWith('/feedback'),
+  },
+];
+
+const SIDEBAR_SELECTED_CLASS = 'mod-selected';
+const WIDTH_EXPANDED = 'calc(var(--default-font-size) * 18)';
+const WIDTH_COLLAPSED = 'calc(var(--default-font-size) * 4.5)';
+const BG_BASE = 'color-mix(in srgb, var(--color-secondary) 8%, var(--color-primary))';
+const BG_FLOAT = 'color-mix(in srgb, var(--color-secondary) 12%, var(--color-primary))';
+
+function readUsername(data: any | null): string {
+  if (!data || typeof data !== 'object') {
+    return '';
+  }
+  if (typeof data.username === 'string') {
+    return data.username;
+  }
+  if (typeof data.email === 'string') {
+    return data.email.split('@')[0];
+  }
+  if (typeof data.first_name === 'string') {
+    return data.first_name;
+  }
+  if (data.user && typeof data.user === 'object') {
+    return readUsername(data.user);
+  }
+  return '';
+}
+
+export default function COM_Sidebar() {
+  const { width } = useWindowDimensions();
+  const location = useLocation();
+  const isMobile = width <= MOBILE_BREAKPOINT;
+  const [stExpanded, setStExpanded] = useState<boolean>(!isMobile);
+
+  useEffect(() => {
+    setStExpanded(!isMobile);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (isMobile) {
+      setStExpanded(false);
+    }
+  }, [location.pathname, isMobile]);
+
+  const handleToggle = () => {
+    if (isMobile) {
+      setStExpanded((prev) => !prev);
+    }
+  };
+
+  const showLabels = !isMobile || stExpanded;
+
+  const sidebarStyle: CSSProperties = useMemo(() => {
+    const expanded = stExpanded || !isMobile;
+    const widthValue = expanded ? WIDTH_EXPANDED : WIDTH_COLLAPSED;
+
+    return {
+      width: widthValue,
+      minWidth: widthValue,
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      flexShrink: 0,
+      gap: 'calc(var(--default-font-size) * 1.2)',
+      padding: expanded
+        ? 'calc(var(--default-font-size) * 1.5) calc(var(--default-font-size))'
+        : 'calc(var(--default-font-size)) calc(var(--default-font-size) * 0.5)',
+      backgroundColor: isMobile && stExpanded ? BG_FLOAT : BG_BASE,
+      borderRight: '1px solid var(--color-primary-a20)',
+      transition: 'width 0.25s ease, padding 0.25s ease',
+      position: isMobile ? (stExpanded ? 'fixed' : 'sticky') : 'sticky',
+      top: 0,
+      left: 0,
+      zIndex: isMobile && stExpanded ? 10 : undefined,
+      boxShadow: isMobile && stExpanded ? '0 0 2rem var(--color-primary-a40)' : undefined,
+      overflowY: 'auto',
+      overscrollBehavior: 'contain',
+    } satisfies CSSProperties;
+  }, [isMobile, stExpanded]);
+
+  const userStore = useUserStore();
+  const [stCredentials, setStCredentials] = useState<any | null>(userStore.read('PropertyCredentials'));
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
+  const username = readUsername(stCredentials);
+
+  const placeholder = isMobile && stExpanded ? (
+    <div
+      aria-hidden
+      style={{ width: WIDTH_COLLAPSED, minWidth: WIDTH_COLLAPSED, height: '100vh', flexShrink: 0 }}
+    />
+  ) : null;
+
+  return (
+    <>
+      {placeholder}
+      <aside className="area-flex-col mod-gap-l mod-padding-none" style={sidebarStyle} aria-label="Primary navigation">
+        <div
+          className="area-flex-col mod-gap-s mod-padding-none"
+          style={{ alignItems: showLabels ? 'stretch' : 'center' }}
+        >
+          {isMobile && (
+            <button
+              type="button"
+              className="look-button-ghost mod-button-auth"
+              onClick={handleToggle}
+              aria-label={stExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+              aria-expanded={stExpanded}
+              style={{
+                borderRadius: '999rem',
+                width: 'calc(var(--default-font-size) * 2.75)',
+                height: 'calc(var(--default-font-size) * 2.75)',
+                padding: 0,
+                justifyContent: 'center',
+                backgroundColor: 'transparent',
+                color: 'var(--color-secondary-a20)',
+              }}
+            >
+              <ExpandIcon
+                style={{
+                  width: 'calc(var(--default-font-size) * 1.1)',
+                  height: 'calc(var(--default-font-size) * 1.1)',
+                  transform: stExpanded ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.3s ease',
+                }}
+              />
+            </button>
+          )}
+          <LogoFull
+            style={{
+              width: '100%',
+              maxWidth: showLabels ? 'calc(var(--default-font-size) * 9)' : 'calc(var(--default-font-size) * 3.5)',
+              height: 'auto',
+              alignSelf: showLabels ? 'flex-start' : 'center',
+            }}
+          />
+        </div>
+        <nav className="area-flex-col mod-gap-s mod-padding-none" style={{ width: '100%', flex: 1 }}>
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              aria-label={item.label}
+              className={({ isActive }) => {
+                const activeByConfig = item.isActive ? item.isActive(location.pathname) : isActive;
+                return [
+                  'area-flex-row',
+                  'mod-gap-s',
+                  'mod-padding-none',
+                  'look-button-ghost',
+                  'mod-button-auth',
+                  activeByConfig ? SIDEBAR_SELECTED_CLASS : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+              }}
+              style={{
+                justifyContent: showLabels ? 'flex-start' : 'center',
+                paddingInline: showLabels
+                  ? 'calc(var(--default-font-size) * 0.75)'
+                  : 'calc(var(--default-font-size) * 0.5)',
+              }}
+              end={!item.isActive}
+              onClick={() => {
+                if (isMobile) {
+                  setStExpanded(false);
+                }
+              }}
+            >
+              <item.Icon style={{ width: 'calc(var(--default-font-size) * 1.1)', height: 'calc(var(--default-font-size) * 1.1)' }} />
+              {showLabels && (
+                <span style={{ whiteSpace: 'nowrap' }}>
+                  {item.label}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+        <div
+          className="area-flex-row mod-gap-s mod-padding-none mod-align-left"
+          style={{ width: '100%', marginTop: 'auto', justifyContent: showLabels ? 'flex-start' : 'center' }}
+        >
+          <div
+            aria-hidden
+            style={{
+              width: showLabels ? 'calc(var(--default-font-size) * 3.5)' : 'calc(var(--default-font-size) * 2.5)',
+              height: showLabels ? 'calc(var(--default-font-size) * 3.5)' : 'calc(var(--default-font-size) * 2.5)',
+              borderRadius: '50%',
+              backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
+              flexShrink: 0,
+            }}
+          />
+          {showLabels && (
+            <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
+              <span className="look-text-x2 look-text-normal">{username}</span>
+              <span className="look-text-x1 look-text-subtle">Free Plan</span>
+            </div>
+          )}
+        </div>
+      </aside>
+    </>
+  );
+}

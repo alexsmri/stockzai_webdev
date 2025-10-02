@@ -22,6 +22,8 @@ import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
 import PAG_404 from './pages/PAG_404';
 import PAG_Debug from './pages/PAG_Debug';
+import PAG_TopStocks from './pages/PAG_TopStocks';
+import PAG_Alerts from './pages/PAG_Alerts';
 
 function Logout() {
   localStorage.clear();
@@ -54,10 +56,7 @@ function App() {
                 <Route path="/users/register" element={<CreateAndLogout />} />
                 <Route path="/users/register/password" element={<CreatePasswordAndLogout />} />
                 <Route path="/users/verification" element={<PAG_VericationCode />} />
-                <Route
-                  path="/users/password-reset/token/request"
-                  element={<PA_PasswordResetRequest />}
-                />
+                <Route path="/users/password-reset/token/request" element={<PA_PasswordResetRequest />} />
                 <Route
                   path="/users/edit"
                   element={
@@ -80,6 +79,22 @@ function App() {
                   element={
                     <COM_ProtectedRoute>
                       <PAG_Companies />
+                    </COM_ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/companies/top-stocks"
+                  element={
+                    <COM_ProtectedRoute>
+                      <PAG_TopStocks />
+                    </COM_ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/alerts"
+                  element={
+                    <COM_ProtectedRoute>
+                      <PAG_Alerts />
                     </COM_ProtectedRoute>
                   }
                 />
