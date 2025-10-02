@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type FunctionComponent, type SVGProps } from 'react';
+import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import LogoFull from '@/assets/media/LOGO_schwarzquer.svg?react';
 import ExpandIcon from '@/assets/media/ICON_Expand.svg?react';
@@ -22,7 +22,8 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Search',
     to: '/companies/search',
     Icon: SearchIcon,
-    isActive: (pathname) => pathname.startsWith('/companies/search') || pathname.startsWith('/companies/page'),
+    isActive: (pathname) =>
+      pathname.startsWith('/companies/search') || pathname.startsWith('/companies/page'),
   },
   {
     label: 'Top Stocks',
@@ -45,10 +46,8 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const SIDEBAR_SELECTED_CLASS = 'mod-selected';
-const WIDTH_EXPANDED = 'calc(var(--default-font-size) * 18)';
 const WIDTH_COLLAPSED = 'calc(var(--default-font-size) * 4.5)';
-const BG_BASE = 'color-mix(in srgb, var(--color-secondary) 8%, var(--color-primary))';
-const BG_FLOAT = 'color-mix(in srgb, var(--color-secondary) 12%, var(--color-primary))';
+const MENU_LINK_PADDING = 'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
 
 function readUsername(data: any | null): string {
   if (!data || typeof data !== 'object') {
@@ -93,70 +92,53 @@ export default function COM_Sidebar() {
 
   const showLabels = !isMobile || stExpanded;
 
-  const sidebarStyle: CSSProperties = useMemo(() => {
-    const expanded = stExpanded || !isMobile;
-    const widthValue = expanded ? WIDTH_EXPANDED : WIDTH_COLLAPSED;
-
-    return {
-      width: widthValue,
-      minWidth: widthValue,
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      flexShrink: 0,
-      gap: 'calc(var(--default-font-size) * 1.2)',
-      padding: expanded
-        ? 'calc(var(--default-font-size) * 1.5) calc(var(--default-font-size))'
-        : 'calc(var(--default-font-size)) calc(var(--default-font-size) * 0.5)',
-      backgroundColor: isMobile && stExpanded ? BG_FLOAT : BG_BASE,
-      borderRight: '1px solid var(--color-primary-a20)',
-      transition: 'width 0.25s ease, padding 0.25s ease',
-      position: isMobile ? (stExpanded ? 'fixed' : 'sticky') : 'sticky',
-      top: 0,
-      left: 0,
-      zIndex: isMobile && stExpanded ? 10 : undefined,
-      boxShadow: isMobile && stExpanded ? '0 0 2rem var(--color-primary-a40)' : undefined,
-      overflowY: 'auto',
-      overscrollBehavior: 'contain',
-    } satisfies CSSProperties;
-  }, [isMobile, stExpanded]);
+  const sidebarClasses = useMemo(() => {
+    const classes = ['area-sidebar', 'area-flex-col', 'mod-gap-l'];
+    if (isMobile && stExpanded) {
+      classes.push('area-sidebar-mobile');
+    }
+    if (!showLabels) {
+      classes.push('area-sidebar--collapsed');
+    }
+    return classes.join(' ');
+  }, [isMobile, stExpanded, showLabels]);
 
   const userStore = useUserStore();
-  const [stCredentials, setStCredentials] = useState<any | null>(userStore.read('PropertyCredentials'));
+  const [stCredentials, setStCredentials] = useState<any | null>(
+    userStore.read('PropertyCredentials')
+  );
   useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   const username = readUsername(stCredentials);
 
-  const placeholder = isMobile && stExpanded ? (
-    <div
-      aria-hidden
-      style={{ width: WIDTH_COLLAPSED, minWidth: WIDTH_COLLAPSED, height: '100vh', flexShrink: 0 }}
-    />
-  ) : null;
+  const placeholder =
+    isMobile && stExpanded ? (
+      <div
+        aria-hidden
+        style={{
+          width: WIDTH_COLLAPSED,
+          minWidth: WIDTH_COLLAPSED,
+          height: '100vh',
+          flexShrink: 0,
+        }}
+      />
+    ) : null;
 
   return (
     <>
       {placeholder}
-      <aside className="area-flex-col mod-gap-l mod-padding-none" style={sidebarStyle} aria-label="Primary navigation">
+      <aside className={sidebarClasses} aria-label="Primary navigation">
         <div
           className="area-flex-col mod-gap-s mod-padding-none"
-          style={{ alignItems: showLabels ? 'stretch' : 'center' }}
+          style={{ alignItems: showLabels ? 'stretch' : 'center', width: '100%' }}
         >
           {isMobile && (
             <button
               type="button"
-              className="look-button-ghost mod-button-auth"
+              className="look-sidebar-toggle look-button-ghost mod-button-auth"
               onClick={handleToggle}
               aria-label={stExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
               aria-expanded={stExpanded}
-              style={{
-                borderRadius: '999rem',
-                width: 'calc(var(--default-font-size) * 2.75)',
-                height: 'calc(var(--default-font-size) * 2.75)',
-                padding: 0,
-                justifyContent: 'center',
-                backgroundColor: 'transparent',
-                color: 'var(--color-secondary-a20)',
-              }}
+              style={{ color: stExpanded ? 'var(--color-secondary-a60)' : undefined }}
             >
               <ExpandIcon
                 style={{
@@ -171,13 +153,15 @@ export default function COM_Sidebar() {
           <LogoFull
             style={{
               width: '100%',
-              maxWidth: showLabels ? 'calc(var(--default-font-size) * 9)' : 'calc(var(--default-font-size) * 3.5)',
+              maxWidth: showLabels
+                ? 'calc(var(--default-font-size) * 9)'
+                : 'calc(var(--default-font-size) * 3.5)',
               height: 'auto',
               alignSelf: showLabels ? 'flex-start' : 'center',
             }}
           />
         </div>
-        <nav className="area-flex-col mod-gap-s mod-padding-none" style={{ width: '100%', flex: 1 }}>
+        <nav className="area-flex-col mod-padding-none" style={{ width: '100%' }}>
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
@@ -187,8 +171,6 @@ export default function COM_Sidebar() {
                 const activeByConfig = item.isActive ? item.isActive(location.pathname) : isActive;
                 return [
                   'area-flex-row',
-                  'mod-gap-s',
-                  'mod-padding-none',
                   'look-button-ghost',
                   'mod-button-auth',
                   activeByConfig ? SIDEBAR_SELECTED_CLASS : '',
@@ -198,9 +180,8 @@ export default function COM_Sidebar() {
               }}
               style={{
                 justifyContent: showLabels ? 'flex-start' : 'center',
-                paddingInline: showLabels
-                  ? 'calc(var(--default-font-size) * 0.75)'
-                  : 'calc(var(--default-font-size) * 0.5)',
+                padding: MENU_LINK_PADDING,
+                width: '100%',
               }}
               end={!item.isActive}
               onClick={() => {
@@ -209,24 +190,33 @@ export default function COM_Sidebar() {
                 }
               }}
             >
-              <item.Icon style={{ width: 'calc(var(--default-font-size) * 1.1)', height: 'calc(var(--default-font-size) * 1.1)' }} />
-              {showLabels && (
-                <span style={{ whiteSpace: 'nowrap' }}>
-                  {item.label}
-                </span>
-              )}
+              <item.Icon
+                style={{
+                  width: 'calc(var(--default-font-size) * 1.2)',
+                  height: 'calc(var(--default-font-size) * 1.2)',
+                }}
+              />
+              {showLabels && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
             </NavLink>
           ))}
         </nav>
         <div
           className="area-flex-row mod-gap-s mod-padding-none mod-align-left"
-          style={{ width: '100%', marginTop: 'auto', justifyContent: showLabels ? 'flex-start' : 'center' }}
+          style={{
+            width: '100%',
+            marginTop: 'auto',
+            justifyContent: showLabels ? 'flex-start' : 'center',
+          }}
         >
           <div
             aria-hidden
             style={{
-              width: showLabels ? 'calc(var(--default-font-size) * 3.5)' : 'calc(var(--default-font-size) * 2.5)',
-              height: showLabels ? 'calc(var(--default-font-size) * 3.5)' : 'calc(var(--default-font-size) * 2.5)',
+              width: showLabels
+                ? 'calc(var(--default-font-size) * 3.5)'
+                : 'calc(var(--default-font-size) * 2.5)',
+              height: showLabels
+                ? 'calc(var(--default-font-size) * 3.5)'
+                : 'calc(var(--default-font-size) * 2.5)',
               borderRadius: '50%',
               backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
               flexShrink: 0,
