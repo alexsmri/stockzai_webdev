@@ -25,43 +25,111 @@
 
 .look-button-primary {
   @include u.stateful-button(var(--color-tertiary));
-  border-radius: 100rem;
+  border-radius: u.scale-gap(6);
   padding: u.scale-padding(0.7) u.scale-padding(1.5);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   text-wrap: nowrap;
+
+  &.mod-button-auth {
+    border-radius: var(--auth-border-radius);
+  }
 }
+
 .look-button-secondary {
-  @include u.look-button() 
+  @include u.stateful-button(var(--color-secondary));
+  border-radius: u.scale-gap(6);
+  padding: u.scale-padding(0.7) u.scale-padding(1.5);
+  font-weight: 500;
+  text-decoration: none;
+  text-wrap: nowrap;
+
+  &.mod-button-auth {
+    border-radius: var(--auth-border-radius);
+  }
 }
+
+.look-button-tertiary {
+  @include u.stateful-button(var(--color-secondary-ui-element), var(--color-secondary-a80));
+  border-radius: u.scale-gap(6);
+  padding: u.scale-padding(0.7) u.scale-padding(1.5);
+  font-weight: 500;
+  text-decoration: none;
+  text-wrap: nowrap;
+  border: 0;
+  backdrop-filter: blur(#{u.scale-gap(0.2)});
+
+  &.mod-button-auth {
+    border-radius: var(--auth-border-radius);
+  }
+}
+
 .look-button-auth {
-  @include u.look-button(u.scale-gap(0.5), 0.2rem)
-    
+  @include u.look-button(0.5, 0.2);
+  font-weight: 500;
 }
+
 .look-button-ghost {
-    color: var(--color-secondary-a80);
-    text-decoration: none;
-    text-wrap: nowrap;
-    margin-top: auto;
-    margin-bottom: auto;
-    background-color: transparent;
-    border: 0;
-    cursor: pointer;
-    &:hover {
-      color: var(--color-secondary);
-      transition: all 0.2s ease-in-out;
-    }
+  display: inline-flex;
+  align-items: center;
+  gap: u.scale-gap(0.5);
+  font-weight: 500;
+  font-size: u.scale-font(0);
+  line-height: 1.4;
+  color: var(--color-secondary-a40);
+  text-decoration: none;
+  text-wrap: nowrap;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding: u.scale-padding(0.5) u.scale-padding(1);
+  background-color: transparent;
+  border: 0;
+  border-radius: u.scale-gap(6);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
+  > svg,
+  > svg *,
+  > .icon,
+  > .icon * {
+    color: inherit;
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  &:hover {
+    color: var(--color-secondary-a60);
+    background-color: color-mix(in srgb, var(--color-secondary) 3%, transparent);
+  }
+
+  &:active {
+    color: var(--color-secondary-a60);
+    background-color: color-mix(in srgb, var(--color-secondary) 6%, transparent);
+    transform: translateY(u.scale-gap(0.05));
+  }
+
+  &.mod-selected {
+    color: var(--color-secondary-a60);
+    background-color: color-mix(in srgb, var(--color-secondary) 10%, transparent);
+  }
+
+  &.mod-button-auth {
+    border-radius: var(--auth-border-radius);
+  }
 }
+
 .look-button-subtle {
-    font-size: u.scale-font(-1);
-    color: var(--color-secondary-a40);
-    text-decoration: none;
-    cursor: pointer;
-    &:hover {
-      color: var(--color-secondary-a60);
-      transition: all 0.2s ease-in-out;
-    }
+  font-weight: 500;
+  font-size: u.scale-font(-1);
+  color: var(--color-secondary-a40);
+  text-decoration: none;
+  cursor: pointer;
+  &:hover {
+    color: var(--color-secondary-a60);
+    transition: all 0.2s ease-in-out;
+  }
 }
+
 
 .look-div-success {
     @include u.look-container($body-color: rgba(0, 210, 109));
@@ -97,6 +165,14 @@
 .look-div-backlight {
   @include u.look-container();
   @include u.gradient-backlight();
+}
+
+.look-div-subtle {
+  @include u.secondary-container(3%);
+}
+
+.look-div-solid {
+  @include u.secondary-container(10%);
 }
 
 .look-div-completion {

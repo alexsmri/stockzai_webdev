@@ -1,0 +1,9 @@
+.state-hover-scale {
+  transition: transform 0.2s ease-in-out;
+  will-change: transform;
+  transform-origin: center;
+
+  &:hover {
+    transform: scale(1.01);
+  }
+}

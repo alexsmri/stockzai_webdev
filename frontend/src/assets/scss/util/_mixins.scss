@@ -38,9 +38,17 @@
     backdrop-filter: blur(0.2rem);
 }
 
+@mixin secondary-container($surface-opacity) {
+    border-radius: var(--default-font-size);
+    background-color: color-mix(in srgb, var(--color-secondary) $surface-opacity, transparent);
+    padding: f.scale-padding(1);
+}
+
 @mixin look-button(
-        $radius: 100rem, 
-        $shadow-size: 0.5rem) {
+        $radius-factor: 6, 
+        $shadow-factor: 0.5) {
+    $radius: f.scale-gap($radius-factor);
+    $shadow-size: f.scale-gap($shadow-factor);
     background-color: var(--color-secondary);
     box-shadow: 0 0 $shadow-size var(--color-secondary);
     border-width: 0;
@@ -56,7 +64,7 @@
     transition: all 0.3s ease-in-out;
 
     &:hover {
-      box-shadow: 0 0 calc($shadow-size * 1.5) var(--color-secondary);
+      box-shadow: 0 0 calc(#{$shadow-size} * 1.5) var(--color-secondary);
     }
 }
 
@@ -101,28 +109,31 @@
     background-image: radial-gradient(var(--color-tertiary-a5), var(--color-transparent) 50%)
 }
 
-@mixin stateful-button($color) {
+@mixin stateful-button($color, $text-color: var(--color-primary)) {
+  $shadow-size: f.scale-gap(0.5);
+  $outline-size: f.scale-gap(0.125);
+  $active-offset: f.scale-gap(0.05);
   background-color: #{$color};
-  color: var(--color-primary);
+  color: #{$text-color};
   border: 0;
-  box-shadow: 0 0 0.5rem color-mix(in srgb, #{$color} 30%, transparent);
+  box-shadow: 0 0 $shadow-size color-mix(in srgb, #{$color} 30%, transparent);
   cursor: pointer;
   transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
 
   &:hover {
     background-color: color-mix(in srgb, #{$color} 85%, white 15%);
-    box-shadow: 0 0 0.75rem color-mix(in srgb, #{$color} 45%, transparent);
+    box-shadow: 0 0 calc(#{$shadow-size} * 1.5) color-mix(in srgb, #{$color} 45%, transparent);
   }
 
   &:focus-visible {
-    outline: 0.125rem solid color-mix(in srgb, #{$color} 65%, white 35%);
-    outline-offset: 0.125rem;
+    outline: #{$outline-size} solid color-mix(in srgb, #{$color} 65%, white 35%);
+    outline-offset: $outline-size;
   }
 
   &:active {
     background-color: color-mix(in srgb, #{$color} 80%, black 20%);
-    box-shadow: 0 0 0.25rem color-mix(in srgb, #{$color} 40%, transparent);
-    transform: translateY(0.05rem);
+    box-shadow: 0 0 calc(#{$shadow-size} * 0.5) color-mix(in srgb, #{$color} 40%, transparent);
+    transform: translateY($active-offset);
   }
 
   &:disabled {

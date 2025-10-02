@@ -21,6 +21,7 @@ import PAG_Subscribe from './pages/PAG_Subscribe';
 import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
 import PAG_404 from './pages/PAG_404';
+import PAG_Debug from './pages/PAG_Debug';
 
 function Logout() {
   localStorage.clear();
@@ -108,6 +109,7 @@ function App() {
                 />
                 <Route path="/feedback" element={<PAG_FormFeedback />} />
                 <Route path="/loading" element={<COM_Loading />} />
+                <Route path="/debug" element={<PAG_Debug />} />
                 <Route path="*" element={<PAG_404 />} />
               </Routes>
             </BrowserRouter>
