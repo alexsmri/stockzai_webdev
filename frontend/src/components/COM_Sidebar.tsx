@@ -46,7 +46,6 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const SIDEBAR_SELECTED_CLASS = 'mod-selected';
-const WIDTH_COLLAPSED = 'calc(var(--default-font-size) * 4.5)';
 const MENU_LINK_PADDING = 'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
 
 function readUsername(data: any | null): string {
@@ -73,6 +72,9 @@ export default function COM_Sidebar() {
   const location = useLocation();
   const isMobile = width <= MOBILE_BREAKPOINT;
   const [stExpanded, setStExpanded] = useState<boolean>(!isMobile);
+  const sidebarWidth = isMobile
+    ? 'var(--sidebar-width-collapsed)'
+    : 'var(--sidebar-width-expanded)';
 
   useEffect(() => {
     setStExpanded(!isMobile);
@@ -110,18 +112,17 @@ export default function COM_Sidebar() {
   useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   const username = readUsername(stCredentials);
 
-  const placeholder =
-    isMobile && stExpanded ? (
-      <div
-        aria-hidden
-        style={{
-          width: WIDTH_COLLAPSED,
-          minWidth: WIDTH_COLLAPSED,
-          height: '100vh',
-          flexShrink: 0,
-        }}
-      />
-    ) : null;
+  const placeholder = (
+    <div
+      aria-hidden
+      style={{
+        width: sidebarWidth,
+        minWidth: sidebarWidth,
+        height: '100vh',
+        flexShrink: 0,
+      }}
+    />
+  );
 
   return (
     <>
@@ -201,7 +202,7 @@ export default function COM_Sidebar() {
           ))}
         </nav>
         <div
-          className="area-flex-row mod-gap-s mod-padding-none mod-align-left"
+          className="area-flex-row mod-gap-s mod-align-left"
           style={{
             width: '100%',
             marginTop: 'auto',
@@ -211,12 +212,8 @@ export default function COM_Sidebar() {
           <div
             aria-hidden
             style={{
-              width: showLabels
-                ? 'calc(var(--default-font-size) * 3.5)'
-                : 'calc(var(--default-font-size) * 2.5)',
-              height: showLabels
-                ? 'calc(var(--default-font-size) * 3.5)'
-                : 'calc(var(--default-font-size) * 2.5)',
+              width: 'calc(var(--default-font-size) * 2.5)',
+              height: 'calc(var(--default-font-size) * 2.5)',
               borderRadius: '50%',
               backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
               flexShrink: 0,

@@ -10,6 +10,8 @@
     --default-font-size: 1rem;
     --auth-border-radius: calc(var(--default-font-size) * 0.5);
     --width-form-auth: 20rem;
+    --sidebar-width-expanded: calc(var(--default-font-size) * 12);
+    --sidebar-width-collapsed: calc(var(--default-font-size) * 4.5);
     @media (max-width: 768px) and (min-width: 425px){
         --default-font-size: 12px;
     }
