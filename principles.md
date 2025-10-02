@@ -58,6 +58,9 @@
 
 - Styling is driven by the SCSS token system: `.area-*` for layout, `.look-*` for surfaces/typography, `.mod-*` for modifiers.
 - Size everything off `--default-font-size` via the `scale-*` helpers or `calc(var(--default-font-size) * value)` so media-query adjustments scale the entire UI.
+- Start with existing `.area-*`, `.look-*`, and `.mod-*` utilities; only introduce new classes when the styling will be reused across components.
+- Handle responsive visibility/toggling with React state tied to shared breakpoints (e.g., `MOBILE_BREAKPOINT`) and keep layout stable (use placeholders/shims instead of shifting siblings).
+- Keep design tokens (colors, spacing, typography) in SCSS
 - Extend visuals using mixins from `assets/scss/util` (`look-container`, `look-transparent`, `gradient-*`) to stay on-brand.
 - Honor the dark palette from `_colors.scss`; when dynamic colors are needed, use helpers in `utils/functions.ts`.
 - Inline styles stay reserved for runtime-calculated values (e.g., sticky offsets); otherwise compose classnames.
