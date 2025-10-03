@@ -4,9 +4,8 @@ import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchResults from '../components/COM_SearchResults';
 import { useLocation, useNavigate } from 'react-router-dom';
 import COM_SearchCompletion from '../components/COM_SearchCompletion';
-import COM_Sidebar from '../components/COM_Sidebar';
 import COM_Footer from '../components/COM_Footer';
-import COM_Breadcrumbs from '../components/COM_Breadcrumbs';
+import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 
 export default function PAG_Search() {
   const navigate = useNavigate();
@@ -43,7 +42,10 @@ export default function PAG_Search() {
     setShowCompletions(false);
     setSubmittedQuery(query);
     setShowResults(true);
-    navigate({ pathname: '/companies/search', search: `?q=${encodeURIComponent(query)}` }, { replace: true });
+    navigate(
+      { pathname: '/companies/search', search: `?q=${encodeURIComponent(query)}` },
+      { replace: true }
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,44 +54,31 @@ export default function PAG_Search() {
   };
 
   return (
-    <div
-      className="area-flex-row mod-gap-none mod-padding-none"
-      style={{ minHeight: '100vh', alignItems: 'stretch' }}
-    >
-      <COM_Sidebar />
-      <div
-        className="area-flex-col mod-gap-l mod-padding-hero mod-align-left"
-        style={{ flex: 1, width: '100%' }}
-      >
-        <COM_Breadcrumbs />
-        <h1 className="look-text-x7 mod-align-left">Search Ticker</h1>
-        <div className="area-flex-col mod-postion-relative mod-gap-none" style={{ alignItems: 'stretch', width: '100%' }}>
-          <COM_SearchBar
-            input={input ?? ''}
-            submit={false}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-          />
-          {input && showCompletions && (
-            <div className="look-div-completion mod-z-1" style={{ width: '100%' }}>
-              <PRV_SearchStore args={utStoreArgs} showFallback={true}>
-                <COM_SearchCompletion
-                  onSelect={(val) => {
-                    navigate(`/companies/page/${val}`);
-                  }}
-                  prQuery={input}
-                />
-              </PRV_SearchStore>
-            </div>
-          )}
-        </div>
-        {showResults && (
-          <PRV_SearchStore args={[submittedQuery, false, 'search']} showFallback={true}>
-            <COM_SearchResults />
+    <STR_ApplicationPage prTitle="Search Ticker">
+      <COM_SearchBar
+        input={input ?? ''}
+        submit={false}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+      />
+      {input && showCompletions && (
+        <div className="look-div-completion mod-z-1" style={{ width: '100%' }}>
+          <PRV_SearchStore args={utStoreArgs} showFallback={true}>
+            <COM_SearchCompletion
+              onSelect={(val) => {
+                navigate(`/companies/page/${val}`);
+              }}
+              prQuery={input}
+            />
           </PRV_SearchStore>
-        )}
-        <COM_Footer />
-      </div>
-    </div>
+        </div>
+      )}
+      {showResults && (
+        <PRV_SearchStore args={[submittedQuery, false, 'search']} showFallback={true}>
+          <COM_SearchResults />
+        </PRV_SearchStore>
+      )}
+      <COM_Footer />
+    </STR_ApplicationPage>
   );
 }
