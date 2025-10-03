@@ -95,7 +95,7 @@ export default function COM_Sidebar() {
   const showLabels = !isMobile || stExpanded;
 
   const sidebarClasses = useMemo(() => {
-    const classes = ['area-sidebar', 'area-flex-col', 'mod-gap-l'];
+    const classes = ['area-sidebar', 'area-flex-col', 'mod-gap-l', 'mod-z-3'];
     if (isMobile && stExpanded) {
       classes.push('area-sidebar-mobile');
     }
@@ -230,3 +230,4 @@ export default function COM_Sidebar() {
     </>
   );
 }
+

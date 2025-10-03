@@ -9,7 +9,7 @@ import { useWindowDimensions } from '../hooks/hooks';
 import { MOBILE_BREAKPOINT } from '../constants';
 
 const MENU_CLASS_NAMES = {
-  open: 'area-menu-mobile',
+  open: 'area-menu-mobile mod-z-3',
   closed: 'area-flex-row mod-gap-xl mod-padding-none mod-center',
 };
 export default function COM_Navbar() {
@@ -94,10 +94,9 @@ export default function COM_Navbar() {
           marginRight: '1rem',
           alignItems: 'center',
           justifySelf: 'center',
-          zIndex: 10,
         }}
       >
-        <nav className="area-navbar" ref={navRef}>
+        <nav className="area-navbar mod-z-3" ref={navRef}>
           <Logo
             className="img-logo mod-cursor-pointer"
             onClick={() => {

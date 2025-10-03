@@ -46,7 +46,7 @@ function COM_Alert({ prId, prSignal, prMessage, prType }: ITF_AlertProps) {
     <>
       {stIsOpen && (
         <div
-          className={`${ALERT_DIV_LOOKUP[prType]} mod-z-top ${
+          className={`${ALERT_DIV_LOOKUP[prType]} mod-z-2 ${
             stAnimating ? 'fade-in-alert' : 'fade-out-alert'
           }`}
         >
@@ -61,3 +61,4 @@ function COM_Alert({ prId, prSignal, prMessage, prType }: ITF_AlertProps) {
 }
 
 export default COM_Alert;
+

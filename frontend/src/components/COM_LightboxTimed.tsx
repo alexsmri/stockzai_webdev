@@ -16,7 +16,7 @@ export default function COM_LightboxTimed() {
 
   return (
     <>
-      <div className="area-lightbox" onClick={() => setStOpen(false)}>
+      <div className="area-lightbox mod-z-4" onClick={() => setStOpen(false)}>
         <div className="look-div-container" style={{ width: '70%' }}>
           <div className="area-flex-col mod-gap-l">
             <h1 className="look-text-x6">Your Input Matters.</h1>
@@ -34,3 +34,4 @@ export default function COM_LightboxTimed() {
     </>
   );
 }
+

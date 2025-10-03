@@ -83,13 +83,18 @@
     align-items: stretch;
 }
 .mod-z-1 {
-    position: absolute;
     z-index: 1;
 }
-.mod-z-top {
-    position: absolute;
-    z-index: 100;
+.mod-z-2 {
+    z-index: 2;
 }
+.mod-z-3 {
+    z-index: 3;
+}
+.mod-z-4 {
+    z-index: 4;
+}
+
 .mod-postion-relative {
     position: relative;
 }
@@ -115,4 +120,5 @@
 .mod-text-wrap {
     text-wrap: auto;
 }
+
 

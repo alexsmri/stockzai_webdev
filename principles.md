@@ -57,6 +57,7 @@
 ### Styling:
 
 - Styling is driven by the SCSS token system: `.area-*` for layout, `.look-*` for surfaces/typography, `.mod-*` for modifiers.
+- Layering uses `.mod-z-1` (dialogs), `.mod-z-2` (alerts), `.mod-z-3` (nav/sidebar), `.mod-z-4` (lightboxes); default flow stays at z0.
 - Size everything off `--default-font-size` via the `scale-*` helpers or `calc(var(--default-font-size) * value)` so media-query adjustments scale the entire UI.
 - Start with existing `.area-*`, `.look-*`, and `.mod-*` utilities; only introduce new classes when the styling will be reused across components.
 - Handle responsive visibility/toggling with React state tied to shared breakpoints (e.g., `MOBILE_BREAKPOINT`) and keep layout stable (use placeholders/shims instead of shifting siblings).
