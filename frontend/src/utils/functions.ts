@@ -262,3 +262,121 @@ export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, 
   let data = prData.company_intel[prKPI] || null
   return {latest_entry: latest_entry, data: data}
 }
+
+type BreadcrumbParam = {
+  source: 'query' | 'path';
+  key: string;
+  transform?: (value: string) => string;
+};
+
+type BreadcrumbConfig = {
+  base: string[];
+  params?: BreadcrumbParam[];
+};
+
+const BREADCRUMB_CONFIG: Record<string, BreadcrumbConfig> = {
+  '/companies/search': {
+    base: ['Search'],
+    params: [
+      {
+        source: 'query',
+        key: 'q',
+        transform: (value) => value.toUpperCase(),
+      },
+    ],
+  },
+  '/companies/page/:symbol': {
+    base: ['Search'],
+    params: [
+      {
+        source: 'path',
+        key: 'symbol',
+        transform: (value) => value.toUpperCase(),
+      },
+    ],
+  },
+  '/companies/top-stocks': {
+    base: ['Search', 'Top Stocks'],
+  },
+  '/alerts': {
+    base: ['Alerts'],
+  },
+  '/feedback': {
+    base: ['Feedback'],
+  },
+};
+
+function matchPathPattern(pattern: string, pathname: string): { matched: boolean; params: Record<string, string> } {
+  const patternSegments = pattern.split('/').filter(Boolean);
+  const pathSegments = pathname.split('/').filter(Boolean);
+
+  if (patternSegments.length !== pathSegments.length) {
+    return { matched: false, params: {} };
+  }
+
+  const params: Record<string, string> = {};
+
+  for (let i = 0; i < patternSegments.length; i += 1) {
+    const patternSegment = patternSegments[i];
+    const valueSegment = pathSegments[i];
+
+    if (patternSegment.startsWith(':')) {
+      const paramName = patternSegment.slice(1);
+      params[paramName] = valueSegment;
+      continue;
+    }
+
+    if (patternSegment !== valueSegment) {
+      return { matched: false, params: {} };
+    }
+  }
+
+  return { matched: true, params };
+}
+
+function titleFromSegment(segment: string): string {
+  return segment
+    .split('-')
+    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : part))
+    .join(' ');
+}
+
+export function getBreadcrumbContent(pathname: string, search: string): string[] {
+  const normalisedPath = pathname || '/';
+  const searchParams = new URLSearchParams(search || '');
+
+  for (const [pattern, config] of Object.entries(BREADCRUMB_CONFIG)) {
+    const { matched, params } = matchPathPattern(pattern, normalisedPath);
+    if (!matched) {
+      continue;
+    }
+
+    const values: string[] = [...config.base];
+
+    if (config.params) {
+      config.params.forEach((paramConfig) => {
+        let value: string | null = null;
+        if (paramConfig.source === 'query') {
+          value = (searchParams.get(paramConfig.key) || '').trim();
+        } else if (paramConfig.source === 'path') {
+          value = params[paramConfig.key] ?? '';
+        }
+
+        if (value) {
+          const transformed = paramConfig.transform ? paramConfig.transform(value) : value;
+          if (transformed) {
+            values.push(transformed);
+          }
+        }
+      });
+    }
+
+    return values;
+  }
+
+  const segments = normalisedPath.split('/').filter(Boolean);
+  if (!segments.length) {
+    return ['Home'];
+  }
+  return segments.map((segment) => titleFromSegment(segment));
+}
