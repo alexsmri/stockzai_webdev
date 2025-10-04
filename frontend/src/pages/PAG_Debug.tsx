@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import COM_MenuSelect from '../components/COM_MenuSelect';
+
 const TEXT_VARIANTS = [
   'look-text-x8',
   'look-text-x7',
@@ -17,7 +20,16 @@ const TEXT_STATES = [
   { className: 'look-text-disabled', label: 'Disabled (Primary 40%)' }
 ];
 
+const MENU_SELECT_OPTIONS = {
+  balance: 'Balance Sheet',
+  cashflow: 'Cashflow Statement',
+  income: 'Income Statement'
+};
+
 function PAG_Debug() {
+  const [selectedMenuKey, setSelectedMenuKey] = useState('');
+  const selectedMenuLabel = MENU_SELECT_OPTIONS[selectedMenuKey];
+
   return (
     <main
       style={{
@@ -29,6 +41,20 @@ function PAG_Debug() {
         margin: '0 auto'
       }}
     >
+      <section
+        className="look-div-container"
+        style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2rem' }}
+      >
+        <h2 className="look-text-x3 look-text-important">Menu Select</h2>
+        <COM_MenuSelect prOptions={MENU_SELECT_OPTIONS} prHandleChange={setSelectedMenuKey} />
+        <p className="look-text-x1 look-text-subtle">
+          Current selection:
+          <span className="look-text-important" style={{ marginLeft: '0.5rem' }}>
+            {selectedMenuLabel ?? 'None'}
+          </span>
+        </p>
+      </section>
+
       <section
         className="look-div-container"
         style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem' }}
