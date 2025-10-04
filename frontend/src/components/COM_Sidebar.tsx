@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import LogoFull from '@/assets/media/LOGO_schwarzquer.svg?react';
-import ExpandIcon from '@/assets/media/ICON_Expand.svg?react';
-import SearchIcon from '@/assets/media/ICON_Search.svg?react';
-import TrophyIcon from '@/assets/media/ICON_FirstPlace.svg?react';
-import AlertIcon from '@/assets/media/ICON_Alert.svg?react';
-import FeedbackIcon from '@/assets/media/ICON_Feedback.svg?react';
+import LOGO_schwarzquer from '@/assets/media/LOGO_schwarzquer.svg?react';
+import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
+import ICON_Search from '@/assets/media/ICON_Search.svg?react';
+import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
+import ICON_Alert from '@/assets/media/ICON_Alert.svg?react';
+import ICON_Feedback from '@/assets/media/ICON_Feedback.svg?react';
 import { useWindowDimensions, useUserStoreSync } from '../hooks/hooks';
 import { useUserStore } from '../context/CTX_UserStore';
 import { MOBILE_BREAKPOINT } from '../constants';
@@ -21,26 +21,26 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Search',
     to: '/companies/search',
-    Icon: SearchIcon,
+    Icon: ICON_Search,
     isActive: (pathname) =>
       pathname.startsWith('/companies/search') || pathname.startsWith('/companies/page'),
   },
   {
     label: 'Top Stocks',
     to: '/companies/top-stocks',
-    Icon: TrophyIcon,
+    Icon: ICON_FirstPlace,
     isActive: (pathname) => pathname.startsWith('/companies/top-stocks'),
   },
   {
     label: 'Alerts',
     to: '/alerts',
-    Icon: AlertIcon,
+    Icon: ICON_Alert,
     isActive: (pathname) => pathname.startsWith('/alerts'),
   },
   {
     label: 'Feedback',
     to: '/feedback',
-    Icon: FeedbackIcon,
+    Icon: ICON_Feedback,
     isActive: (pathname) => pathname.startsWith('/feedback'),
   },
 ];
@@ -141,7 +141,7 @@ export default function COM_Sidebar() {
               aria-expanded={stExpanded}
               style={{ color: stExpanded ? 'var(--color-secondary-a60)' : undefined }}
             >
-              <ExpandIcon
+              <ICON_Expand
                 style={{
                   width: 'calc(var(--default-font-size) * 1.1)',
                   height: 'calc(var(--default-font-size) * 1.1)',
@@ -151,14 +151,12 @@ export default function COM_Sidebar() {
               />
             </button>
           )}
-          <LogoFull
+          <LOGO_schwarzquer
             style={{
-              width: '100%',
-              maxWidth: showLabels
-                ? 'calc(var(--default-font-size) * 9)'
-                : 'calc(var(--default-font-size) * 3.5)',
-              height: 'auto',
+              width: 'auto',
+              height: 'calc(var(--default-font-size) * 1.3)',
               alignSelf: showLabels ? 'flex-start' : 'center',
+              padding: 'calc(var(--default-font-size) * 0.5)',
             }}
           />
         </div>
@@ -230,4 +228,3 @@ export default function COM_Sidebar() {
     </>
   );
 }
-

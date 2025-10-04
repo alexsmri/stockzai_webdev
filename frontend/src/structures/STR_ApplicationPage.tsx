@@ -15,18 +15,20 @@ export default function STR_ApplicationPage({
       style={{ minHeight: '100vh', alignItems: 'stretch' }}
     >
       <COM_Sidebar />
-      <div
-        className="area-flex-col mod-gap-l mod-padding-hero mod-align-left"
-        style={{ flex: 1, width: '100%' }}
-      >
+      <div className="area-application">
         <COM_Breadcrumbs />
-        <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>
         <div
-          className="area-flex-col mod-postion-relative mod-gap-none"
-          style={{ alignItems: 'stretch', width: '100%' }}
-        ></div>
+          className="area-application-body area-flex-col mod-gap-l mod-padding-l mod-align-left"
+          style={{ flex: 1, width: '100%' }}
+        >
+          <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>
+          <div
+            className="area-flex-col mod-postion-relative mod-gap-none"
+            style={{ alignItems: 'stretch', width: '100%' }}
+          ></div>
 
-        {children}
+          {children}
+        </div>
       </div>
     </div>
   );
