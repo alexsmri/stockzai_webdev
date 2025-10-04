@@ -15,7 +15,7 @@ function COM_Breadcrumbs() {
   }
 
   return (
-    <div className="area-flex-row" style={{ alignItems: 'center' }} aria-label="Breadcrumb">
+    <div className="area-breadcrumbs" aria-label="Breadcrumb">
       {crumbs.map((label, index) => {
         const isLast = index === crumbs.length - 1;
         const textClass = isLast

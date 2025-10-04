@@ -62,6 +62,7 @@ function COM_FormEditProfile() {
       if (utRes) {
         setStSuccess(true);
         handleAlertOpen('Username changed successfully.', 's');
+        utStore.update('PropertyCredentials', { username: stUsername });
       } else {
         const utMessage = (utStore.getError('ActionEditProfile') as string) || 'An error occured.';
         handleAlertOpen(utMessage, 'f');
