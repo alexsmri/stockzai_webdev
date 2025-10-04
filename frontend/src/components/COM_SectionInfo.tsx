@@ -15,7 +15,7 @@ function COM_SectionInfo(props: InfoSectionProps) {
   const prShowChange = props.prShowChange ? true : false;
   return (
     <>
-      <div className="area-flex-col look-div-container mod-gap-l">
+      <div className="area-flex-col look-div-subtle mod-gap-l">
         <div className="area-flex-row">
           <h3 className="look-text-x5">{props.title}</h3>
           {prShowChange && props.title && (

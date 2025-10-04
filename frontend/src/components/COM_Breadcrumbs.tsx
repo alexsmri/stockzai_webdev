@@ -19,8 +19,8 @@ function COM_Breadcrumbs() {
       {crumbs.map((label, index) => {
         const isLast = index === crumbs.length - 1;
         const textClass = isLast
-          ? 'look-text-x2 look-text-normal'
-          : 'look-text-x2 look-text-subtle';
+          ? 'look-text-x1 look-text-normal'
+          : 'look-text-x1 look-text-subtle';
 
         return (
           <Fragment key={`${label}-${index}`}>

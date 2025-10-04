@@ -36,7 +36,7 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
     <>
       <div className={'area-flex-col'}>
         <h3 className="look-text-x2">{utText}</h3>
-        <div className="look-div-container">
+        <div className="look-div-subtle">
           {Object.entries(flattenedData).map(([key, value]) => (
             <COM_KPIInfo prTableRole={prTableRole} prKPI={key} prValue={value} />
           ))}

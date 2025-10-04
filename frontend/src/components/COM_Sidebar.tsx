@@ -222,8 +222,8 @@ export default function COM_Sidebar() {
           />
           {showLabels && (
             <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
-              <span className="look-text-x2 look-text-normal">{username}</span>
-              <span className="look-text-x1 look-text-subtle">Free Plan</span>
+              <span className="look-text-x1 look-text-normal">{username}</span>
+              <span className="look-text-x0 look-text-subtle">Free Plan</span>
             </div>
           )}
         </div>
