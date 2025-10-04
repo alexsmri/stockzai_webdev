@@ -9,6 +9,12 @@
 .mod-padding-none {
     padding: 0;
 }
+.mod-padding-side {
+    padding: 0 u.scale-padding(1)
+}
+.mod-padding-side-s {
+    padding: 0 u.scale-padding(0.5);
+}
 .mod-padding-l {
     padding: u.scale-padding(2);
 }
@@ -125,5 +131,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
+.mod-overflow-x-scroll {
+    overflow-x: scroll;
+}
 

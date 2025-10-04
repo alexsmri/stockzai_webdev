@@ -1,6 +1,7 @@
 @use '../util' as u;
 
 .state-hover-scale {
+  cursor: pointer;
   transition: transform 0.2s ease-in-out;
   will-change: transform;
   transform-origin: center;

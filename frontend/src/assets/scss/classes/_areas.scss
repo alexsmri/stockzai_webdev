@@ -1,4 +1,4 @@
-@use "../util" as u;
+﻿@use "../util" as u;
 
 .area-body {
     display: flex;
@@ -110,6 +110,19 @@
     grid-template-columns: 0.5fr 0.5fr 2fr 1fr 0.5fr 0.5fr 0.5fr;
     justify-items: center;
     padding: u.scale-padding(1);
+}
+
+
+@mixin search-results-grid {
+    display: grid;
+    grid-template-columns: minmax(5rem, 0.6fr) minmax(16rem, 2.8fr) minmax(12rem, 1.6fr) repeat(3, 1fr);
+    column-gap: u.scale-gap(1);
+    padding: u.scale-padding(1);
+    align-items: center;
+}
+
+.area-grid-results {
+    @include search-results-grid();
 }
 
 .area-alert-success {
@@ -272,3 +285,4 @@
     max-height: u.scale-gap(18);
     z-index: 1;
 }
+
