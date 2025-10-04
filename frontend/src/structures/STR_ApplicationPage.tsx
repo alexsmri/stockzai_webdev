@@ -6,7 +6,7 @@ export default function STR_ApplicationPage({
   prTitle,
   children,
 }: {
-  prTitle: string;
+  prTitle?: string;
   children: ReactNode;
 }) {
   return (
@@ -21,7 +21,7 @@ export default function STR_ApplicationPage({
           className="area-application-body area-flex-col mod-gap-l mod-padding-l mod-align-left"
           style={{ flex: 1, width: '100%' }}
         >
-          <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>
+          {prTitle && <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>}
           <div
             className="area-flex-col mod-postion-relative mod-gap-none"
             style={{ alignItems: 'stretch', width: '100%' }}

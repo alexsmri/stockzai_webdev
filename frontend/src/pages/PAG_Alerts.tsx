@@ -3,7 +3,7 @@ import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 
 function PAG_Alerts() {
   return (
-    <STR_ApplicationPage prTitle="Top Stocks">
+    <STR_ApplicationPage>
       <COM_Footer />
     </STR_ApplicationPage>
   );

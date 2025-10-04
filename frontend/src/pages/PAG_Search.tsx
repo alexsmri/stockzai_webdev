@@ -54,7 +54,7 @@ export default function PAG_Search() {
   };
 
   return (
-    <STR_ApplicationPage prTitle="Search Ticker">
+    <STR_ApplicationPage>
       <COM_SearchBar
         input={input ?? ''}
         submit={false}
