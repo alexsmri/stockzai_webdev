@@ -196,73 +196,71 @@ function COM_SearchResults() {
   }
 
   return (
-    <div className="mod-overflow-x-scroll mod-margin-xl">
-      <div
-        className="area-flex-col mod-align-stretch"
-        style={{ minWidth: 'calc(var(--default-font-size) * 48)' }}
-      >
-        <div className="area-grid-results mod-padding-side">
-          {COLUMN_CONFIG.map((column) => {
-            const Icon = column.icon;
-            const isActive = sortState.columnId === column.id && sortState.direction !== null;
-            const sortDirection = isActive ? sortState.direction : null;
+    <div
+      className="area-flex-col mod-align-stretch"
+      style={{ minWidth: 'calc(var(--default-font-size) * 48)' }}
+    >
+      <div className="area-grid-results mod-padding-side">
+        {COLUMN_CONFIG.map((column) => {
+          const Icon = column.icon;
+          const isActive = sortState.columnId === column.id && sortState.direction !== null;
+          const sortDirection = isActive ? sortState.direction : null;
 
-            return (
-              <button
-                type="button"
-                key={column.id}
-                className={`look-button-ghost mod-button-auth look-text-x0${
-                  isActive ? ' mod-selected' : ''
-                }`}
-                onClick={() => handleSort(column)}
-              >
-                <Icon style={{ width: 'calc(var(--default-font-size) * 1)' }} />
-                <span>{column.title}</span>
-                <ICON_Triangle
-                  style={{
-                    width: 'calc(var(--default-font-size) * 1)',
-                    height: 'auto',
-                    transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none',
-                    visibility: isActive ? 'visible' : 'hidden',
-                  }}
-                />
-              </button>
-            );
-          })}
-        </div>
-        <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
-          {sortedResults.map(([symbol, company]) => {
-            const companyName = getDisplayText(company?.name, 'Unknown Company');
-            const sector = getDisplayText(company?.sector, 'Unknown Sector');
-            const sectorRank = getDisplayRank(company?.sectorRanking);
-            const financialScore = getDisplayScore(company?.financial_score);
-            const valuationScore = getDisplayScore(company?.valuation_score);
-
-            return (
-              <div
-                key={symbol}
-                className="area-grid-results look-div-subtle state-hover-scale"
-                onClick={() => {
-                  navigate(`/companies/page/${symbol}`);
+          return (
+            <button
+              type="button"
+              key={column.id}
+              className={`look-button-ghost mod-button-auth look-text-x0${
+                isActive ? ' mod-selected' : ''
+              }`}
+              onClick={() => handleSort(column)}
+            >
+              <Icon style={{ width: 'calc(var(--default-font-size) * 1)' }} />
+              <span>{column.title}</span>
+              <ICON_Triangle
+                style={{
+                  width: 'calc(var(--default-font-size) * 1)',
+                  height: 'auto',
+                  transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none',
+                  visibility: isActive ? 'visible' : 'hidden',
                 }}
+              />
+            </button>
+          );
+        })}
+      </div>
+      <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
+        {sortedResults.map(([symbol, company]) => {
+          const companyName = getDisplayText(company?.name, 'Unknown Company');
+          const sector = getDisplayText(company?.sector, 'Unknown Sector');
+          const sectorRank = getDisplayRank(company?.sectorRanking);
+          const financialScore = getDisplayScore(company?.financial_score);
+          const valuationScore = getDisplayScore(company?.valuation_score);
+
+          return (
+            <div
+              key={symbol}
+              className="area-grid-results look-div-subtle state-hover-scale"
+              onClick={() => {
+                navigate(`/companies/page/${symbol}`);
+              }}
+            >
+              <span className="look-text-x1 look-priority-high">{symbol}</span>
+              <span
+                className="look-text-x1 look-priority-medium mod-text-ellipsis"
+                title={companyName}
               >
-                <span className="look-text-x1 look-priority-high">{symbol}</span>
-                <span
-                  className="look-text-x1 look-priority-medium mod-text-ellipsis"
-                  title={companyName}
-                >
-                  {companyName}
-                </span>
-                <span className="look-text-x1 look-priority-low mod-text-ellipsis" title={sector}>
-                  {sector}
-                </span>
-                <span className="look-text-x1 look-priority-low">{sectorRank}</span>
-                <span className="look-text-x1 look-priority-low">{financialScore}</span>
-                <span className="look-text-x1 look-priority-low">{valuationScore}</span>
-              </div>
-            );
-          })}
-        </div>
+                {companyName}
+              </span>
+              <span className="look-text-x1 look-priority-low mod-text-ellipsis" title={sector}>
+                {sector}
+              </span>
+              <span className="look-text-x1 look-priority-low">{sectorRank}</span>
+              <span className="look-text-x1 look-priority-low">{financialScore}</span>
+              <span className="look-text-x1 look-priority-low">{valuationScore}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

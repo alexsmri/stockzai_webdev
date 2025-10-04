@@ -227,7 +227,7 @@
 
 .look-text-x4 {
   font-family: 'Geist', 'Inter', sans-serif;
-  font-size: 1.5rem;
+  font-size: u.scale_font(3);
   font-weight: 700;
   line-height: 1.35;
   text-align: center;
@@ -236,7 +236,7 @@
 
 .look-text-x3 {
   font-family: 'Geist', 'Inter', sans-serif;
-  font-size: 1rem;
+  font-size: u.scale_font(2);
   font-weight: 700;
   line-height: 1.4;
   @include u.remove-margin();
@@ -244,7 +244,7 @@
 
 .look-text-x2 {
   font-family: 'Geist', 'Inter', sans-serif;
-  font-size: 1rem;
+  font-size: u.scale_font(1);
   font-weight: 500;
   line-height: 1.5;
   @include u.remove-margin();
@@ -252,7 +252,7 @@
 
 .look-text-x1 {
   font-family: 'Geist', 'Inter', sans-serif;
-  font-size: 0.75rem;
+  font-size: u.scale_font(0);
   font-weight: 600;
   line-height: 1.4;
   @include u.remove-margin();
@@ -260,7 +260,7 @@
 
 .look-text-x0 {
   font-family: 'Geist', 'Inter', sans-serif;
-  font-size: 0.5rem;
+  font-size: u.scale_font(-1);
   font-weight: 600;
   line-height: 1.4;
   @include u.remove-margin();

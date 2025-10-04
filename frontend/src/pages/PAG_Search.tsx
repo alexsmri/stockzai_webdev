@@ -55,7 +55,7 @@ export default function PAG_Search() {
 
   return (
     <STR_ApplicationPage>
-      <div className="mod-postion-relative">
+      <div className="area-flex-row mod-postion-relative mod-padding-side">
         <COM_SearchBar
           input={input ?? ''}
           submit={true}
