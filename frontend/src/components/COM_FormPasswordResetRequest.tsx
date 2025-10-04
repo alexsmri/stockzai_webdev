@@ -32,7 +32,7 @@ export default function COM_FormPasswordResetRequest() {
             value={stEmail}
             onChange={(e) => setStEmail(e.target.value)}
             placeholder="Email"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <button className="look-button-auth">Submit</button>
         </form>

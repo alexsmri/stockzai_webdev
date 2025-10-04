@@ -70,14 +70,14 @@ export default function COM_FormPasswordReset() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="look-input-primary"
+                className="look-input-auth"
               />
               <input
                 type="password"
                 value={password2}
                 onChange={(e) => setPassword2(e.target.value)}
                 placeholder="Repeat Password"
-                className="look-input-primary"
+                className="look-input-auth"
               />
               <button className="look-button-auth">Submit</button>
             </form>

@@ -53,14 +53,14 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <button className="look-button-auth">{stLoading ? 'Logging In...' : 'Continue'}</button>
         </form>

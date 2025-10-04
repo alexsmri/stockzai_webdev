@@ -44,14 +44,14 @@ function COM_FormRegister() {
             value={stEmail}
             onChange={(e) => setStEmail(e.target.value)}
             placeholder="Email"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <input
             type="text"
             value={stUsername}
             onChange={(e) => setStUsername(e.target.value)}
             placeholder="Username"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <button className="look-button-auth">{CONTINUE_LABEL}</button>
         </form>

@@ -35,7 +35,7 @@ export default function COM_SearchBar({
           value={input}
           onChange={handleChange}
           placeholder="Search for a ticker..."
-          className="look-input"
+          className="look-input-primary"
         />
         {submit && (
           <button type="submit" className="look-button-tertiary" aria-label="Search">

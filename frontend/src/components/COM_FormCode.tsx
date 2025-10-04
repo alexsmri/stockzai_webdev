@@ -229,7 +229,7 @@ export default function COM_FormCode({
                 pattern="\d*"
                 maxLength={1}
                 ref={inputRefs.current[i]}
-                className="look-input-secondary"
+                className="look-input-auth"
                 value={code[i] ?? ''}
                 aria-selected={selectedIdx === i}
                 onFocus={() => setSelectedIdx(i)}

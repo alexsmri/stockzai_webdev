@@ -149,3 +149,47 @@
   }
 }
 
+@mixin stateful-input () {
+  display: block;
+  min-width: 100%;
+  box-sizing: border-box;
+  border-radius: u.scale-gap(5);
+  background-color: var(--color-secondary-ui-element);
+  color: var(--color-secondary-a60);
+  font: inherit;
+  line-height: 1.5;
+  padding: u.scale-padding(0.7) u.scale-padding(1.5);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  appearance: none;
+
+  &::placeholder {
+    color: var(--color-secondary-a40);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-lift);
+    border-color: var(--color-secondary-a20);
+  }
+
+  &:focus,
+  &:focus-visible {
+    background-color: var(--color-primary-lift);
+    border-color: var(--color-secondary-a40);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--color-primary-lift);
+    border-color: var(--color-secondary-a40);
+  }
+
+  &:disabled {
+    background-color: var(--color-primary-a20);
+    color: var(--color-secondary-a20);
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: var(--color-secondary-a20);
+    }
+  }
+}
+

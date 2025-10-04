@@ -81,14 +81,14 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
             value={stPassword}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <input
             type="password"
             value={stPasswordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
             placeholder="Repeat Password"
-            className="look-input-secondary"
+            className="look-input-auth"
           />
           <label
             className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"

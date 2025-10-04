@@ -96,7 +96,7 @@ function COM_FormEditProfile() {
               value={stUsername}
               onChange={handleChange}
               placeholder={stSuccess ? stUsername : utInitialUsername}
-              className="look-input-secondary"
+              className="look-input-auth"
             />
             <button className="look-button-secondary">Save</button>
           </form>

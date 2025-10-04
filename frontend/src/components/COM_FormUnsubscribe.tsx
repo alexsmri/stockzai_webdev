@@ -101,7 +101,7 @@ export default function COM_FormUnsubscribe() {
             value={stOtherChecked ? stReason : ''}
             placeholder="Other Reason"
             onChange={handleTextChange}
-            className="look-input-secondary"
+            className="look-input-auth"
             disabled={!stOtherChecked}
           />
         </div>
