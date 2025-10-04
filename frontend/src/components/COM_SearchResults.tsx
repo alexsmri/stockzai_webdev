@@ -245,14 +245,19 @@ function COM_SearchResults() {
                 navigate(`/companies/page/${symbol}`);
               }}
             >
-              <span className="look-text-x1 look-priority-high">{symbol}</span>
+              <span className="look-text-x1 look-priority-high mod-text-wrap-gradient">
+                {symbol}
+              </span>
               <span
-                className="look-text-x1 look-priority-medium mod-text-ellipsis"
+                className="look-text-x1 look-priority-medium mod-text-wrap-gradient"
                 title={companyName}
               >
                 {companyName}
               </span>
-              <span className="look-text-x1 look-priority-low mod-text-ellipsis" title={sector}>
+              <span
+                className="look-text-x1 look-priority-low mod-text-wrap-gradient"
+                title={sector}
+              >
                 {sector}
               </span>
               <span className="look-text-x1 look-priority-low">{sectorRank}</span>

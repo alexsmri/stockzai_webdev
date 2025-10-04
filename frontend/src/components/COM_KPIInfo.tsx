@@ -30,14 +30,16 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
             >
               {getKPIText(prKPI)}
             </p>
-            <p>{formatLargeNumber(prValue)}</p>
+            <p className="look-text-x1 look-text-normal">{formatLargeNumber(prValue)}</p>
           </div>
           <COM_IndicatorChange prKPI={prKPI} />
         </div>
       ) : (
         <div key={prKPI} className="area-flex-row mod-space-between">
-          <p className="mod-align-left">{getKPIText(prKPI)}</p>
-          <p className="mod-align-right">{formatLargeNumber(prValue)}</p>
+          <p className="look-text-x1 look-text-subtle mod-align-left">{getKPIText(prKPI)}</p>
+          <p className="look-text-x1 look-text-normal mod-align-right">
+            {formatLargeNumber(prValue)}
+          </p>
         </div>
       )}
     </>

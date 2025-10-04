@@ -1,13 +1,11 @@
 import { useParams } from 'react-router-dom';
 import COM_SectionInfo from '../components/COM_SectionInfo';
 import COM_ScoreRadial from '../components/COM_ScoreRadial';
-import COM_Navbar from '../components/COM_Navbar';
 import { PRV_CompanyStore } from '../context/CTX_CompanyStore';
 import { PRV_KPIStore } from '../context/CTX_KPIStore';
 import NotFound from './PAG_404';
 import COM_LightboxKPI from '../components/COM_LightboxKPI';
 import COM_TableInfo from '../components/COM_TableInfo';
-import COM_Footer from '../components/COM_Footer';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 
 function PAG_Companies() {

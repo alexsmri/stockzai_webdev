@@ -131,4 +131,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.mod-text-wrap-gradient {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 18px), transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 18px), transparent 100%);
+}
 
