@@ -23,6 +23,10 @@
   width: var(--width-form-auth);
 }
 
+.look-shadow {
+    @include u.outer-shadow();
+}
+
 .look-button-primary {
   @include u.stateful-button(var(--color-tertiary));
   border-radius: u.scale-gap(6);

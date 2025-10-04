@@ -1,8 +1,12 @@
-@use "../util/index" as u;
+@use '../util' as u;
 
-.hover-scale {
-  @include u.look-container-hover();
-}
-.hover-color {
-  @include u.look-container-hover(1);
+.state-hover-scale {
+  transition: transform 0.2s ease-in-out;
+  will-change: transform;
+  transform-origin: center;
+  @include u.outer-shadow();
+
+  &:hover {
+    transform: scale(1.01);
+  }
 }

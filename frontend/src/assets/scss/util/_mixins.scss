@@ -1,5 +1,11 @@
 @use './functions' as f;
 
+@mixin outer-shadow() {
+    box-shadow:
+        0 0.6rem 1.4rem -0.4rem color-mix(in srgb, var(--color-shadow) 16%, transparent),
+        0 1.8rem 3.6rem -1rem color-mix(in srgb, var(--color-shadow) 28%, transparent);
+}
+
 @mixin look-transparent($radius: 0.8rem, $offset: 0.5rem, $blur: 1rem, $color: rgba(255, 255, 255)) {
     background-image: f.paint-gradient($color);
     background-color: transparent;
