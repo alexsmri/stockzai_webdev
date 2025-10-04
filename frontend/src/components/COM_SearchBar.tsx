@@ -8,6 +8,7 @@ interface SearchBarProps {
   handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
+const ICON_WIDTH = 'calc(var(--default-font-size) * 1.5)';
 export default function COM_SearchBar({
   input,
   submit = true,
@@ -31,6 +32,7 @@ export default function COM_SearchBar({
     <>
       <form onSubmit={onSubmitForm} className="area-searchbar">
         <input
+          name="searchbar"
           type="text"
           value={input}
           onChange={handleChange}
@@ -39,7 +41,11 @@ export default function COM_SearchBar({
         />
         {submit && (
           <button type="submit" className="look-button-tertiary" aria-label="Search">
-            <ICON_Search aria-hidden="true" focusable="false" />
+            <ICON_Search
+              aria-hidden="true"
+              focusable="false"
+              style={{ width: ICON_WIDTH, height: 'auto' }}
+            />
           </button>
         )}
       </form>

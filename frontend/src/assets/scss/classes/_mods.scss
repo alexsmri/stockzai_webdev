@@ -120,5 +120,10 @@
 .mod-text-wrap {
     text-wrap: auto;
 }
+.mod-text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 

@@ -55,24 +55,26 @@ export default function PAG_Search() {
 
   return (
     <STR_ApplicationPage>
-      <COM_SearchBar
-        input={input ?? ''}
-        submit={true}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-      />
-      {input && showCompletions && (
-        <div className="look-div-completion mod-z-1" style={{ width: '100%' }}>
-          <PRV_SearchStore args={utStoreArgs} showFallback={true}>
-            <COM_SearchCompletion
-              onSelect={(val) => {
-                navigate(`/companies/page/${val}`);
-              }}
-              prQuery={input}
-            />
-          </PRV_SearchStore>
-        </div>
-      )}
+      <div className="mod-postion-relative">
+        <COM_SearchBar
+          input={input ?? ''}
+          submit={true}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
+        {input && showCompletions && (
+          <div className="area-completions">
+            <PRV_SearchStore args={utStoreArgs} showFallback={true}>
+              <COM_SearchCompletion
+                onSelect={(val) => {
+                  navigate(`/companies/page/${val}`);
+                }}
+                prQuery={input}
+              />
+            </PRV_SearchStore>
+          </div>
+        )}
+      </div>
       {showResults && (
         <PRV_SearchStore args={[submittedQuery, false, 'search']} showFallback={true}>
           <COM_SearchResults />

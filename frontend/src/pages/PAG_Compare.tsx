@@ -20,7 +20,7 @@ export default function PAG_Compare() {
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [submitIndex, setSubmitIndex] = useState<number>(0);
-  const utStoreArgs = [input, input.length <= 2, "completion"] as [string, boolean, string];
+  const utStoreArgs = [input, input.length <= 2, 'completion'] as [string, boolean, string];
 
   const { width } = useWindowDimensions();
 
@@ -35,13 +35,9 @@ export default function PAG_Compare() {
       <COM_Hero>
         <h1 className="look-text-x7">Compare Tickers</h1>
         <div className="area-flex-col mod-postion-relative">
-          <COM_SearchBar
-            input={input ?? ''}
-            submit={false}
-            handleChange={handleChange}
-          ></COM_SearchBar>
+          <COM_SearchBar input={input ?? ''} submit={false} handleChange={handleChange} />
           {input && showCompletions && (
-            <div className="look-div-completion mod-z-1">
+            <div className="area-completions">
               <PRV_SearchStore args={utStoreArgs} showFallback={true}>
                 <COM_SearchCompletion
                   onSelect={(val) => {
@@ -70,7 +66,7 @@ export default function PAG_Compare() {
           <p className="look-text-x0">Sector Ranking</p>
         </div>
         {showResults && (
-          <PRV_SearchStore args={[submittedQuery, true, "search"]} showFallback={true}>
+          <PRV_SearchStore args={[submittedQuery, true, 'search']} showFallback={true}>
             <COM_ComparisonResults submittedQuery={submittedQuery} submitIndex={submitIndex} />
           </PRV_SearchStore>
         )}
@@ -79,4 +75,3 @@ export default function PAG_Compare() {
     </>
   );
 }
-
