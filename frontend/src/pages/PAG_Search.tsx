@@ -57,7 +57,7 @@ export default function PAG_Search() {
     <STR_ApplicationPage>
       <COM_SearchBar
         input={input ?? ''}
-        submit={false}
+        submit={true}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
       />

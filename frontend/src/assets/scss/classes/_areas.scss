@@ -227,3 +227,10 @@
     box-shadow: 0 0 2rem var(--color-primary-a40);
 }
 
+.area-searchbar {
+    display: flex;
+    flex-direction: row;
+    column-gap: u.scale-gap(0.8);
+    width: clamp(u.scale-gap(20), u.scale-gap(30), u.scale-gap(30));
+}
+

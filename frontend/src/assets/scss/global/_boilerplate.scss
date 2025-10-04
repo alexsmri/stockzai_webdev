@@ -23,11 +23,15 @@ input,
 textarea,
 select,
 button {
+  border-color: transparent;
   font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(0);
 
   &::placeholder {
     font-size: u.scale_font(0);
+  }
+  &:focus {
+    outline: none
   }
 }
 

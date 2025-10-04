@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import LOGO_schwarzquer from '@/assets/media/LOGO_schwarzquer.svg?react';
+import LOGO_schwarzquer from '@/assets/media/LOGO_quadrat.svg?react';
 import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
@@ -47,6 +47,9 @@ const NAV_ITEMS: NavItem[] = [
 
 const SIDEBAR_SELECTED_CLASS = 'mod-selected';
 const MENU_LINK_PADDING = 'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
+const LOGO_PADDING_EXPANDED =
+  'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
+const LOGO_PADDING = 'calc(var(--default-font-size) * 0.5) 0';
 
 function readUsername(data: any | null): string {
   if (!data || typeof data !== 'object') {
@@ -154,9 +157,9 @@ export default function COM_Sidebar() {
           <LOGO_schwarzquer
             style={{
               width: 'auto',
-              height: 'calc(var(--default-font-size) * 1.3)',
+              height: 'calc(var(--default-font-size) * 2.8)',
               alignSelf: showLabels ? 'flex-start' : 'center',
-              padding: 'calc(var(--default-font-size) * 0.5)',
+              padding: showLabels ? LOGO_PADDING_EXPANDED : LOGO_PADDING,
             }}
           />
         </div>
