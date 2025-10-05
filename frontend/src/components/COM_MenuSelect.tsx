@@ -1,4 +1,5 @@
-import { CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 
 export type MenuSelectOptions = Record<string, string>;
 
@@ -105,10 +106,16 @@ export default function COM_MenuSelect({ prOptions, prHandleChange }: MenuSelect
           key={key}
           ref={(node) => assignRef(key, node)}
           type="button"
-          className={`look-menu-select__option${selectedKey === key ? ' is-selected' : ''}`}
+          className={`look-text-clickable${selectedKey === key ? ' mod-selected' : ''}`}
           onClick={() => setSelectedKey(key)}
         >
-          {label}
+          <span
+            className={`look-text-clickable mod-padding-none ${
+              selectedKey === key ? ' mod-selected' : ''
+            }`}
+          >
+            {label}
+          </span>
         </button>
       ))}
     </div>
