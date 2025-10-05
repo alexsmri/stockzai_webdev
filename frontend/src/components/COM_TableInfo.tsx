@@ -34,8 +34,8 @@ export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
   const flattenedData = cleanCompanyData({ prTableRole, prKPIs: stKPIs, prData: stData });
   return (
     <>
-      <div className={'area-flex-col'}>
-        <h3 className="look-text-x2">{utText}</h3>
+      <div className="area-flex-col mod-align-stretch">
+        <h3 className="look-text-x2 look-text-normal">{utText}</h3>
         <div className="look-div-subtle">
           {Object.entries(flattenedData).map(([key, value]) => (
             <COM_KPIInfo prTableRole={prTableRole} prKPI={key} prValue={value} />

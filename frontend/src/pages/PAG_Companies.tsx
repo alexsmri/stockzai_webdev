@@ -21,8 +21,8 @@ function PAG_Companies() {
         <PRV_CompanyStore args={[symbol]} showFallback={true}>
           <STR_ApplicationPage>
             <h1 className="look-text-x7">{symbol}</h1>
-            <div className="area-flex-col mod-gap-xl mod-padding-xl">
-              <div className="area-flex-wrap mod-flex-grow-children">
+            <div className="area-flex-col mod-padding-xl mod-align-stretch">
+              <div className="area-flex-wrap mod-flex-grow-children mod-padding-none">
                 <COM_LightboxKPI />
                 <COM_SectionInfo title="Scores." prShowChange={true}>
                   <COM_ScoreRadial KPI="financial_score" />
@@ -32,15 +32,30 @@ function PAG_Companies() {
                   <COM_TableInfo prTableRole="basics" />
                 </COM_SectionInfo>
               </div>
-              <COM_SectionInfo title="Ratios.">
-                <COM_TableInfo prTableRole="ratios" />
-                <COM_TableInfo prTableRole="valuation" />
-              </COM_SectionInfo>
-              <COM_SectionInfo title="Financials.">
-                <COM_TableInfo prTableRole="income_statement" />
-                <COM_TableInfo prTableRole="balance_sheet" />
-                <COM_TableInfo prTableRole="cashflow_statement" />
-              </COM_SectionInfo>
+              <div className="area-flex-wrap mod-flex-grow-children mod-align-start mod-padding-none">
+                <COM_SectionInfo
+                  title="Ratios."
+                  prMenuOptions={{
+                    ratios: 'Financial Ratios',
+                    valuation: 'Valuation Ratios',
+                  }}
+                >
+                  <COM_TableInfo prTableRole="ratios" />
+                  <COM_TableInfo prTableRole="valuation" />
+                </COM_SectionInfo>
+                <COM_SectionInfo
+                  title="Financials."
+                  prMenuOptions={{
+                    income_statement: 'Income Statement',
+                    balance_sheet: 'Balance Sheet',
+                    cashflow_statement: 'Cashflow Statement',
+                  }}
+                >
+                  <COM_TableInfo prTableRole="income_statement" />
+                  <COM_TableInfo prTableRole="balance_sheet" />
+                  <COM_TableInfo prTableRole="cashflow_statement" />
+                </COM_SectionInfo>
+              </div>
             </div>
           </STR_ApplicationPage>
         </PRV_CompanyStore>
