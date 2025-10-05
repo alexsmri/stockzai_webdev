@@ -408,7 +408,7 @@
   max-width: max-content;
   gap: 0;
   padding: 0;
-  border-radius: u.scale-gap(6);
+  border-radius: var(--auth-border-radius);
   background-color: var(--color-secondary-ui-element);
   backdrop-filter: blur(u.scale-gap(0.2));
   isolation: isolate;
@@ -416,13 +416,11 @@
 
   &__indicator {
     position: absolute;
-    top: u.scale-padding(0.15);
-    bottom: u.scale-padding(0.15);
+    top: 0;
+    bottom: 0;
     left: 0;
-    border-radius: calc(u.scale-gap(6) - u.scale-gap(0.45));
-    background: linear-gradient(180deg,
-      color-mix(in srgb, var(--color-secondary) 18%, transparent 82%) 0%,
-      color-mix(in srgb, var(--color-secondary) 8%, transparent 92%) 100%);
+    border-radius: var(--auth-border-radius);
+    background: var(--color-secondary-ui-element);
     box-shadow: 0 u.scale-gap(0.3) u.scale-gap(1) color-mix(in srgb, var(--color-shadow) 20%, transparent);
     transition:
       transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1),

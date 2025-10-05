@@ -22,17 +22,17 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
   return (
     <>
       {!ROLES_NO_INDICATORS.includes(prTableRole) ? (
-        <div className="area-flex-col mod-gap-none mod-align-right" key={prKPI}>
-          <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
-            <p
-              className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-gradient"
-              onClick={() => handleLBOpen(prKPI)}
-            >
-              {getKPIText(prKPI)}
-            </p>
+        <div className="area-flex-row mod-space-between" key={prKPI}>
+          <p
+            className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-gradient"
+            onClick={() => handleLBOpen(prKPI)}
+          >
+            {getKPIText(prKPI)}
+          </p>
+          <div className="area-flex-row mod-gap-s mod-padding-none">
             <p className="look-text-x1 look-text-normal">{formatLargeNumber(prValue)}</p>
+            <COM_IndicatorChange prKPI={prKPI} />
           </div>
-          <COM_IndicatorChange prKPI={prKPI} />
         </div>
       ) : (
         <div key={prKPI} className="area-flex-row mod-space-between">

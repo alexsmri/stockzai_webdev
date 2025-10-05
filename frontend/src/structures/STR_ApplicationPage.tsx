@@ -19,11 +19,6 @@ export default function STR_ApplicationPage({
         <COM_Breadcrumbs />
         <div className="area-application-body" style={{ flex: 1, width: '100%' }}>
           {prTitle && <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>}
-          <div
-            className="area-flex-col mod-postion-relative mod-gap-none"
-            style={{ alignItems: 'stretch', width: '100%' }}
-          ></div>
-
           {children}
         </div>
       </div>

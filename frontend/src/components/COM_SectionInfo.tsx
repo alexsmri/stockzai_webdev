@@ -10,7 +10,7 @@ const MENU_CLASS = 'area-flex-col mod-align-stretch mod-padding-none';
 const NO_MENU_CLASS = 'area-flex-wrap mod-space-around mod-gap-l mod-flex-grow-children mod-center';
 
 interface InfoSectionProps {
-  title: string;
+  title?: string;
   subitle?: string;
   children: ReactNode;
   prShowChange?: boolean;
@@ -90,7 +90,9 @@ function COM_SectionInfo({
   return (
     <div className="area-flex-col mod-align-stretch look-div-subtle">
       <div className="area-flex-row mod-space-between">
-        <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>
+        {title && (
+          <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>
+        )}
         {showControlArea && (
           <div className="area-flex-row mod-gap-s mod-padding-none">
             {menuEntries && prMenuOptions && (
