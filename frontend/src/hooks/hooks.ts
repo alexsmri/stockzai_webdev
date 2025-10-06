@@ -1,99 +1,65 @@
-import { useEffect, useState } from "react";
-import type { TYP_APIResponse } from "../types/types";
-import STO_Companies from "../stores/STO_Companies";
-import STO_KPI from "../stores/STO_KPI";
-import STO_Search from "../stores/STO_Search";
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction, type RefObject } from "react";
+import type STO_Companies from "../stores/STO_Companies";
+import type { ValidKeys as CompanyStoreKeys } from "../stores/STO_Companies";
 import type STO_Users from "../stores/STO_Users";
-import type { ValidKeys } from "../stores/STO_Users";
-import STO_Winners from "../stores/STO_Winners";
+import type { ValidKeys as UserStoreKeys } from "../stores/STO_Users";
 
-export function useCompanyStoreSync(
-    store: STO_Companies, 
-    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
-) {
-
-  useEffect(() => {
-    const subscriber = () => {
-      store.get().then(setData);
-    };
-
-    store.subscribe(subscriber)
-    store.get().then(setData);
-  }, [store])
+interface CompaniesSyncOptions {
+  autoFetch?: boolean;
+  prUrlPaths?: (string | number)[];
+  prUrlParams?: Record<string, unknown>;
 }
 
-export function useKPIStoreSync(
-    store: STO_KPI, 
-    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
+export function useCompaniesStoreSync<TData = Record<string, unknown>>(
+  store: STO_Companies,
+  key: CompanyStoreKeys,
+  setData: Dispatch<SetStateAction<TData | null>>,
+  options: CompaniesSyncOptions = {}
 ) {
+  const { autoFetch = false, prUrlPaths = [], prUrlParams = {} } = options;
+  const serializedPaths = useMemo(() => JSON.stringify(prUrlPaths), [prUrlPaths]);
+  const serializedParams = useMemo(() => JSON.stringify(prUrlParams), [prUrlParams]);
 
   useEffect(() => {
     const subscriber = () => {
-      store.get().then(setData);
+      const nextValue = store.read(key) as TData | null | undefined;
+      setData(nextValue ?? null);
     };
 
-    store.subscribe(subscriber)
-    store.get().then(setData);
+    const unsubscribe = store.subscribe(key, subscriber);
+    subscriber();
 
-    return () => store.unsubscribe(subscriber);
-  }, [store])
-}
+    if (autoFetch) {
+      void store.get(key, prUrlPaths, prUrlParams);
+    }
 
-export function useSearchStoreSync(
-    store: STO_Search, 
-    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
-) {
-
-  useEffect(() => {
-    const subscriber = () => {
-      store.get().then(setData);
-    };
-
-    store.subscribe(subscriber)
-    store.get().then(setData);
-
-    return () => store.unsubscribe(subscriber);
-  }, [store])
-}
-
-export function useWinnerStoreSync(
-    store: STO_Winners, 
-    setData: React.Dispatch<React.SetStateAction<TYP_APIResponse | null>>
-) {
-
-  useEffect(() => {
-    const subscriber = () => {
-      store.get().then(setData);
-    };
-
-    store.subscribe(subscriber)
-    store.get().then(setData);
-  }, [store])
+    return unsubscribe;
+  }, [store, key, autoFetch, serializedPaths, serializedParams]);
 }
 
 export function useUserStoreSync(
-    store: STO_Users, 
-    key: ValidKeys,
-    setData: React.Dispatch<React.SetStateAction<any | null>>
+  store: STO_Users,
+  key: UserStoreKeys,
+  setData: Dispatch<SetStateAction<any | null>>
 ) {
   useEffect(() => {
     const subscriber = () => {
       setData(store.read(key));
     };
-    store.subscribe(key, subscriber)
-
-    return () => store.unsubscribe(key, subscriber);
-  }, [store])
+    const unsubscribe = store.subscribe(key, subscriber);
+    subscriber();
+    return () => unsubscribe();
+  }, [store, key]);
 }
 
 function getWindowDimensions() {
-  const {innerWidth: width, innerHeight: height} = window;
+  const { innerWidth: width, innerHeight: height } = window;
   return {
-
     width,
-    height
+    height,
   };
 }
+
 export function useWindowDimensions() {
   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
 
@@ -101,31 +67,35 @@ export function useWindowDimensions() {
     function handleResize() {
       setWindowDimensions(getWindowDimensions());
     }
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [])
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return windowDimensions;
 }
 
-export function useStickyObserver(ref: React.RefObject<HTMLElement | null>, sentinelID: string, stickingClass = "is-sticking") {
+export function useStickyObserver(
+  ref: RefObject<HTMLElement | null>,
+  sentinelID: string,
+  stickingClass = "is-sticking"
+) {
   useEffect(() => {
-    const sentinel = document.getElementById(sentinelID)
+    const sentinel = document.getElementById(sentinelID);
     const el = ref.current;
     if (!sentinel || !el) return;
 
     const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.boundingClientRect.y < 0 || !entry.isIntersecting) {
-        el.classList.add(stickingClass);
-      } else {
-        el.classList.remove(stickingClass);
-      }
-    },
-    { threshold: [0] }
-  );
+      ([entry]) => {
+        if (entry.boundingClientRect.y < 0 || !entry.isIntersecting) {
+          el.classList.add(stickingClass);
+        } else {
+          el.classList.remove(stickingClass);
+        }
+      },
+      { threshold: [0] }
+    );
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [ref, stickingClass]);
+  }, [ref, stickingClass, sentinelID]);
 }

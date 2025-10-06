@@ -1,24 +1,29 @@
 import { getChangeColor, formatLargeNumber, getKPIScoring } from '../utils/functions';
-import { useCompanyStoreSync } from '../hooks/hooks';
-import { useCompanyStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useState } from 'react';
 import COM_IconColor from './COM_IconColor';
 import { getChangeDivClass } from '../utils/functions';
-import { useKPIStore } from '../context/CTX_KPIStore';
-import { useKPIStoreSync } from '../hooks/hooks';
+
+type CompanyIntelSeries = Record<string, number>;
+type CompanyStoreRecord = {
+  company_intel?: Record<string, CompanyIntelSeries>;
+};
+
+type KPICatalog = Record<string, unknown>;
 
 function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: boolean }) {
-  const utCompanyStore = useCompanyStore();
-  const utKPIStore = useKPIStore();
-  const [stData, setStData] = useState<Record<string, any> | null>(null);
-  const [stMode, setStMode] = useState<'abs' | 'cha'>('cha');
-  const [stKPIs, setStKPIs] = useState<Record<string, any> | null>(null);
+  const store = useCompaniesStore();
+  const [companyData, setCompanyData] = useState<CompanyStoreRecord | null>(null);
+  const [kpiCatalog, setKpiCatalog] = useState<KPICatalog | null>(null);
+  const [mode, setMode] = useState<'abs' | 'cha'>('cha');
 
-  useCompanyStoreSync(utCompanyStore, setStData);
-  useKPIStoreSync(utKPIStore, setStKPIs);
-  if (!stData || !stData.company_intel[prKPI] || !stKPIs) return null;
-  const utKPIScoring = getKPIScoring(prKPI, stKPIs);
-  const utKPIIntel: Record<any, number> = stData.company_intel[prKPI];
+  useCompaniesStoreSync<CompanyStoreRecord>(store, 'PropertyCompanyProfile', setCompanyData);
+  useCompaniesStoreSync<KPICatalog>(store, 'PropertyCompanyKPIs', setKpiCatalog);
+
+  const utKPIIntel = companyData?.company_intel?.[prKPI];
+  if (!utKPIIntel || !kpiCatalog) return null;
+  const utKPIScoring = getKPIScoring(prKPI, kpiCatalog);
   const utDates = Object.keys(utKPIIntel).sort((a, b) => (Date.parse(a) > Date.parse(b) ? -1 : 1));
   const utChildrenEmpty = (
     <div className="area-flex-row mod-gap-none mod-padding-none">
@@ -55,9 +60,9 @@ function COM_IndicatorChange({ prKPI, prShowDiv }: { prKPI: string; prShowDiv?: 
       <p
         className="mod-cursor-pointer"
         style={{ color: utColor }}
-        onClick={() => setStMode(stMode === 'abs' ? 'cha' : 'abs')}
+        onClick={() => setMode(mode === 'abs' ? 'cha' : 'abs')}
       >
-        {stMode === 'cha' ? utDisplayChange : formatLargeNumber(utAbsolute)}
+        {mode === 'cha' ? utDisplayChange : formatLargeNumber(utAbsolute)}
       </p>
       <COM_IconColor
         prColor={utColor}

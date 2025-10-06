@@ -1,6 +1,6 @@
 import { Line } from 'react-chartjs-2';
-import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useCompanyStoreSync, useKPIStoreSync, useWindowDimensions } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync, useWindowDimensions } from '../hooks/hooks';
 import { useState } from 'react';
 import { getKPIScoring, getKPIText, getChangeColor, getChangeBackground } from '../utils/functions';
 import { MOBILE_BREAKPOINT } from '../constants';
@@ -15,7 +15,11 @@ import {
   PointElement,
   Filler,
 } from 'chart.js';
-import { useKPIStore } from '../context/CTX_KPIStore';
+
+type CompanyIntelSeries = Record<string, number>;
+type CompanyStoreRecord = {
+  company_intel?: Record<string, CompanyIntelSeries>;
+};
 
 const CHART_WIDTH_VW_DESKTOP = 50;
 const CHART_HEIGHT_VH_DESKTOP = 50;
@@ -26,7 +30,7 @@ interface ChartLineProps {
   KPI: string;
 }
 
-function getKPIChange(prKPIData: Record<any, any>) {
+function getKPIChange(prKPIData: CompanyIntelSeries) {
   const utDataLen = Object.keys(prKPIData).length;
   if (utDataLen >= 2) {
     const utNew = prKPIData[Object.keys(prKPIData)[utDataLen - 1]];
@@ -34,19 +38,18 @@ function getKPIChange(prKPIData: Record<any, any>) {
     const utAbsolute = utNew - utOld;
     const utChange = (utAbsolute / Math.abs(utOld)) * 100;
     return utChange;
-  } else {
-    return 0;
   }
+  return 0;
 }
 
 export default function COM_ChartLine({ KPI }: ChartLineProps) {
-  const utCompanyStore = useCompanyStore();
-  const utKPIStore = useKPIStore();
+  const store = useCompaniesStore();
   const { width: utWidth, height: utHeight } = useWindowDimensions();
-  const [stData, setStData] = useState<Record<string, any> | null>(null);
-  const [stKPIs, setStKPIs] = useState<Record<string, any> | null>(null);
-  useCompanyStoreSync(utCompanyStore, setStData);
-  useKPIStoreSync(utKPIStore, setStKPIs);
+  const [companyData, setCompanyData] = useState<CompanyStoreRecord | null>(null);
+  const [kpiCatalog, setKpiCatalog] = useState<Record<string, unknown> | null>(null);
+
+  useCompaniesStoreSync<CompanyStoreRecord>(store, 'PropertyCompanyProfile', setCompanyData);
+  useCompaniesStoreSync(store, 'PropertyCompanyKPIs', setKpiCatalog);
 
   ChartJS.register(
     CategoryScale,
@@ -60,10 +63,10 @@ export default function COM_ChartLine({ KPI }: ChartLineProps) {
   );
   const text = getKPIText(KPI);
 
-  if (!stData || !stKPIs) return null;
-  const KPIData = stData.company_intel?.[KPI];
+  const KPIData = companyData?.company_intel?.[KPI];
+  if (!KPIData || !kpiCatalog) return null;
 
-  const utKPIScoring = getKPIScoring(KPI, stKPIs);
+  const utKPIScoring = getKPIScoring(KPI, kpiCatalog as Record<string, unknown>);
   const utChange = getKPIChange(KPIData);
   const utLineColor = getChangeColor(utChange * utKPIScoring);
   const utBGColor = getChangeBackground(utChange * utKPIScoring);

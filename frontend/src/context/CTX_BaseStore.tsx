@@ -5,11 +5,11 @@ export interface ITF_Fillable {
   fill: () => Promise<void>;
 }
 
-type APIStoreWithCreate<TStore extends ITF_Fillable, TArgs extends any[]> = {
+type APIStoreWithCreate<TStore extends ITF_Fillable, TArgs extends unknown[]> = {
   create: (...args: TArgs) => TStore;
 };
 
-export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extends any[]>(
+export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extends unknown[]>(
   StoreClass: APIStoreWithCreate<TStore, TArgs>,
   storeName: string
 ) {
@@ -62,11 +62,11 @@ export function createAPIStoreProvider<TStore extends ITF_Fillable, TArgs extend
   return { useStore, StoreProvider };
 }
 
-type StoreWithCreate<TStore, TArgs extends any[]> = {
+type StoreWithCreate<TStore, TArgs extends unknown[]> = {
   create: (...args: TArgs) => Promise<TStore>;
 };
 
-export function createStoreProvider<TStore, TArgs extends any[]>(
+export function createStoreProvider<TStore, TArgs extends unknown[]>(
   StoreClass: StoreWithCreate<TStore, TArgs>,
   storeName: string
 ) {

@@ -1,22 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import COM_KPIInfoCard from '../components/COM_KPIInfoCard';
 import DCOM_KPIInfoCard from '../components/dumb/DCOM_KPIInfoCard';
 import COM_SectionInfo from '../components/COM_SectionInfo';
 import COM_ScoreRadial from '../components/COM_ScoreRadial';
-import { PRV_CompanyStore, useCompanyStore } from '../context/CTX_CompanyStore';
-import { PRV_KPIStore } from '../context/CTX_KPIStore';
-import { useCompanyStoreSync } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
 import COM_LightboxKPI from '../components/COM_LightboxKPI';
 import COM_TableInfo from '../components/COM_TableInfo';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import NotFound from './PAG_404';
 
-function PAG_CompaniesContent({ symbol }: { symbol: string }) {
-  const companyStore = useCompanyStore();
-  const [companyData, setCompanyData] = useState<Record<string, any> | null>(null);
+type CompanyProfileRecord = {
+  latest_entries?: Record<string, unknown>;
+  company_intel?: Record<string, Record<string, number>>;
+  [key: string]: unknown;
+};
 
-  useCompanyStoreSync(companyStore, setCompanyData);
+function PAG_CompaniesContent({ symbol }: { symbol: string }) {
+  const store = useCompaniesStore();
+  const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);
+
+  useCompaniesStoreSync<CompanyProfileRecord>(store, 'PropertyCompanyProfile', setCompanyData, {
+    autoFetch: true,
+    prUrlPaths: [symbol],
+  });
+
+  useEffect(() => {
+    void store.get('PropertyCompanyKPIs');
+  }, [store]);
 
   const latestEntries = companyData?.latest_entries ?? {};
   const symbolValue =
@@ -86,13 +98,7 @@ function PAG_Companies() {
     return <NotFound />;
   }
 
-  return (
-    <PRV_KPIStore args={[]} showFallback={true}>
-      <PRV_CompanyStore args={[symbol]} showFallback={true}>
-        <PAG_CompaniesContent symbol={symbol} />
-      </PRV_CompanyStore>
-    </PRV_KPIStore>
-  );
+  return <PAG_CompaniesContent symbol={symbol} />;
 }
 
 export default PAG_Companies;

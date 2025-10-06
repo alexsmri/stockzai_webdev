@@ -43,11 +43,11 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
         if (
           refreshed &&
           utStore.read('ActionRefreshToken') &&
-          utStore.read('ActionRefreshToken')['access']
+          (utStore.read('ActionRefreshToken') as Record<string, any>['access'])
         ) {
           utStore.update('ActionLogin', {
             refresh: refreshToken,
-            access: utStore.read('ActionRefreshToken')['access'],
+            access: utStore.read('ActionRefreshToken') as Record<string, any>['access'],
           });
           setStValid(true);
         } else {

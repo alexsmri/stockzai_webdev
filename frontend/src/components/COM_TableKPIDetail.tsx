@@ -1,6 +1,5 @@
-import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useKPIStore } from '../context/CTX_KPIStore';
-import { useCompanyStoreSync, useKPIStoreSync } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
 import DCOM_TableInfo from './dumb/DCOM_TableInfo';
 import { useState } from 'react';
 import {
@@ -11,31 +10,35 @@ import {
 } from '../utils/functions';
 import { calcAverage, calcChange1Y } from '../utils/math';
 import { formatPercentile, formatPercentileEstimate } from '../utils/formats';
+import type { TYP_APIResponseKPI } from '../types/types';
 
+type CompanyProfileRecord = {
+  company_intel?: Record<string, Record<string, number>>;
+  [key: string]: unknown;
+};
 const ROLE_BLOB_LOOKUP = {
   ratios: 'finScoresDict',
   valuation: 'valScoresDict',
 };
 
 export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
-  const utCompanyStore = useCompanyStore();
-  const utKPIStore = useKPIStore();
-  const [stData, setStData] = useState<Record<any, any> | null>(null);
-  const [stKPIs, setStKPIs] = useState<Record<any, any> | null>(null);
+  const store = useCompaniesStore();
+  const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);
+  const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
 
-  useCompanyStoreSync(utCompanyStore, setStData);
-  useKPIStoreSync(utKPIStore, setStKPIs);
+  useCompaniesStoreSync(store, 'PropertyCompanyProfile', setCompanyData);
+  useCompaniesStoreSync<TYP_APIResponseKPI>(store, 'PropertyCompanyKPIs', setKpiCatalog);
 
-  if (!stData || !stKPIs) return null;
+  if (!companyData || !kpiCatalog) return null;
 
-  const utRole: 'ratios' | 'valuation' = getKPIDetails({ prKPI, prKPIs: stKPIs })['role'];
+  const utRole: 'ratios' | 'valuation' = getKPIDetails({ prKPI, prKPIs: kpiCatalog })['role'];
   const utBlob = getKPIData({
     prKPI: ROLE_BLOB_LOOKUP[utRole],
-    prData: stData,
+    prData: companyData,
   });
 
-  const utKPIData = getKPIData({ prKPI, prData: stData });
-  const utSectorData = getKPIData({ prKPI: 'sector', prData: stData });
+  const utKPIData = getKPIData({ prKPI, prData: companyData });
+  const utSectorData = getKPIData({ prKPI: 'sector', prData: companyData });
   const utSector = utSectorData.latest_entry || 'Sector';
 
   let utPercentile = null;
@@ -43,7 +46,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
   const utChange = calcChange1Y(utKPIData.data).changePct;
-  let tableData: Record<string, any> = {
+  const tableData: Record<string, unknown> = {
     'Current Value': utKPIData.latest_entry,
     'Trailing AVG': utAverage,
   };

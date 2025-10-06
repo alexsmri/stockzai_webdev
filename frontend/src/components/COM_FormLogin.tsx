@@ -11,7 +11,9 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const utStore = useUserStore();
   const [stLoading, setStLoading] = useState(false);
   const navigate = useNavigate();
-  const [tokens, setTokens] = useState<Record<string, any> | null>(utStore.read('ActionLogin'));
+  const [tokens, setTokens] = useState<Record<string, any> | null>(
+    utStore.read('ActionLogin') as Record<string, any> | null
+  );
   const { handleAlertOpen, handleAlertClose } = useAlert();
 
   const name = 'Login';

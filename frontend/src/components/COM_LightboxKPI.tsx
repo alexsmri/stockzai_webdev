@@ -5,47 +5,46 @@ import COM_ChartLine from './COM_ChartLine';
 import { getKPIText } from '../utils/functions';
 import COM_TableKPIDetail from './COM_TableKPIDetail';
 import { getKPIDetails } from '../utils/functions';
-import { useKPIStore } from '../context/CTX_KPIStore';
-import { useKPIStoreSync, useWindowDimensions } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync, useWindowDimensions } from '../hooks/hooks';
 import COM_IndicatorChange from './COM_IndicatorChange';
 import { MOBILE_BREAKPOINT } from '../constants';
+import type { TYP_APIResponseKPI } from '../types/types';
 
 const KPI_BLOB_ROLES = ['ratios', 'valuation'];
 
 export default function COM_LightboxKPI() {
   const { stIsOpen: isOpen, stSelectedKPI: selectedKPI, handleClose: close } = useLightbox();
-  if (!isOpen) return null;
-  const utKPIStore = useKPIStore();
-  const [stKPIs, setStKPIs] = useState<Record<any, any> | null>(null);
-  useKPIStoreSync(utKPIStore, setStKPIs);
+  const store = useCompaniesStore();
+  const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
   const { width } = useWindowDimensions();
 
-  if (!stKPIs || !selectedKPI) return null;
+  useCompaniesStoreSync<TYP_APIResponseKPI>(store, 'PropertyCompanyKPIs', setKpiCatalog);
 
-  const utKPIDetails = getKPIDetails({ prKPI: selectedKPI, prKPIs: stKPIs });
+  if (!isOpen || !kpiCatalog || !selectedKPI) return null;
+
+  const utKPIDetails = getKPIDetails({ prKPI: selectedKPI, prKPIs: kpiCatalog });
   const utRole = utKPIDetails['role'];
 
   return (
     <>
       <COM_Lightbox isOpen={isOpen} onClose={close}>
-        {selectedKPI && (
-          <div className="area-flex-col mod-center">
-            {width > MOBILE_BREAKPOINT ? (
-              <div className="area-flex-wrap">
-                <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
-                <div className="mod-center">
-                  <COM_IndicatorChange prKPI={selectedKPI} prShowDiv={true} />
-                </div>
+        <div className="area-flex-col mod-center">
+          {width > MOBILE_BREAKPOINT ? (
+            <div className="area-flex-wrap">
+              <h2 className="look-text-x5">{getKPIText(selectedKPI)}</h2>
+              <div className="mod-center">
+                <COM_IndicatorChange prKPI={selectedKPI} prShowDiv={true} />
               </div>
-            ) : (
-              <h2 className="look-text-x4">{getKPIText(selectedKPI)}</h2>
-            )}
-            <div className="area-flex-wrap mod-flex-grow-children">
-              <COM_ChartLine KPI={selectedKPI} />
-              {KPI_BLOB_ROLES.includes(utRole) && <COM_TableKPIDetail prKPI={selectedKPI} />}
             </div>
+          ) : (
+            <h2 className="look-text-x4">{getKPIText(selectedKPI)}</h2>
+          )}
+          <div className="area-flex-wrap mod-flex-grow-children">
+            <COM_ChartLine KPI={selectedKPI} />
+            {KPI_BLOB_ROLES.includes(utRole) && <COM_TableKPIDetail prKPI={selectedKPI} />}
           </div>
-        )}
+        </div>
       </COM_Lightbox>
     </>
   );

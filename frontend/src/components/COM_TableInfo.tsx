@@ -1,13 +1,10 @@
-import { useState, type SetStateAction } from 'react';
-import { useCompanyStore } from '../context/CTX_CompanyStore';
-import { useCompanyStoreSync } from '../hooks/hooks';
-import { useKPIStore } from '../context/CTX_KPIStore';
-import { useKPIStoreSync } from '../hooks/hooks';
+import { useState } from 'react';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
 import { getRoleText } from '../utils/functions';
 import { cleanCompanyData } from '../utils/formats';
 import COM_KPIInfo from './COM_KPIInfo';
 import type { TYP_APIResponseKPI } from '../types/types';
-import type { Dispatch } from 'react';
 
 interface ITF_TableInfoProps {
   prTableRole:
@@ -21,21 +18,20 @@ interface ITF_TableInfoProps {
 }
 
 export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
-  const utCompanyStore = useCompanyStore();
-  const utKpiStore = useKPIStore();
-  const utText = getRoleText(prTableRole);
-  const [stKPIs, setStKPIs] = useState<TYP_APIResponseKPI | null>(null);
-  const [stData, setStData] = useState<Record<string, any> | null>(null);
+  const store = useCompaniesStore();
+  const text = getRoleText(prTableRole);
+  const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
+  const [companyData, setCompanyData] = useState<Record<string, any> | null>(null);
 
-  useCompanyStoreSync(utCompanyStore, setStData);
-  useKPIStoreSync(utKpiStore, setStKPIs as Dispatch<SetStateAction<Record<string, any> | null>>);
+  useCompaniesStoreSync(store, 'PropertyCompanyProfile', setCompanyData);
+  useCompaniesStoreSync<TYP_APIResponseKPI>(store, 'PropertyCompanyKPIs', setKpiCatalog);
 
-  if (!stData || !stData.latest_entries || !stKPIs) return null;
-  const flattenedData = cleanCompanyData({ prTableRole, prKPIs: stKPIs, prData: stData });
+  if (!companyData || !companyData.latest_entries || !kpiCatalog) return null;
+  const flattenedData = cleanCompanyData({ prTableRole, prKPIs: kpiCatalog, prData: companyData });
   return (
     <>
       <div className="area-flex-col mod-align-stretch">
-        <h3 className="look-text-x2 look-text-normal">{utText}</h3>
+        <h3 className="look-text-x2 look-text-normal">{text}</h3>
         <div className="look-div-subtle">
           {Object.entries(flattenedData).map(([key, value]) => (
             <COM_KPIInfo prTableRole={prTableRole} prKPI={key} prValue={value} />

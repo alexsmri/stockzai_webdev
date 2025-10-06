@@ -1,5 +1,4 @@
-import { STO_Base } from "./STO_Base"
-import api from "../api";
+import { STO_Base } from "./STO_Base";
 
 const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
@@ -20,113 +19,48 @@ const ROUTE_CONFIG = {
   ActionSubscribeNewsletterVerify: "/api/users/subscribe-newsletter/verify/",
 } as const;
 
-const PERSISTED_KEYS: ValidKeys[] = [
-    "ActionLogin",
-    "PropertyCredentials",
-    "ActionRefreshToken",
-]
-
 export type ValidKeys = keyof typeof ROUTE_CONFIG;
 
-export default class STO_Users extends STO_Base {
-    keys: ValidKeys[] = Object.keys(ROUTE_CONFIG) as ValidKeys[];
-    routes = ROUTE_CONFIG;
+const PERSISTED_KEYS: ValidKeys[] = [
+  "ActionLogin",
+  "PropertyCredentials",
+  "ActionRefreshToken",
+];
 
-    static async create(): Promise<STO_Users> {
-        const store = new STO_Users();
-        for (const key of PERSISTED_KEYS) {
-            const data = store.hydrate(key);
-            if (data) {
-                store.data[key] = data;
-                store.notify(key)
-            }
-        }
-        store.init();
-        return store;
-    }
+export default class STO_Users extends STO_Base<ValidKeys> {
+  keys: ValidKeys[] = Object.keys(ROUTE_CONFIG) as ValidKeys[];
+  routes = ROUTE_CONFIG;
 
-    async get(key: ValidKeys): Promise<any> {
-        try {
-            this.status[key] = "loading"
-            const value = await api.get(this.routes[key]);
-            if (value.data.msg) {
-                this.data[key] = value.data.msg
-                this.persist(key)
-                this.status[key] = "success"
-                return this.data[key];
-            } else {
-                this.status[key] = "error"
-                this.error[key] = value.data.error
-                return false
-            }
-        } catch (error) {
-            console.log(`Error: ${error}`)
-            this.error[key] = error;
-            this.status[key] = "error";
-            return false
-        } finally {
-            this.notify(key);
-        }
-    }
+  private constructor() {
+    super({ storagePrefix: "userStore", persistedKeys: PERSISTED_KEYS });
+  }
 
-    async post(key: ValidKeys, postData: any, returnData: boolean = false): Promise<any> {
-        try {
-            this.status[key] = "loading";
-            const value = await api.post(this.routes[key], postData)
-            if (value.data.msg) {
-                this.data[key] = value.data.msg
-                this.persist(key)
-                this.status[key] = "success"
-                return returnData ? value.data.msg : true
-            } else {
-                this.status[key] = "error"
-                this.error[key] = value.data.error
-                return false
-            }
-        } catch (error) {
-            console.log(`Error: ${error}`)
-            this.error[key] = error;
-            this.status[key] = "error";
-            return false
-        } finally {
-            this.notify(key);
-        }
-    }
+  static async create(): Promise<STO_Users> {
+    const store = new STO_Users();
+    store.init();
+    return store;
+  }
 
-    read(key: ValidKeys): any {
-        this.data[key] = this.hydrate(key)
-        return this.data[key];
-    }
-    update(key: ValidKeys, updateData: Record<any, any>): any {
-        Object.keys(updateData).forEach((dataKey) => {
-            this.data[key][dataKey] = updateData[dataKey];
-        })
-        this.persist(key);
+  init(): void {
+    this.ensureAllKeysInitialized();
+    for (const key of PERSISTED_KEYS) {
+      const hydrated = this.hydrate(key);
+      if (hydrated) {
+        this.data[key] = hydrated;
+        this.status[key] = "success";
         this.notify(key);
+      }
     }
+  }
 
-    clear(key: ValidKeys): void {
-        this.data[key] = {}
-        this.persist(key)
+  read(key: ValidKeys): unknown {
+    this.ensureKeyInitialized(key);
+    if (this.shouldPersist(key)) {
+      const hydrated = this.hydrate(key);
+      if (hydrated) {
+        this.data[key] = hydrated;
+      }
     }
-
-    persist(key: ValidKeys): void {
-        if (PERSISTED_KEYS.includes(key)) {
-            if (Object.keys(this.data[key]).length !== 0) {
-                localStorage.setItem(`userStore:${key}`, JSON.stringify(this.data[key]))
-            } else {
-                localStorage.removeItem(`userStore:${key}`)
-            }
-        }
-    }
-
-    hydrate(key: ValidKeys): any | null {
-        if (PERSISTED_KEYS.includes(key)) {
-            const raw = localStorage.getItem(`userStore:${key}`);
-            if (raw !== "undefined") {
-                return raw ? JSON.parse(raw) : null;
-            }
-        }
-        return null
-    }
+    return this.data[key];
+  }
 }

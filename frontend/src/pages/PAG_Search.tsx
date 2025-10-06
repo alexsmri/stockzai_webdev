@@ -1,4 +1,3 @@
-import { PRV_SearchStore } from '../context/CTX_SearchStore';
 import { useEffect, useState } from 'react';
 import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchResults from '../components/COM_SearchResults';
@@ -15,8 +14,6 @@ export default function PAG_Search() {
   const [input, setInput] = useState<string>('');
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
-
-  const utStoreArgs = [input, input.length <= 2, 'completion'] as [string, boolean, string];
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -64,22 +61,17 @@ export default function PAG_Search() {
         />
         {input && showCompletions && (
           <div className="area-completions">
-            <PRV_SearchStore args={utStoreArgs} showFallback={true}>
-              <COM_SearchCompletion
-                onSelect={(val) => {
-                  navigate(`/companies/page/${val}`);
-                }}
-                prQuery={input}
-              />
-            </PRV_SearchStore>
+            <COM_SearchCompletion
+              onSelect={(val) => {
+                navigate(`/companies/page/${val}`);
+              }}
+              prQuery={input}
+              prUnique={input.length <= 2}
+            />
           </div>
         )}
       </div>
-      {showResults && (
-        <PRV_SearchStore args={[submittedQuery, false, 'search']} showFallback={true}>
-          <COM_SearchResults />
-        </PRV_SearchStore>
-      )}
+      {showResults && <COM_SearchResults prQuery={submittedQuery} />}
       <COM_Footer />
     </STR_ApplicationPage>
   );

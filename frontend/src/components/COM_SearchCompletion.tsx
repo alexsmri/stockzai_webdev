@@ -1,26 +1,37 @@
-import { useSearchStoreSync } from '../hooks/hooks';
-import { useSearchStore } from '../context/CTX_SearchStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { VAI_SearchData } from '../types/interfaces';
 
 const MAX_COMPLETIONS_SHOWN = 7;
 
 interface PRI_SearchCompletion {
   prQuery: string;
+  prUnique: boolean;
   onSelect: (value: string) => void;
 }
 
-function COM_SearchCompletion({ prQuery, onSelect }: PRI_SearchCompletion) {
-  const store = useSearchStore();
-  const [data, setData] = useState<Record<string, any> | null>(null);
+function COM_SearchCompletion({ prQuery, prUnique, onSelect }: PRI_SearchCompletion) {
+  const store = useCompaniesStore();
+  const [data, setData] = useState<VAI_SearchData | null>(null);
 
-  useSearchStoreSync(store, setData);
+  useEffect(() => {
+    if (!prQuery.trim()) {
+      setData(null);
+    }
+  }, [prQuery]);
+
+  useCompaniesStoreSync<VAI_SearchData>(store, 'PropertySearchCompletion', setData, {
+    autoFetch: prQuery.trim().length > 0,
+    prUrlPaths: prQuery ? [prQuery] : [],
+    prUrlParams: { unique: prUnique, variant: 'completion' },
+  });
 
   if (!data?.results) {
     return null;
   }
 
-  const safeData = data as VAI_SearchData;
+  const safeData = data;
   const shouldShow = safeData.results && data.query === prQuery;
 
   if (!shouldShow) {

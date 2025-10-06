@@ -1,4 +1,3 @@
-import { PRV_SearchStore } from '../context/CTX_SearchStore';
 import { useState } from 'react';
 import COM_SearchBar from '../components/COM_SearchBar';
 import COM_ComparisonResults from '../components/COM_ComparisonResults';
@@ -20,7 +19,6 @@ export default function PAG_Compare() {
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [submitIndex, setSubmitIndex] = useState<number>(0);
-  const utStoreArgs = [input, input.length <= 2, 'completion'] as [string, boolean, string];
 
   const { width } = useWindowDimensions();
 
@@ -38,17 +36,16 @@ export default function PAG_Compare() {
           <COM_SearchBar input={input ?? ''} submit={false} handleChange={handleChange} />
           {input && showCompletions && (
             <div className="area-completions">
-              <PRV_SearchStore args={utStoreArgs} showFallback={true}>
-                <COM_SearchCompletion
-                  onSelect={(val) => {
-                    setSubmittedQuery(val);
-                    setShowCompletions(false);
-                    setShowResults(true);
-                    setSubmitIndex((prev) => prev + 1);
-                  }}
-                  prQuery={input}
-                />
-              </PRV_SearchStore>
+              <COM_SearchCompletion
+                onSelect={(val) => {
+                  setSubmittedQuery(val);
+                  setShowCompletions(false);
+                  setShowResults(true);
+                  setSubmitIndex((prev) => prev + 1);
+                }}
+                prQuery={input}
+                prUnique={input.length <= 2}
+              />
             </div>
           )}
         </div>
@@ -66,9 +63,7 @@ export default function PAG_Compare() {
           <p className="look-text-x0">Sector Ranking</p>
         </div>
         {showResults && (
-          <PRV_SearchStore args={[submittedQuery, true, 'search']} showFallback={true}>
-            <COM_ComparisonResults submittedQuery={submittedQuery} submitIndex={submitIndex} />
-          </PRV_SearchStore>
+          <COM_ComparisonResults submittedQuery={submittedQuery} submitIndex={submitIndex} />
         )}
       </div>
       <COM_Footer />

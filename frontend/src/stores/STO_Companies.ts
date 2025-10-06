@@ -1,31 +1,31 @@
-import api from "../api"
-import type { ITF_Fillable } from "../context/CTX_BaseStore";
-import type { TYP_APIResponse } from "../types/types";
-import { BaseAPIStore } from "./STO_Base";
+import { STO_Base } from "./STO_Base";
 
-export default class STO_Companies extends BaseAPIStore<TYP_APIResponse> implements ITF_Fillable {
+const ROUTE_CONFIG = {
+  PropertyCompanyProfile: "/api/companies",
+  PropertyCompanyKPIs: "/api/companies/kpis",
+  PropertySearchResults: "/api/companies/search",
+  PropertySearchCompletion: "/api/companies/search",
+  PropertySearchComparison: "/api/companies/search",
+  PropertyCompanyWinners: "/api/companies/winners",
+} as const;
 
-    private symbol: string
+export type ValidKeys = keyof typeof ROUTE_CONFIG;
 
-    private constructor(symbol: string) {
-        super();
-        this.symbol = symbol;
-    }
-    static create(symbol: string): STO_Companies {
-        const store = new STO_Companies(symbol);
-        store.init();
-        return store;
-    }
-    async fetch() {
-        try {
-        const company = await api.get(`/api/companies/${this.symbol}/`, { responseType: "json" });
-        console.log(company)
-        return company.data.msg
-        } catch {
-            return {}
-        }
-    }
+export default class STO_Companies extends STO_Base<ValidKeys> {
+  keys: ValidKeys[] = Object.keys(ROUTE_CONFIG) as ValidKeys[];
+  routes = ROUTE_CONFIG;
 
-  };
+  private constructor() {
+    super({ storagePrefix: "companiesStore" });
+  }
 
-  
+  static async create(): Promise<STO_Companies> {
+    const store = new STO_Companies();
+    store.init();
+    return store;
+  }
+
+  init(): void {
+    this.ensureAllKeysInitialized();
+  }
+}

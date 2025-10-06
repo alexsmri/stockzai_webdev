@@ -40,11 +40,11 @@ function COM_ProtectedRoute({ children }: { children: JSX.Element }) {
         if (
           refreshed &&
           utStore.read('ActionRefreshToken') &&
-          utStore.read('ActionRefreshToken')['access']
+          (utStore.read('ActionRefreshToken') as Record<string, any>['access'])
         ) {
           utStore.update('ActionLogin', {
             refresh: refreshToken,
-            access: utStore.read('ActionRefreshToken')['access'],
+            access: utStore.read('ActionRefreshToken') as Record<string, any>['access'],
           });
           setIsAuthorized(true);
         } else {

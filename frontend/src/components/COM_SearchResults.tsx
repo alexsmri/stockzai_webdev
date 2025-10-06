@@ -1,12 +1,13 @@
-﻿import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
 import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
 
-import { useSearchStore } from '../context/CTX_SearchStore';
-import { useSearchStoreSync } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { VAI_SearchData } from '../types/interfaces';
 
+type SearchResultEntry = Record<string, unknown>;
 type SortDirection = 'asc' | 'desc';
 type ColumnKey =
   | 'symbol'
@@ -58,7 +59,7 @@ const COLUMN_CONFIG: ColumnConfig[] = [
   },
 ];
 
-function getColumnValue(column: ColumnConfig, symbol: string, company: Record<string, any>) {
+function getColumnValue(column: ColumnConfig, symbol: string, company: SearchResultEntry) {
   if (column.key === 'symbol') {
     return symbol;
   }
@@ -101,22 +102,36 @@ function getOppositeDirection(direction: SortDirection): SortDirection {
   return direction === 'asc' ? 'desc' : 'asc';
 }
 
-function COM_SearchResults() {
-  const store = useSearchStore();
-  const [data, setData] = useState<Record<string, any> | null>(null);
+interface SearchResultsProps {
+  prQuery: string;
+}
+
+function COM_SearchResults({ prQuery }: SearchResultsProps) {
+  const store = useCompaniesStore();
+  const [data, setData] = useState<VAI_SearchData | null>(null);
   const [sortState, setSortState] = useState<SortCycle>({ columnId: null, direction: null });
 
-  useSearchStoreSync(store, setData);
+  useEffect(() => {
+    if (!prQuery.trim()) {
+      setData(null);
+    }
+  }, [prQuery]);
 
-  const safeData = (data as VAI_SearchData) ?? null;
+  useCompaniesStoreSync<VAI_SearchData>(store, 'PropertySearchResults', setData, {
+    autoFetch: prQuery.trim().length > 0,
+    prUrlPaths: prQuery ? [prQuery] : [],
+    prUrlParams: { unique: false, variant: 'search' },
+  });
+
+  const safeData = data;
   const navigate = useNavigate();
 
   const sortedResults = useMemo(() => {
-    if (!safeData?.results || typeof safeData.results !== 'object') {
-      return [] as Array<[string, Record<string, any>]>;
+    if (!safeData?.results || typeof safeData.results !== 'object' || safeData.query !== prQuery) {
+      return [] as Array<[string, SearchResultEntry]>;
     }
 
-    const entries = Object.entries(safeData.results) as Array<[string, Record<string, any>]>;
+    const entries = Object.entries(safeData.results) as Array<[string, SearchResultEntry]>;
 
     if (!sortState.columnId || !sortState.direction) {
       return entries;
@@ -129,21 +144,14 @@ function COM_SearchResults() {
     }
 
     const direction = sortState.direction;
-    const isNumeric = NUMERIC_COLUMNS.has(column.id);
+    const isNumeric = NUMERIC_COLUMNS.has(column.key);
 
-    return [...entries].sort(([symbolA, companyA], [symbolB, companyB]) => {
+    return [...entries].sort((a, b) => {
+      const [symbolA, companyA] = a;
+      const [symbolB, companyB] = b;
+
       const rawA = getColumnValue(column, symbolA, companyA);
       const rawB = getColumnValue(column, symbolB, companyB);
-
-      if (rawA == null && rawB == null) {
-        return 0;
-      }
-      if (rawA == null) {
-        return 1;
-      }
-      if (rawB == null) {
-        return -1;
-      }
 
       if (isNumeric) {
         const numberA = Number(rawA);
@@ -167,7 +175,7 @@ function COM_SearchResults() {
 
       return direction === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
     });
-  }, [safeData?.results, sortState]);
+  }, [safeData?.results, safeData?.query, sortState, prQuery]);
 
   const handleSort = (column: ColumnConfig) => {
     const defaultDirection = getDefaultDirection(column);

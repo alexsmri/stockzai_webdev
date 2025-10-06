@@ -1,11 +1,15 @@
 import { getScoreColor, getDashOffset } from '../utils/functions';
-import { useCompanyStoreSync } from '../hooks/hooks';
-import { useCompanyStore } from '../context/CTX_CompanyStore';
+import { useCompaniesStoreSync } from '../hooks/hooks';
+import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useState } from 'react';
 import COM_IndicatorChange from './COM_IndicatorChange';
 import { useLightbox } from '../context/CTX_Lightbox';
+type CompanyProfileRecord = {
+  latest_entries?: Record<string, number>;
+  [key: string]: unknown;
+};
 interface PI_ScoreRadial {
-  KPI: 'financial_score' | 'valuation_score'; // Optional type for the score
+  KPI: 'financial_score' | 'valuation_score';
 }
 
 function getScoreText(scoreKPI: 'financial_score' | 'valuation_score'): string {
@@ -18,13 +22,13 @@ function getScoreText(scoreKPI: 'financial_score' | 'valuation_score'): string {
 }
 
 function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
-  const store = useCompanyStore();
-  const [data, setData] = useState<Record<string, any> | null>(null);
+  const store = useCompaniesStore();
+  const [data, setData] = useState<CompanyProfileRecord | null>(null);
 
-  useCompanyStoreSync(store, setData);
+  useCompaniesStoreSync(store, 'PropertyCompanyProfile', setData);
   const { handleLBOpen } = useLightbox();
 
-  if (!data || !data.latest_entries[KPI]) return null;
+  if (!data || !data.latest_entries?.[KPI]) return null;
   const score = data.latest_entries[KPI];
   const color = getScoreColor(score);
   const offset = getDashOffset(score);
