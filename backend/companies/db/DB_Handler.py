@@ -1,11 +1,11 @@
-﻿from sqlalchemy import create_engine, MetaData, insert, text, Table
+﻿from .DB_Executor import DB_Executor
 from datetime import datetime, date
 import decimal
 import numpy
 import pandas as pd
 import os
 from .formats import parse_json
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,279 +21,64 @@ KPI_NAME_ALIASES = {
     "sectorRanking": "sectorRanking",
 }
 
+DB_FUNCTIONS: Dict[str, str] = {
+    "kpi_info": "dbq_get_kpi_info",
+    "kpis": "dbq_get_kpis",
+    "kpi": "dbq_get_kpi",
+    "company_data": "dbq_get_company_data",
+    "company_search": "dbq_get_company_search",
+    "company_winners": "dbq_get_company_winners",
+    "distinct_sectors": "dbq_get_distinct_sectors",
+    "sector_ranking": "dbq_get_sector_ranking",
+    "sector_company_data": "dbq_get_sector_company_data",
+}
+
 class DB_Handler:
 
     def __init__(self,
                  database: str):
+        self.executor = DB_Executor(database)
+        self.database = self.executor.database
+        self.engine = self.executor.engine
+        self.metadata = self.executor.metadata
 
-        def get_db_login():
-            login = {}
-            for login_info in ["MYSQL_USERNAME", "MYSQL_PASSWORD", "MYSQL_HOST", "MYSQL_DATABASE"]:
-                value = os.getenv(login_info)
+    def get(self, key: str, *args, **kwargs):
+        if not key:
+            raise KeyError("Key must be provided for DB_Handler.get")
 
-                if not value:
-                    raise ValueError(f"{login_info} environment variable not set.")
-                else:
-                    login[login_info] = value
-            return login
+        func_name = DB_FUNCTIONS.get(key.lower())
+        if not func_name:
+            raise KeyError(f"Unknown DB function key: {key}")
 
-        login_data = get_db_login()
-        self.database = database
-        self.engine = create_engine(f'mysql+pymysql://{login_data["MYSQL_USERNAME"]}:{login_data["MYSQL_PASSWORD"]}@{login_data["MYSQL_HOST"]}/{login_data["MYSQL_DATABASE"]}')
-        self.metadata = MetaData()
-        self.metadata.reflect(bind=self.engine)
-    
-    def _build_conditions(self, conditions: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
-        if not conditions:
-            return "", {}
+        func = getattr(self, func_name, None)
+        if func is None:
+            raise AttributeError(f"DB function '{func_name}' is not implemented")
 
-        clauses: list[str] = []
-        params: Dict[str, Any] = {}
+        return func(*args, **kwargs)
 
-        for idx, (column, value) in enumerate(conditions.items()):
-            param_name = f"param_{idx}"
+    def _build_conditions(self, *args, **kwargs):
+        return self.executor._build_conditions(*args, **kwargs)
 
-            if isinstance(value, list):
-                clauses.append(f"`{column}` IN :{param_name}")
-                params[param_name] = tuple(value)
+    def dbu_read(self, *args, **kwargs):
+        return self.executor.dbu_read(*args, **kwargs)
 
-            elif isinstance(value, str) and value.endswith("func"):
-                # value like "NOW()func" â†’ drop the suffix, treat as raw SQL function
-                clauses.append(f"`{column}` = {value[:-4]}")
+    def dbu_read_selectcount(self, *args, **kwargs):
+        return self.executor.dbu_read_selectcount(*args, **kwargs)
 
-            elif isinstance(value, str) and value[:1] in {">", "<"}:
-                operator, cleaned = value[0], value[1:]
-                clauses.append(f"`{column}` {operator} :{param_name}")
-                params[param_name] = cleaned
+    def dbu_read_selectdistinct(self, *args, **kwargs):
+        return self.executor.dbu_read_selectdistinct(*args, **kwargs)
 
-            elif value is None:
-                clauses.append(f"`{column}` IS NULL")
+    def dbu_read_execute(self, *args, **kwargs):
+        return self.executor.dbu_read_execute(*args, **kwargs)
 
-            else:
-                clauses.append(f"`{column}` = :{param_name}")
-                params[param_name] = value
+    def dbu_write(self, *args, **kwargs):
+        return self.executor.dbu_write(*args, **kwargs)
 
-        return " WHERE " + " AND ".join(clauses), params
-    
-    def dbu_read(self,
-             table_name: str,
-             column_name: str | bool = False,
-             conditions: dict | bool = False,
-             order_by: str | None = None,
-             ascend: bool = False) \
-            -> pd.DataFrame:
+    def dbu_write_df(self, *args, **kwargs):
+        return self.executor.dbu_write_df(*args, **kwargs)
 
-        column_sql = f"`{column_name}`" if column_name else "*"
-        base_sql = f"SELECT {column_sql} FROM `{self.database}`.`{table_name}`"
-
-        where_sql, params = self._build_conditions(conditions or {})
-        order_sql = f" ORDER BY {order_by} {'ASC' if ascend else 'DESC'}" if order_by else ""
-
-        query = text(base_sql + where_sql + order_sql)
-
-        with self.engine.connect() as conn:
-            results = conn.execute(query, params).fetchall()
-
-            if not column_name:
-                columns = []
-                metadata = MetaData()
-                table_columns = Table(table_name,
-                                      metadata,
-                                      autoload_with=self.engine
-                                      ).columns
-                if table_columns:
-                    columns.extend(column.name for column in table_columns)
-            else:
-                columns = [column_name]
-
-        df = pd.DataFrame(results, columns=columns)
-
-        return df
-
-    def dbu_read_selectcount(self, table_name: str, column_name: str | bool = False, conditions: dict | bool = False) -> int:
-        # Base query with parameterized table and column names
-        query = f"SELECT COUNT(*) FROM {self.database}.`{table_name}`"
-        if column_name:
-            query = f"SELECT COUNT(`{column_name}`) FROM {self.database}.`{table_name}`"
-
-        params = {}  # Dictionary to hold query parameters
-
-        if conditions:
-            operators = ["<", ">"]
-            condition_statements = []
-
-            for idx, (condition, condition_value) in enumerate(conditions.items()):
-                operator = "="
-
-                # Check if the condition is using a comparison operator
-                if isinstance(condition_value, list):
-                    operator = "IN"
-                    condition_statements.append(f"`{condition}` {operator} :param{idx}")
-                    params[f"param{idx}"] = tuple(condition_value)  # Ensure value is tuple for IN clause
-
-                elif condition_value is None or condition_value == "None":
-                    operator = "IS"
-                    condition_statements.append(f"`{condition}` {operator} NULL")
-
-                else:
-                    if isinstance(condition_value, str):
-                        try:
-                            # Handle operators like <, > if specified in condition_value
-                            if condition_value[0] in operators:
-                                operator = condition_value[0]
-                                condition_value = condition_value[1:]
-                        except ValueError:
-                            operator = "="
-                        except IndexError:
-                            operator = "="
-
-                    condition_statements.append(f"`{condition}` {operator} :param{idx}")
-                    params[f"param{idx}"] = condition_value
-
-            # Add WHERE clause with all conditions combined by AND
-            query += " WHERE " + " AND ".join(condition_statements)
-
-        # Execute the query safely with parameters
-        with self.engine.connect() as conn:
-            results = int(conn.execute(text(query), params).scalar())
-            conn.close()
-
-        return results
-
-    def dbu_read_selectdistinct(self, table_name, column_name: str | bool = False, conditions: dict | bool = False):
-
-        query = f"SELECT DISTINCT FROM {self.database}.{table_name}"
-
-        if column_name:
-            query = f"SELECT DISTINCT (`{column_name}`) FROM {table_name}"
-
-        if conditions:
-            operators = ["<", ">"]
-            for idx, condition in enumerate(conditions):
-                condition_value = conditions[condition]
-                if idx == 0:
-                    if isinstance(condition_value, str):
-                        try:
-                            operators.index(condition_value[0])
-                            query = f"{query} WHERE {condition} {condition_value[0]} "
-                            condition_value = condition_value[1:]
-                        except ValueError:
-                            query = f"{query} WHERE {condition} = "
-                    else:
-                        query = f"{query} WHERE {condition} = "
-
-                else:
-                    try:
-                        operators.index(conditions[condition][0])
-                        query = f"{query} AND {condition} {condition_value[0]} "
-                        condition_value = condition_value[1:]
-                    except ValueError:
-                        query = f"{query} AND {condition} = "
-
-                if isinstance(condition_value, str):
-                    if condition_value[-4:] == 'func':
-                        query = f"{query}{condition_value[:-4]}"
-
-                    else:
-                        query = f"{query}'{text(condition_value)}'"
-                else:
-                    query = f"{query}{condition_value}"
-
-        with self.engine.connect() as conn:
-            results = conn.execute(text(query)).fetchall()
-
-            if not column_name:
-                columns = []
-                metadata = MetaData()
-                table_columns = Table(table_name,
-                                      metadata,
-                                      autoload_with=self.engine
-                                      ).columns
-                if table_columns:
-                    columns.extend(column.name for column in table_columns)
-            else:
-                columns = [column_name]
-
-        df = pd.DataFrame(results, columns=columns)
-
-        return df
-
-    def dbu_read_execute(self, query: str, table_name: str | None = None, params: list | None = None):
-
-        with self.engine.connect() as conn:
-            results = conn.execute(text(query), parameters=params).fetchall()
-
-        if table_name:
-            columns = []
-            metadata = MetaData()
-            table_columns = Table(table_name,
-                                  metadata,
-                                  autoload_with=self.engine
-                                  ).columns
-            if table_columns:
-                columns.extend(column.name for column in table_columns if query.find(str(column.name)) != -1)
-
-            df = pd.DataFrame(results, columns=columns)
-            return df
-
-        return results
-
-    def dbu_write(self, table, value: dict, check=True, check_exclude: list | None = None):
-
-        if not check_exclude:
-            check_exclude = []
-
-        table_obj = self.metadata.tables.get(table)
-
-        if table_obj is None:
-            raise ValueError(f"Table {table} does not exist in the database schema")
-
-        cleaned_value = {key: (None if value[key] is None or str(value[key]) == "Infinity" else value[key])
-                         for key in value}
-
-        existing = self.dbu_read_selectcount(table,
-                                    conditions={value: cleaned_value[value] for value in cleaned_value if value not in check_exclude}) \
-            if check else False
-
-        if not existing:
-            ins = insert(table_obj).values(**cleaned_value)
-
-            with self.engine.connect() as conn:
-                conn.execute(ins)
-                conn.commit()
-
-        return True
-
-    def dbu_write_df(self, table: str, df: pd.DataFrame, check=True, returncheck=True):
-        columns = df.columns
-
-        for idx, (_, values) in enumerate(df.iterrows()):
-            dic = {}
-            for column in columns:
-                dic[column] = values[column]
-            if check and self.dbu_read_selectcount(table, conditions=dic) != 0:
-                continue
-            else:
-                self.dbu_write(table, dic)
-
-        if returncheck:
-            output = pd.DataFrame(columns=columns)
-        return output
-
-    def dbu_check_df(self, table, df: pd.DataFrame):
-        columns = df.columns
-        values_out = []
-
-        for idx, (_, values) in enumerate(df.iterrows()):
-            dic = {}
-            for column in columns:
-                dic[column] = values[column]
-            if self.dbu_read_selectcount(table, conditions=dic) != 0:
-                continue
-            else:
-                values_out.append(values)
-        output = pd.DataFrame(values_out, columns=columns)
-        return output if any(output) else None
+    def dbu_check_df(self, *args, **kwargs):
+        return self.executor.dbu_check_df(*args, **kwargs)
 
     def dbq_get_kpi_info(self, kpi):
         kpi_entry: pd.DataFrame = self.dbu_read(table_name="kpi", conditions={"KPI": kpi})
@@ -380,7 +165,7 @@ class DB_Handler:
 
         return {"company_intel": company_intel, "latest_entries": latest_entries}
     
-    def dbg_get_company_search(self, search_request: str, additional_kpis: list[str] = [], unique: bool = False):
+    def dbq_get_company_search(self, search_request: str, additional_kpis: list[str] = [], unique: bool = False):
         results = {}
 
         additional_kpis_info = {kpi: self.dbq_get_kpi_info(kpi) for kpi in additional_kpis}
@@ -693,8 +478,6 @@ class DB_Handler:
                 results[symbol].setdefault(friendly, None)
 
         return results
-
-
 
 
 
