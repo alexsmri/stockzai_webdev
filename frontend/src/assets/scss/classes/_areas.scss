@@ -287,3 +287,29 @@
     z-index: 1;
 }
 
+.area-tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none; // let clicks through except on tooltip
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    pointer-events: all; // so user can't click behind
+    transition: clip-path 0.3s ease;
+  }
+
+  .tooltip {
+    position: absolute;
+    z-index: 10000;
+    background: #111;
+    color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    pointer-events: all;
+    width: 250px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  }
+}

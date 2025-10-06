@@ -46,7 +46,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
 
   const utAverage = calcAverage(Object.values(utKPIData.data));
   const utChange = calcChange1Y(utKPIData.data).changePct;
-  const tableData: Record<string, unknown> = {
+  const tableData: Record<string, any> = {
     'Current Value': utKPIData.latest_entry,
     'Trailing AVG': utAverage,
   };

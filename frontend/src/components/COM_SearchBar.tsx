@@ -1,7 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
 
-interface SearchBarProps {
+interface ITF_SearchBarProps {
   input: string;
   submit?: boolean;
   handleSubmit?: (e: FormEvent) => void | null;
@@ -14,7 +14,7 @@ export default function COM_SearchBar({
   submit = true,
   handleSubmit,
   handleChange,
-}: SearchBarProps) {
+}: ITF_SearchBarProps) {
   const onSubmitForm = (event: FormEvent) => {
     if (!submit) {
       event.preventDefault();
