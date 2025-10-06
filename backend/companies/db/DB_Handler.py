@@ -1,17 +1,25 @@
-from sqlalchemy import create_engine, MetaData, insert, text, Table
+﻿from sqlalchemy import create_engine, MetaData, insert, text, Table
 from datetime import datetime, date
 import decimal
 import numpy
 import pandas as pd
 import os
 from .formats import parse_json
-from companies.models import WinnerEntry
 from typing import Any, Dict, Tuple
 import logging
 
 logger = logging.getLogger(__name__)
 
 NUMERAL_TYPES = (int, float, decimal.Decimal, numpy.int64, numpy.int32, numpy.float64, numpy.float32)
+
+KPI_NAME_ALIASES = {
+    "financial_score": "financial_score",
+    "valuation_score": "valuation_score",
+    "total_score": "totalScore",
+    "name": "name",
+    "sector": "sector",
+    "sectorRanking": "sectorRanking",
+}
 
 class DB_Handler:
 
@@ -50,7 +58,7 @@ class DB_Handler:
                 params[param_name] = tuple(value)
 
             elif isinstance(value, str) and value.endswith("func"):
-                # value like "NOW()func" → drop the suffix, treat as raw SQL function
+                # value like "NOW()func" â†’ drop the suffix, treat as raw SQL function
                 clauses.append(f"`{column}` = {value[:-4]}")
 
             elif isinstance(value, str) and value[:1] in {">", "<"}:
@@ -462,3 +470,234 @@ class DB_Handler:
 
         return out
         
+
+    def _resolve_kpi_name(self, kpi: str) -> str:
+        """Translate friendly KPI aliases to the underlying KPI names."""
+        return KPI_NAME_ALIASES.get(kpi, kpi)
+
+    @staticmethod
+    def _coerce_value(value: Any) -> Any:
+        parsed = parse_json(value)
+        if parsed is None:
+            return None
+        if isinstance(parsed, str):
+            stripped = parsed.strip()
+            if not stripped or stripped.upper() == "NULL":
+                return None
+            try:
+                number = float(stripped.replace(",", ""))
+            except ValueError:
+                return stripped
+            if number.is_integer():
+                return int(number)
+            return number
+        if isinstance(parsed, NUMERAL_TYPES):
+            try:
+                number = float(parsed)
+            except (TypeError, ValueError):
+                return parsed
+            if number.is_integer():
+                return int(number)
+            return number
+        return parsed
+
+    def dbq_get_distinct_sectors(self) -> list[str]:
+        """Return a sorted list of all sectors that have data in the basics table."""
+        sector_info = self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
+        query = (
+            "SELECT DISTINCT b.value "
+            "FROM basics b "
+            "WHERE b.KPI = :sector_kpi_id "
+            "AND b.value IS NOT NULL "
+            "AND b.value != 'NULL' "
+            "ORDER BY b.value"
+        )
+        rows = self.dbu_read_execute(query, params={"sector_kpi_id": sector_info["id"]})
+        return [row[0] for row in rows if isinstance(row[0], str) and row[0].strip()]
+
+    def dbq_get_sector_ranking(self, sector: str, metric: str, limit: int = 100, risk_levels: list[str] | None = None) -> list[dict[str, Any]]:
+        """Fetch the top companies for a sector ranked by the provided KPI."""
+        metric_info = self.dbq_get_kpi_info(self._resolve_kpi_name(metric))
+        sector_info = self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
+
+        metric_table = metric_info["role"]
+
+        query = f"""
+            WITH latest_metric AS (
+                SELECT t.SYMBOL,
+                       CAST(t.value AS DECIMAL(32, 8)) AS metric_value,
+                       ROW_NUMBER() OVER (PARTITION BY t.SYMBOL ORDER BY t.date DESC) AS metric_row
+                FROM `{metric_table}` t
+                WHERE t.KPI = :metric_kpi_id
+            ),
+            latest_sector AS (
+                SELECT b.SYMBOL,
+                       b.value AS sector_value,
+                       ROW_NUMBER() OVER (PARTITION BY b.SYMBOL ORDER BY b.date DESC) AS sector_row
+                FROM `basics` b
+                WHERE b.KPI = :sector_kpi_id
+            )
+            SELECT lm.SYMBOL,
+                   lm.metric_value
+            FROM latest_metric lm
+            JOIN latest_sector ls ON ls.SYMBOL = lm.SYMBOL
+            WHERE lm.metric_row = 1
+              AND ls.sector_row = 1
+              AND ls.sector_value = :sector
+              AND lm.metric_value IS NOT NULL
+              AND lm.metric_value != 0
+            ORDER BY lm.metric_value DESC
+            LIMIT :limit
+        """
+
+        params: dict[str, Any] = {
+            "metric_kpi_id": metric_info["id"],
+            "sector_kpi_id": sector_info["id"],
+            "sector": sector,
+            "limit": limit,
+        }
+
+        rows = self.dbu_read_execute(query, params=params)
+
+        if risk_levels:
+            logger.debug("Risk level filtering not yet implemented. Provided levels: %s", risk_levels)
+
+        ranking: list[dict[str, Any]] = []
+        for index, (symbol, metric_value) in enumerate(rows, start=1):
+            if not symbol:
+                continue
+            ranking.append(
+                {
+                    "symbol": symbol,
+                    "rank": index,
+                    "score": float(metric_value) if metric_value is not None else None,
+                }
+            )
+        return ranking
+
+    def _fetch_latest_basics_by_kpi(self, kpi_id: int, symbols: list[str]) -> dict[str, Any]:
+        if not symbols:
+            return {}
+
+        query = """
+            WITH latest_values AS (
+                SELECT b.SYMBOL,
+                       b.value,
+                       ROW_NUMBER() OVER (PARTITION BY b.SYMBOL ORDER BY b.date DESC) AS rn
+                FROM `basics` b
+                WHERE b.KPI = :kpi_id AND b.SYMBOL IN :symbols
+            )
+            SELECT SYMBOL, value FROM latest_values WHERE rn = 1
+        """
+
+        rows = self.dbu_read_execute(query, params={"kpi_id": kpi_id, "symbols": tuple(symbols)})
+        return {symbol: self._coerce_value(value) for symbol, value in rows if symbol}
+
+    def dbq_get_sector_company_data(self, sector: str, kpis: list[str], symbols: list[str] | None = None) -> dict[str, dict[str, Any]]:
+        """Collect the latest KPI values for the given symbols within a sector."""
+        if not kpis:
+            return {}
+
+        friendly_to_info: dict[str, dict[str, Any]] = {}
+        for friendly in kpis:
+            try:
+                friendly_to_info[friendly] = self.dbq_get_kpi_info(self._resolve_kpi_name(friendly))
+            except Exception:
+                logger.warning("Missing KPI info for %s", friendly)
+
+        if not friendly_to_info:
+            return {}
+
+        if symbols is None:
+            sector_info = friendly_to_info.get("sector") or self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
+            sector_query = (
+                "SELECT DISTINCT b.SYMBOL "
+                "FROM basics b "
+                "WHERE b.KPI = :sector_kpi_id "
+                "AND b.value = :sector"
+            )
+            rows = self.dbu_read_execute(
+                sector_query,
+                params={
+                    "sector_kpi_id": sector_info["id"],
+                    "sector": sector,
+                },
+            )
+            symbols = [row[0] for row in rows if row[0]]
+
+        if not symbols:
+            return {}
+
+        results: dict[str, dict[str, Any]] = {symbol: {"symbol": symbol} for symbol in symbols}
+
+        role_groups: dict[str, list[tuple[str, int]]] = {}
+        for friendly, info in friendly_to_info.items():
+            role_groups.setdefault(info["role"], []).append((friendly, info["id"]))
+
+        for role, items in role_groups.items():
+            kpi_ids = tuple(info_id for _, info_id in items)
+            if not kpi_ids:
+                continue
+
+            query = f"""
+                WITH latest_values AS (
+                    SELECT t.SYMBOL,
+                           t.KPI,
+                           t.value,
+                           ROW_NUMBER() OVER (PARTITION BY t.SYMBOL, t.KPI ORDER BY t.date DESC) AS rn
+                    FROM `{role}` t
+                    WHERE t.KPI IN :kpi_ids AND t.SYMBOL IN :symbol_list
+                )
+                SELECT SYMBOL, KPI, value
+                FROM latest_values
+                WHERE rn = 1
+            """
+
+            params = {
+                "kpi_ids": kpi_ids,
+                "symbol_list": tuple(symbols),
+            }
+
+            try:
+                rows = self.dbu_read_execute(query, params=params)
+            except Exception:
+                logger.warning("Failed to fetch KPI data for role %s", role)
+                continue
+
+            id_to_friendly = {info_id: friendly for friendly, info_id in items}
+            for symbol, kpi_id, value in rows:
+                if symbol not in results or kpi_id not in id_to_friendly:
+                    continue
+                friendly_key = id_to_friendly[kpi_id]
+                results[symbol][friendly_key] = self._coerce_value(value)
+
+        if "name" in kpis and "name" not in friendly_to_info:
+            fallback_name_kpi = 90
+            try:
+                name_info = self.dbq_get_kpi_info(self._resolve_kpi_name("name"))
+                fallback_name_kpi = name_info["id"]
+            except Exception:
+                logger.debug("Using fallback KPI id %s for company names", fallback_name_kpi)
+            names = self._fetch_latest_basics_by_kpi(fallback_name_kpi, list(symbols))
+            for symbol, value in names.items():
+                results.setdefault(symbol, {})["name"] = value
+
+        if "sector" in kpis and "sector" not in friendly_to_info:
+            sector_info = self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
+            sectors = self._fetch_latest_basics_by_kpi(sector_info["id"], list(symbols))
+            for symbol, value in sectors.items():
+                results.setdefault(symbol, {})["sector"] = value
+
+        for symbol in results:
+            for friendly in kpis:
+                results[symbol].setdefault(friendly, None)
+
+        return results
+
+
+
+
+
+
+
+
