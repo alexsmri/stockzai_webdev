@@ -52,7 +52,7 @@ class CompanySearchView(APIView):
         variant = (request.GET.get("variant") or "search").lower()
         results = None
         try:
-            results = db.dbg_get_company_search(
+            results = db.dbq_get_company_search(
                 query,
                 ["financial_score", "valuation_score", "sector", "sectorRanking"],
                 unique=unique,
