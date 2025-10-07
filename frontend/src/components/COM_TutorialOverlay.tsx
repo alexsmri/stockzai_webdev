@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 interface Step {
-  selector: string; // e.g. ".my-button" or "#price-chart"
+  ref: React.RefObject<HTMLElement>;
   title?: string;
   text?: string;
 }
@@ -17,7 +17,7 @@ export default function COM_TutorialOverlay({ prSteps, onFinish }: PI_TutorialOv
 
   // Highlight area of current step
   useEffect(() => {
-    const el = document.querySelector(prSteps[stepIndex].selector);
+    const el = prSteps[stepIndex].ref.current;
     if (el) setRect(el.getBoundingClientRect());
   }, [stepIndex]);
 

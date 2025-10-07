@@ -18,9 +18,9 @@ type CompanyProfileRecord = {
 };
 
 const TUTORIAL_STEPS = [
-  { selector: '#hero-cta', text: 'Click here to start your journey!' },
-  { selector: '.score-card', text: 'Here you can view detailed metrics.' },
-  { selector: '#profile', text: 'Your profile lives up here.' },
+  { ref: '#hero-cta', text: 'Click here to start your journey!' },
+  { ref: '.score-card', text: 'Here you can view detailed metrics.' },
+  { ref: '#profile', text: 'Your profile lives up here.' },
 ];
 
 function PAG_CompaniesContent({ symbol }: { symbol: string }) {
