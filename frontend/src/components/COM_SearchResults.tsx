@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
 import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
@@ -7,9 +7,9 @@ import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { VAI_SearchData } from '../types/interfaces';
 
-type SearchResultEntry = Record<string, unknown>;
-type SortDirection = 'asc' | 'desc';
-type ColumnKey =
+type TYP_SearchResultEntry = Record<string, unknown>;
+type TYP_SortDirection = 'asc' | 'desc';
+type TYP_ColumnKey =
   | 'symbol'
   | 'name'
   | 'sector'
@@ -17,22 +17,26 @@ type ColumnKey =
   | 'financial_score'
   | 'valuation_score';
 
-type SortCycle = {
-  columnId: ColumnKey | null;
-  direction: SortDirection | null;
+type TYP_SortCycle = {
+  columnId: TYP_ColumnKey | null;
+  direction: TYP_SortDirection | null;
 };
 
-interface ColumnConfig {
-  id: ColumnKey;
+interface ITF_ColumnConfig {
+  id: TYP_ColumnKey;
   title: string;
-  key: ColumnKey;
+  key: TYP_ColumnKey;
   icon: typeof ICON_FirstPlace;
   defaultSorting: 'a' | 'd';
 }
 
-const NUMERIC_COLUMNS = new Set<ColumnKey>(['sectorRanking', 'financial_score', 'valuation_score']);
+const NUMERIC_COLUMNS = new Set<TYP_ColumnKey>([
+  'sectorRanking',
+  'financial_score',
+  'valuation_score',
+]);
 
-const COLUMN_CONFIG: ColumnConfig[] = [
+const COLUMN_CONFIG: ITF_ColumnConfig[] = [
   { id: 'symbol', title: 'Symbol', key: 'symbol', icon: ICON_FirstPlace, defaultSorting: 'a' },
   { id: 'name', title: 'Name', key: 'name', icon: ICON_FirstPlace, defaultSorting: 'a' },
   { id: 'sector', title: 'Sector', key: 'sector', icon: ICON_FirstPlace, defaultSorting: 'a' },
@@ -59,7 +63,7 @@ const COLUMN_CONFIG: ColumnConfig[] = [
   },
 ];
 
-function getColumnValue(column: ColumnConfig, symbol: string, company: SearchResultEntry) {
+function getColumnValue(column: ITF_ColumnConfig, symbol: string, company: TYP_SearchResultEntry) {
   if (column.key === 'symbol') {
     return symbol;
   }
@@ -94,22 +98,22 @@ function getDisplayRank(value: unknown) {
   return '-';
 }
 
-function getDefaultDirection(column: ColumnConfig): SortDirection {
+function getDefaultDirection(column: ITF_ColumnConfig): TYP_SortDirection {
   return column.defaultSorting === 'd' ? 'desc' : 'asc';
 }
 
-function getOppositeDirection(direction: SortDirection): SortDirection {
+function getOppositeDirection(direction: TYP_SortDirection): TYP_SortDirection {
   return direction === 'asc' ? 'desc' : 'asc';
 }
 
-interface SearchResultsProps {
+interface PI_SearchResults {
   prQuery: string;
 }
 
-function COM_SearchResults({ prQuery }: SearchResultsProps) {
+function COM_SearchResults({ prQuery }: PI_SearchResults) {
   const store = useCompaniesStore();
   const [data, setData] = useState<VAI_SearchData | null>(null);
-  const [sortState, setSortState] = useState<SortCycle>({ columnId: null, direction: null });
+  const [sortState, setSortState] = useState<TYP_SortCycle>({ columnId: null, direction: null });
 
   useEffect(() => {
     if (!prQuery.trim()) {
@@ -128,10 +132,10 @@ function COM_SearchResults({ prQuery }: SearchResultsProps) {
 
   const sortedResults = useMemo(() => {
     if (!safeData?.results || typeof safeData.results !== 'object' || safeData.query !== prQuery) {
-      return [] as Array<[string, SearchResultEntry]>;
+      return [] as Array<[string, TYP_SearchResultEntry]>;
     }
 
-    const entries = Object.entries(safeData.results) as Array<[string, SearchResultEntry]>;
+    const entries = Object.entries(safeData.results) as Array<[string, TYP_SearchResultEntry]>;
 
     if (!sortState.columnId || !sortState.direction) {
       return entries;
@@ -177,7 +181,7 @@ function COM_SearchResults({ prQuery }: SearchResultsProps) {
     });
   }, [safeData?.results, safeData?.query, sortState, prQuery]);
 
-  const handleSort = (column: ColumnConfig) => {
+  const handleSort = (column: ITF_ColumnConfig) => {
     const defaultDirection = getDefaultDirection(column);
     const oppositeDirection = getOppositeDirection(defaultDirection);
 
