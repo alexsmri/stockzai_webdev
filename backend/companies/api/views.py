@@ -1,4 +1,5 @@
-﻿from django.http import Http404
+import logging
+from django.http import Http404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -11,6 +12,7 @@ from ..db.DB_Handler import DB_Handler
 
 
 db = DB_Handler("companies")
+logger = logging.getLogger(__name__)
 
 
 class CompanyPageView(APIView):
@@ -152,3 +154,24 @@ class CompanyLeaderboardView(APIView):
             "intel": relevant_intel,
         }
         return api_json_response(msg=response_payload)
+
+
+class CompanyDistinctKPIValuesView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None
+
+    def get(self, request):
+        kpi_param = request.GET.get("kpi")
+        if not kpi_param:
+            return api_json_response(msg=[])
+
+        try:
+            values = db.dbq_get_distinct_kpi_values(kpi_param)
+        except ValueError:
+            logger.warning("Rejected distinct KPI request for non-basics KPI %s", kpi_param)
+            return api_json_response(msg=[])
+        except Exception:
+            logger.exception("Failed to fetch distinct KPI values for %s", kpi_param)
+            return api_json_response(error="distinct_kpi_fetch_failed")
+
+        return api_json_response(msg=values)

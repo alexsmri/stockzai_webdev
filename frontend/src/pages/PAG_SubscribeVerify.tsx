@@ -25,13 +25,13 @@ export default function PAG_SubscribeVerify() {
 
   useEffect(() => {
     (async () => {
-      const consents = await utStore.get('PropertyConsents');
+      const consents = (await utStore.get('PropertyConsents')) as null | Record<string, any>;
       if (consents?.consents_newsletter) {
         navigate('/users/unsubscribe-newsletter', { replace: true });
         return;
       }
 
-      const credentials = await utStore.get('PropertyCredentials');
+      const credentials = (await utStore.get('PropertyCredentials')) as null | Record<string, any>;
       if (credentials) {
         setStEmail(credentials.email);
         setStUsername(credentials.username);

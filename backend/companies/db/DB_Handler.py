@@ -1,4 +1,4 @@
-﻿from .DB_Executor import DB_Executor
+from .DB_Executor import DB_Executor
 from datetime import datetime, date
 import decimal
 import numpy
@@ -31,6 +31,7 @@ DB_FUNCTIONS: Dict[str, str] = {
     "distinct_sectors": "dbq_get_distinct_sectors",
     "sector_ranking": "dbq_get_sector_ranking",
     "sector_company_data": "dbq_get_sector_company_data",
+    "distinct_kpi_values": "dbq_get_distinct_kpi_values",
 }
 
 class DB_Handler:
@@ -286,6 +287,52 @@ class DB_Handler:
             return number
         return parsed
 
+    def dbq_get_distinct_kpi_values(self, kpi: str) -> list[Any]:
+        """Fetch distinct, sanitized values for a KPI limited to the basics role."""
+        if not kpi:
+            return []
+
+        resolved_kpi = self._resolve_kpi_name(kpi)
+
+        try:
+            info = self.dbq_get_kpi_info(resolved_kpi)
+        except Exception:
+            logger.warning("Failed to resolve KPI %s for distinct values", kpi)
+            raise
+
+        role = info.get("role")
+        if role != "basics":
+            raise ValueError("Distinct KPI values are only supported for basics role KPIs")
+
+        query = (
+            "SELECT DISTINCT value "
+            f"FROM `{role}` "
+            "WHERE KPI = :kpi_id "
+            "AND value IS NOT NULL "
+            "AND value != 'NULL' "
+            "ORDER BY value"
+        )
+
+        rows = self.dbu_read_execute(query, params={"kpi_id": info["id"]})
+
+        seen = set()
+        results: list[Any] = []
+        for (value,) in rows:
+            coerced = self._coerce_value(value)
+            if coerced is None:
+                continue
+            if isinstance(coerced, str):
+                cleaned = coerced.strip()
+                if not cleaned:
+                    continue
+                coerced = cleaned
+            if coerced in seen:
+                continue
+            seen.add(coerced)
+            results.append(coerced)
+
+        return results
+
     def dbq_get_distinct_sectors(self) -> list[str]:
         """Return a sorted list of all sectors that have data in the basics table."""
         sector_info = self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
@@ -478,6 +525,10 @@ class DB_Handler:
                 results[symbol].setdefault(friendly, None)
 
         return results
+
+
+
+
 
 
 

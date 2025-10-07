@@ -48,7 +48,11 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
         return;
       }
 
-      const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
+      const utTokenRes = (await utStore.post(
+        'TokenVerificationRequest',
+        { email: prEmail },
+        true
+      )) as Record<string, any> | null;
       if (!utTokenRes?.uid) {
         handleAlertOpen('Unable to send verification code. Please try again.', 'f', 5000);
         return;

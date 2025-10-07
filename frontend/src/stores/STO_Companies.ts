@@ -7,6 +7,8 @@ const ROUTE_CONFIG = {
   PropertySearchCompletion: "/api/companies/search",
   PropertySearchComparison: "/api/companies/search",
   PropertyCompanyWinners: "/api/companies/winners",
+  PropertyCompanyLeaderboard: "/api/companies/leaderboard",
+  PropertyDistinctKPIValues: "/api/companies/distinct",
 } as const;
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;
@@ -29,3 +31,4 @@ export default class STO_Companies extends STO_Base<ValidKeys> {
     this.ensureAllKeysInitialized();
   }
 }
+

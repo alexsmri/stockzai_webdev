@@ -1,7 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
-import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
+import ICON_FirstPlace from '../assets/media/ICON_FirstPlace.svg?react';
+import ICON_Triangle from '../assets/media/ICON_FirstPlace.svg?react';
 
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';

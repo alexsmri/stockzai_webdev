@@ -271,33 +271,35 @@
 .area-completions {
     position: absolute;
     top: calc(100% + u.scale-gap(0.5));
-    width: clamp(u.scale-gap(10), u.scale-gap(30), 50vw);
+    max-width: fit-content;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     row-gap: u.scale-gap(0.25);
     padding: u.scale-padding(0.5);
-    background-color: var(--color-secondary-ui-element);
-    border-radius: u.scale-gap(5);
+    background-color: var(--color-secondary-ui-subtle);
+    backdrop-filter: blur(u.scale-gap(1));
+    border-radius: u.scale-gap(2);
     border: 1px solid var(--color-secondary-a10);
     box-shadow: 0 u.scale-gap(0.5) u.scale-gap(2) var(--color-primary-a40);
     overflow: hidden;
     overflow-y: auto;
     max-height: u.scale-gap(18);
     z-index: 1;
+    @include u.remove-scrollbar()
 }
 
 .area-tutorial-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  pointer-events: none; // let clicks through except on tooltip
+  pointer-events: none;
 
   .overlay {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    pointer-events: all; // so user can't click behind
+    pointer-events: all; 
     transition: clip-path 0.3s ease;
   }
 

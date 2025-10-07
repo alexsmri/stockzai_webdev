@@ -36,7 +36,10 @@ function COM_Winners({ prBreakpoint }: { prBreakpoint: 'mobile' | 'desktop' }) {
         return (
           <div key={key} className="area-flex-col look-div-container">
             <div className="mod-right">
-              <DCOM_IndicatorChange prChange={value.priceChange} prShowDiv={true} />
+              <DCOM_IndicatorChange
+                prChange={value.priceChange as number | null}
+                prShowDiv={true}
+              />
             </div>
             <p className="look-text-x4">{key}</p>
             <DCOM_ScoreRadial prScore={value.totalScore ?? 0} />
