@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import PAG_Companies from './pages/PAG_Companies';
+import PAG_CompaniesFree from './pages/PAG_CompaniesFree';
 import PAG_Login from './pages/PAG_Login';
 import PAG_Register from './pages/PAG_Register';
 import PAG_RegisterPassword from './pages/PAG_RegisterPassword';
@@ -58,7 +59,10 @@ function App() {
                   <Route path="/users/register" element={<CreateAndLogout />} />
                   <Route path="/users/register/password" element={<CreatePasswordAndLogout />} />
                   <Route path="/users/verification" element={<PAG_VericationCode />} />
-                  <Route path="/users/password-reset/token/request" element={<PA_PasswordResetRequest />} />
+                  <Route
+                    path="/users/password-reset/token/request"
+                    element={<PA_PasswordResetRequest />}
+                  />
                   <Route
                     path="/users/edit"
                     element={
@@ -84,6 +88,7 @@ function App() {
                       </COM_ProtectedRoute>
                     }
                   />
+                  <Route path="/companies/page/free/:symbol" element={<PAG_CompaniesFree />} />
                   <Route
                     path="/companies/top-stocks"
                     element={

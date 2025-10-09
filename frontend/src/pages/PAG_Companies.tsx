@@ -17,12 +17,6 @@ type CompanyProfileRecord = {
   [key: string]: unknown;
 };
 
-const TUTORIAL_STEPS = [
-  { ref: '#hero-cta', text: 'Click here to start your journey!' },
-  { ref: '.score-card', text: 'Here you can view detailed metrics.' },
-  { ref: '#profile', text: 'Your profile lives up here.' },
-];
-
 function PAG_CompaniesContent({ symbol }: { symbol: string }) {
   const store = useCompaniesStore();
   const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);

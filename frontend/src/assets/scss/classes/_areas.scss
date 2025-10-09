@@ -296,11 +296,13 @@
   pointer-events: none;
 
   .overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     pointer-events: all; 
     transition: clip-path 0.3s ease;
+    mask: url(#hole-mask);
+    -webkit-mask: url(#hole-mask);
   }
 
   .tooltip {
@@ -314,4 +316,10 @@
     width: 250px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
   }
+
+  .hole {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  mix-blend-mode: destination-out;
+}
 }

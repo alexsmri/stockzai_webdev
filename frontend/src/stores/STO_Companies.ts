@@ -2,6 +2,7 @@ import { STO_Base } from "./STO_Base";
 
 const ROUTE_CONFIG = {
   PropertyCompanyProfile: "/api/companies",
+  PropertyCompanyProfileFree: "/api/companies/free",
   PropertyCompanyKPIs: "/api/companies/kpis",
   PropertySearchResults: "/api/companies/search",
   PropertySearchCompletion: "/api/companies/search",

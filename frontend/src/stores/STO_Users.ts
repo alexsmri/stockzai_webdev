@@ -3,6 +3,7 @@ import { STO_Base } from "./STO_Base";
 const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
   PropertyConsents: "/api/users/consents/",
+  PropertyTutorialCompleted: "/local/users/tutorial-completed/",
   ActionVerification: "/api/users/verification/",
   ActionRegistrationCheck: "/api/users/register/check/",
   TokenVerificationRequest: "/api/users/verification/token/",
@@ -25,6 +26,7 @@ const PERSISTED_KEYS: ValidKeys[] = [
   "ActionLogin",
   "PropertyCredentials",
   "ActionRefreshToken",
+  "PropertyTutorialCompleted",
 ];
 
 export default class STO_Users extends STO_Base<ValidKeys> {
@@ -62,5 +64,20 @@ export default class STO_Users extends STO_Base<ValidKeys> {
       }
     }
     return this.data[key];
+  }
+
+  setTutorialCompleted(completed: boolean): void {
+    this.update("PropertyTutorialCompleted", { completed });
+  }
+
+  getTutorialCompleted(): boolean {
+    const stored = this.read("PropertyTutorialCompleted");
+    if (typeof stored === "boolean") {
+      return stored;
+    }
+    if (stored && typeof stored === "object") {
+      return Boolean((stored as { completed?: boolean }).completed);
+    }
+    return false;
   }
 }

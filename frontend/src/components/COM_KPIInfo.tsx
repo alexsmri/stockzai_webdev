@@ -25,6 +25,7 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
         <div className="area-flex-row mod-space-between" key={prKPI}>
           <p
             className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-gradient"
+            data-kpi={prKPI}
             onClick={() => handleLBOpen(prKPI)}
           >
             {getKPIText(prKPI)}
@@ -36,7 +37,9 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
         </div>
       ) : (
         <div key={prKPI} className="area-flex-row mod-space-between">
-          <p className="look-text-x1 look-text-subtle mod-align-left">{getKPIText(prKPI)}</p>
+          <p className="look-text-x1 look-text-subtle mod-align-left" data-kpi={prKPI}>
+            {getKPIText(prKPI)}
+          </p>
           <p className="look-text-x1 look-text-normal mod-align-right">
             {formatLargeNumber(prValue)}
           </p>

@@ -15,15 +15,17 @@ interface ITF_TableInfoProps {
     | 'ratios'
     | 'valuation'
     | 'blobs';
+  prFree?: boolean;
 }
 
-export default function COM_TableInfo({ prTableRole }: ITF_TableInfoProps) {
+export default function COM_TableInfo({ prTableRole, prFree = false }: ITF_TableInfoProps) {
   const store = useCompaniesStore();
   const text = getRoleText(prTableRole);
+  const storeKey = prFree ? 'PropertyCompanyProfileFree' : 'PropertyCompanyProfile';
   const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
   const [companyData, setCompanyData] = useState<Record<string, any> | null>(null);
 
-  useCompaniesStoreSync(store, 'PropertyCompanyProfile', setCompanyData);
+  useCompaniesStoreSync(store, storeKey, setCompanyData);
   useCompaniesStoreSync<TYP_APIResponseKPI>(store, 'PropertyCompanyKPIs', setKpiCatalog);
 
   if (!companyData || !companyData.latest_entries || !kpiCatalog) return null;

@@ -65,5 +65,9 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
     tableData['Change 1Y'] = `${formatLargeNumber(utChange)}%`;
   }
 
-  return <DCOM_TableInfo prTitle="Details" prData={tableData} prType="table" />;
+  return (
+    <div data-tutorial="kpi-details-table">
+      <DCOM_TableInfo prTitle="Details" prData={tableData} prType="table" />
+    </div>
+  );
 }

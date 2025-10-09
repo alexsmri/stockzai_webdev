@@ -1,8 +1,9 @@
-import logging
+﻿import logging
 from django.http import Http404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
+from companies.constants import FREE_TICKERS
 from companies.models import DBSnapshots
 from stockzAI.response import api_json_response
 from users.models import TrackingEvent
@@ -36,8 +37,21 @@ class CompanyPageView(APIView):
         return api_json_response(msg=intel)
 
 
+class CompanyFreePageView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None
+
+    def get(self, request, symbol):
+        symbol_upper = (symbol or "").upper()
+        if symbol_upper not in FREE_TICKERS:
+            raise Http404("No data found for this symbol.")
+
+        intel = db.dbq_get_company_data(symbol_upper)
+        return api_json_response(msg=intel)
+
+
 class KPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = None  # This should be set to the appropriate serializer class
 
     def get(self, request):
