@@ -4,6 +4,7 @@ const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
   PropertyConsents: "/api/users/consents/",
   PropertyTutorialCompleted: "/local/users/tutorial-completed/",
+  PropertyAccess: "/api/users/access/",
   ActionVerification: "/api/users/verification/",
   ActionRegistrationCheck: "/api/users/register/check/",
   TokenVerificationRequest: "/api/users/verification/token/",
@@ -27,6 +28,7 @@ const PERSISTED_KEYS: ValidKeys[] = [
   "PropertyCredentials",
   "ActionRefreshToken",
   "PropertyTutorialCompleted",
+  "PropertyAccess",
 ];
 
 export default class STO_Users extends STO_Base<ValidKeys> {

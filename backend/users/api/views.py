@@ -1,7 +1,17 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
-from users.models import User, TokenVerification, TokenPasswordReset, TokenNewsletter, UserConsents, TrackingEvent
+from users.models import (
+    User,
+    TokenVerification,
+    TokenPasswordReset,
+    TokenNewsletter,
+    UserConsents,
+    TrackingEvent,
+    Subscription,
+    Purchase,
+    Product
+)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
@@ -355,6 +365,36 @@ def view_unsubscribe_newsletter(request):
 def view_consents(request):
     consents = UserConsents.objects.filter(user=request.user).first()
     msg = {"consents_newsletter": consents.consents_newsletter} if consents else {}
+    return api_json_response(msg=msg)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def view_access(request):
+    user = request.user
+
+    subscriptions = Subscription
+    products = user._entitled_products()
+    permissions = set()
+    product_payload = []
+
+    for product in products:
+        product_permissions = list(product.permissions or [])
+        permissions.update(product_permissions)
+        product_payload.append(
+            {
+                "id": product.pk,
+                "name": product.name,
+                "description": product.description,
+                "permissions": product_permissions,
+            }
+        )
+
+    msg = {
+        "products": product_payload,
+        "permissions": sorted(permissions),
+    }
+
     return api_json_response(msg=msg)
 
 

@@ -34,6 +34,50 @@ class User(AbstractBaseUser, PermissionsMixin):
             ('is_paid', 'Owns a subscription'),
         ]
 
+    def _entitled_products(self):
+        """Collect active products user currently has access to via subscriptions or purchases."""
+        products = {}
+
+        try:
+            subscription = self.subscription
+        except Subscription.DoesNotExist:
+            subscription = None
+        if subscription and subscription.has_valid_access():
+            products[subscription.product_id] = subscription.product
+
+        for purchase in self.purchases.select_related('product').all():
+            product = purchase.product
+            if product and product.is_active:
+                products[product.pk] = product
+
+        return list(products.values())
+
+    def has_permission(self, permission_code: str) -> bool:
+        if not permission_code:
+            return False
+
+        for product in self._entitled_products():
+            permissions = product.permissions or []
+            if permission_code in permissions:
+                return True
+        return False
+
+    def has_product(self, product_lookup) -> bool:
+        if product_lookup is None:
+            return False
+
+        for product in self._entitled_products():
+            if isinstance(product_lookup, Product):
+                if product.pk == product_lookup.pk:
+                    return True
+            elif isinstance(product_lookup, int):
+                if product.pk == product_lookup:
+                    return True
+            else:
+                if str(product_lookup) == product.name:
+                    return True
+        return False
+
 
 class TokenPasswordReset(models.Model):
     uid = models.CharField(max_length=256, editable=False, unique=True)
@@ -72,6 +116,88 @@ class UserConsents(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='consents')
     consents_newsletter = models.BooleanField(default=False)
     given_at = models.DateTimeField(auto_now_add=True)
+
+class Permission(models.Model):
+    name = models.CharField(max_length=128, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+    
+class Product(models.Model):
+    name = models.CharField(max_length=128, unique=True)
+    description = models.TextField(blank=True)
+    #TODO: permissions = models.Field(default=list, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Pricing(models.Model):
+    INTERVAL_MONTHLY = 'monthly'
+    INTERVAL_QUARTERLY = 'quarterly'
+    INTERVAL_YEARLY = 'yearly'
+    INTERVAL_ONETIME = 'onetime'
+
+    INTERVAL_CHOICES = [
+        (INTERVAL_MONTHLY, 'Monthly'),
+        (INTERVAL_QUARTERLY, 'Quarterly'),
+        (INTERVAL_YEARLY, 'Yearly'),
+        (INTERVAL_ONETIME, 'One-time'),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='pricings')
+    name = models.CharField(max_length=128)
+    description = models.TextField(blank=True)
+    interval = models.CharField(max_length=16, choices=INTERVAL_CHOICES)
+    price_per_interval = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('product', 'name', 'interval')
+
+    def __str__(self):
+        return f"{self.product.name} - {self.name} ({self.interval})"
+
+
+class Subscription(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='subscriptions')
+    is_active = models.BooleanField(default=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    cancel_at_period_end = models.BooleanField(default=False)
+    provider = models.CharField(max_length=64, blank=True)
+    provider_subscription_id = models.CharField(max_length=128, blank=True)
+    provider_plan_id = models.CharField(max_length=128, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Subscription<{self.user_id} -> {self.product_id}>"
+
+    def has_valid_access(self) -> bool:
+        if not self.is_active:
+            return False
+        if not self.product.is_active:
+            return False
+        if self.expires_at and self.expires_at <= timezone.now():
+            return False
+        return True
+
+
+class Purchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='purchases')
+    provider = models.CharField(max_length=64, blank=True)
+    provider_transaction_id = models.CharField(max_length=128, blank=True)
+    purchased_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+    def __str__(self):
+        return f"Purchase<{self.user_id} -> {self.product_id}>"
 
 class TrackingEvent(models.Model):
     EVENT_NEWSLETTER_UNSUB = 'newsletter_unsubscribe'

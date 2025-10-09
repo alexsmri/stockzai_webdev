@@ -8,6 +8,7 @@ from .views import (
     view_credentials,
     view_consents,
     view_edit_profile,
+    view_access,
     view_password_reset_token,
     view_reset_password,
     view_subscribe_newsletter_token,
@@ -37,6 +38,7 @@ urlpatterns = [
     path("verification/token/", view_verification_token, name="verification_token"),
     path("credentials/", view_credentials, name="credentials"),
     path("consents/", view_consents, name="consents"),
+    path("access/", view_access, name="access"),
     path("edit/", view_edit_profile, name="edit"),
     path("unsubscribe-newsletter/", view_unsubscribe_newsletter, name="unsubscribe_newsletter"),
     path(
