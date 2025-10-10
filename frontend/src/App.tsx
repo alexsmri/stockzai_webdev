@@ -26,6 +26,7 @@ import PAG_404 from './pages/PAG_404';
 import PAG_Debug from './pages/PAG_Debug';
 import PAG_TopStocks from './pages/PAG_TopStocks';
 import PAG_Alerts from './pages/PAG_Alerts';
+import COM_PremiumRoute from './components/COM_PremiumRoute';
 
 function Logout() {
   localStorage.clear();
@@ -93,7 +94,9 @@ function App() {
                     path="/companies/top-stocks"
                     element={
                       <COM_ProtectedRoute>
-                        <PAG_TopStocks />
+                        <COM_PremiumRoute prAccessConfig={{ permissions: ['company_page:all'] }}>
+                          <PAG_TopStocks />
+                        </COM_PremiumRoute>
                       </COM_ProtectedRoute>
                     }
                   />

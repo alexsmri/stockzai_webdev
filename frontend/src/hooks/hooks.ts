@@ -4,17 +4,21 @@ import type { ValidKeys as CompanyStoreKeys } from "../stores/STO_Companies";
 import type STO_Users from "../stores/STO_Users";
 import type { ValidKeys as UserStoreKeys } from "../stores/STO_Users";
 
-interface CompaniesSyncOptions {
+interface ITF_CompaniesSyncOptions {
   autoFetch?: boolean;
   prUrlPaths?: (string | number)[];
   prUrlParams?: Record<string, unknown>;
+}
+
+interface ITF_UserSyncOptions {
+  autoFetch?: boolean;
 }
 
 export function useCompaniesStoreSync<TData = Record<string, unknown>>(
   store: STO_Companies,
   key: CompanyStoreKeys,
   setData: Dispatch<SetStateAction<TData | null>>,
-  options: CompaniesSyncOptions = {}
+  options: ITF_CompaniesSyncOptions = {}
 ) {
   const { autoFetch = false, prUrlPaths = [], prUrlParams = {} } = options;
   const serializedPaths = useMemo(() => JSON.stringify(prUrlPaths), [prUrlPaths]);
@@ -37,19 +41,32 @@ export function useCompaniesStoreSync<TData = Record<string, unknown>>(
   }, [store, key, autoFetch, serializedPaths, serializedParams]);
 }
 
-export function useUserStoreSync(
+export function useUserStoreSync<TData = Record<string, unknown>>(
   store: STO_Users,
   key: UserStoreKeys,
-  setData: Dispatch<SetStateAction<any | null>>
+  setData: Dispatch<SetStateAction<any | null>>,
+  options: ITF_UserSyncOptions = {}
 ) {
+  const { autoFetch = false, } = options;
   useEffect(() => {
     const subscriber = () => {
-      setData(store.read(key));
+      const nextValue = store.read(key) as TData | null | undefined;
+      setData((nextValue ?? null));
     };
+
     const unsubscribe = store.subscribe(key, subscriber);
     subscriber();
-    return () => unsubscribe();
-  }, [store, key]);
+
+    if (autoFetch) {
+      try {
+        void store.get(key);
+      } catch {
+        console.warn("autoFetch in useUserStoreSynch failed")
+      }
+    }
+
+    return unsubscribe;
+  }, [store, key, autoFetch]);
 }
 
 function getWindowDimensions() {
