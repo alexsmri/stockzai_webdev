@@ -4,14 +4,22 @@ from typing import Iterable, Union
 from django.http import HttpRequest
 
 from stockzAI.response import api_json_response
+from users.models import PermissionCode
 
 
-def _normalise_requirement(value: Union[str, Iterable[str], None]) -> Iterable[str]:
+def _normalise_requirement(value: Union[str, PermissionCode, Iterable[Union[str, PermissionCode]], None]) -> Iterable[str]:
     if value is None:
         return []
+    if isinstance(value, PermissionCode):
+        return [value.value]
     if isinstance(value, str):
         return [value]
-    return [item for item in value if item]
+    normalized = []
+    for item in value:
+        if not item:
+            continue
+        normalized.append(item.value if isinstance(item, PermissionCode) else item)
+    return normalized
 
 
 def _ensure_user(request: HttpRequest):
@@ -21,7 +29,7 @@ def _ensure_user(request: HttpRequest):
     return user, None
 
 
-def require_permission(required: Union[str, Iterable[str]]):
+def require_permission(required: Union[str, PermissionCode, Iterable[Union[str, PermissionCode]]]):
     """
     View decorator that ensures the authenticated user holds at least one
     of the specified paywall permissions.

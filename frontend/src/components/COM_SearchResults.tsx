@@ -6,6 +6,7 @@ import ICON_Triangle from '../assets/media/ICON_FirstPlace.svg?react';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { VAI_SearchData } from '../types/interfaces';
+import COM_PaywallSearchResult from './COM_PaywallSearchResult';
 
 type TYP_SearchResultEntry = Record<string, unknown>;
 type TYP_SortDirection = 'asc' | 'desc';
@@ -111,7 +112,7 @@ interface PI_SearchResults {
 }
 
 function COM_SearchResults({ prQuery }: PI_SearchResults) {
-  const store = useCompaniesStore();
+  const utStore = useCompaniesStore();
   const [data, setData] = useState<VAI_SearchData | null>(null);
   const [sortState, setSortState] = useState<TYP_SortCycle>({ columnId: null, direction: null });
 
@@ -121,7 +122,7 @@ function COM_SearchResults({ prQuery }: PI_SearchResults) {
     }
   }, [prQuery]);
 
-  useCompaniesStoreSync<VAI_SearchData>(store, 'PropertySearchResults', setData, {
+  useCompaniesStoreSync<VAI_SearchData>(utStore, 'PropertySearchResults', setData, {
     autoFetch: prQuery.trim().length > 0,
     prUrlPaths: prQuery ? [prQuery] : [],
     prUrlParams: { unique: false, variant: 'search' },
@@ -129,6 +130,12 @@ function COM_SearchResults({ prQuery }: PI_SearchResults) {
 
   const safeData = data;
   const navigate = useNavigate();
+  const redactedSymbols = useMemo(() => {
+    if (!safeData?.redacted || !Array.isArray(safeData.redacted)) {
+      return new Set<string>();
+    }
+    return new Set(safeData.redacted.map((item) => String(item).toUpperCase()));
+  }, [safeData?.redacted]);
 
   const sortedResults = useMemo(() => {
     if (!safeData?.results || typeof safeData.results !== 'object' || safeData.query !== prQuery) {
@@ -243,6 +250,8 @@ function COM_SearchResults({ prQuery }: PI_SearchResults) {
       </div>
       <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
         {sortedResults.map(([symbol, company]) => {
+          const symbolUpper = symbol.toUpperCase();
+          const isRedacted = redactedSymbols.has(symbolUpper);
           const companyName = getDisplayText(company?.name, 'Unknown Company');
           const sector = getDisplayText(company?.sector, 'Unknown Sector');
           const sectorRank = getDisplayRank(company?.sectorRanking);
@@ -250,31 +259,39 @@ function COM_SearchResults({ prQuery }: PI_SearchResults) {
           const valuationScore = getDisplayScore(company?.valuation_score);
 
           return (
-            <div
-              key={symbol}
-              className="area-grid-results look-div-subtle state-hover-scale"
-              onClick={() => {
-                navigate(`/companies/page/${symbol}`);
-              }}
-            >
-              <span className="look-text-x1 look-priority-high mod-text-wrap-gradient">
-                {symbol}
-              </span>
-              <span
-                className="look-text-x1 look-priority-medium mod-text-wrap-gradient"
-                title={companyName}
+            <div key={symbol} style={{ position: 'relative' }}>
+              <div
+                className="area-grid-results look-div-subtle state-hover-scale"
+                onClick={() => {
+                  navigate(`/companies/page/${symbol}`);
+                }}
               >
-                {companyName}
-              </span>
-              <span
-                className="look-text-x1 look-priority-low mod-text-wrap-gradient"
-                title={sector}
-              >
-                {sector}
-              </span>
-              <span className="look-text-x1 look-priority-low">{sectorRank}</span>
-              <span className="look-text-x1 look-priority-low">{financialScore}</span>
-              <span className="look-text-x1 look-priority-low">{valuationScore}</span>
+                <span className="look-text-x1 look-priority-high mod-text-wrap-gradient">
+                  {symbol}
+                </span>
+                <span
+                  className="look-text-x1 look-priority-medium mod-text-wrap-gradient"
+                  title={companyName}
+                >
+                  {companyName}
+                </span>
+                <span
+                  className="look-text-x1 look-priority-low mod-text-wrap-gradient"
+                  title={sector}
+                >
+                  {sector}
+                </span>
+                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
+                  {sectorRank}
+                </span>
+                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
+                  {financialScore}
+                </span>
+                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
+                  {valuationScore}
+                </span>
+              </div>
+              <COM_PaywallSearchResult prIsRedacted={isRedacted} />
             </div>
           );
         })}

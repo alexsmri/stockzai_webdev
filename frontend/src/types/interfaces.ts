@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 
 export interface VAI_SearchData {
   query: string,
-  results: Record<string, Record<string, any>>
+  results: Record<string, Record<string, any>>;
+  redacted: string[];
 }
 
 export interface VAI_APIStore {

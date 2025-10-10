@@ -3,9 +3,26 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from datetime import timedelta
 
 from .managers import UserManager
+
+
+class PermissionCode(models.TextChoices):
+    COMPANY_SEARCH_ALL = "company_search:all", "Company search (all)"
+    COMPANY_PAGE_ALL = "company_page:all", "Company page (all)"
+
+
+def validate_permission_choices(value):
+    if value in (None, ""):
+        return
+    if not isinstance(value, (list, tuple)):
+        raise ValidationError("Permissions must be provided as a list.")
+    valid_values = {choice.value for choice in PermissionCode}
+    invalid = [item for item in value if item not in valid_values]
+    if invalid:
+        raise ValidationError(f"Invalid permission(s): {', '.join(invalid)}")
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -51,12 +68,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return list(products.values())
     
-    def has_permission(self, permission_code: str) -> bool:
+    def has_permission(self, permission_code: str | PermissionCode) -> bool:
         if not permission_code:
             return False
+        code = permission_code.value if isinstance(permission_code, PermissionCode) else permission_code
 
-        for product in self._entitled_products():
-            if product.permissions.filter(name=permission_code).exists():
+        for product in self._entitled_products:
+            permissions = product.permissions or []
+            if code in permissions:
                 return True
         return False
 
@@ -64,7 +83,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if product_lookup is None:
             return False
 
-        for product in self._entitled_products():
+        for product in self._entitled_products:
             if isinstance(product_lookup, Product):
                 if product.pk == product_lookup.pk:
                     return True
@@ -115,17 +134,10 @@ class UserConsents(models.Model):
     consents_newsletter = models.BooleanField(default=False)
     given_at = models.DateTimeField(auto_now_add=True)
 
-class Permission(models.Model):
-    name = models.CharField(max_length=128, unique=True)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
-    
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(blank=True)
-    permissions = models.ManyToManyField(Permission, related_name="products", blank=True)
+    permissions = models.JSONField(default=list, blank=True, validators=[validate_permission_choices])
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

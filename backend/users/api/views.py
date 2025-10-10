@@ -372,14 +372,15 @@ def view_consents(request):
 @permission_classes([IsAuthenticated])
 def view_access(request):
     user: User = request.user
-    products = user._entitled_products()
+    products = user._entitled_products
 
     product_names = []
     permission_names = set()
 
     for product in products:
+        product_permissions = list(product.permissions or [])
         product_names.append(product.name)
-        permission_names.update(product.permissions.values_list("name", flat=True))
+        permission_names.update(product_permissions)
 
     msg = {
         "products": product_names,

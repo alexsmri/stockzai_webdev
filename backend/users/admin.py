@@ -1,15 +1,16 @@
 from django.contrib import admin
-from .models import (User, 
-                     TokenPasswordReset, 
-                     TokenVerification, 
-                     TokenNewsletter, 
-                     UserConsents, 
-                     TrackingEvent, 
-                     Subscription, 
-                     Pricing, 
-                     Product, 
-                     Purchase, 
-                     Permission)
+from .models import (
+    User,
+    TokenPasswordReset,
+    TokenVerification,
+    TokenNewsletter,
+    UserConsents,
+    TrackingEvent,
+    Subscription,
+    Pricing,
+    Product,
+    Purchase,
+)
 
 admin.site.register(User)
 admin.site.register(TokenPasswordReset)
@@ -21,5 +22,4 @@ admin.site.register(Subscription)
 admin.site.register(Pricing)
 admin.site.register(Product)
 admin.site.register(Purchase)
-admin.site.register(Permission)
 

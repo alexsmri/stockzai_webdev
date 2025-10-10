@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from companies.constants import FREE_TICKERS
 from companies.models import DBSnapshots
 from stockzAI.response import api_json_response
-from users.models import TrackingEvent
+from users.models import TrackingEvent, User, PermissionCode
 from users.utils.tracking import track_event
 
 from ..db.DB_Handler import DB_Handler
@@ -14,6 +14,47 @@ from ..db.DB_Handler import DB_Handler
 
 db = DB_Handler("companies")
 logger = logging.getLogger(__name__)
+
+AVAILABLE_COLUMNS = ["SYMBOL", "name", "sector"]
+AVAILABLE_COLUMNS_SET = {column.upper() for column in AVAILABLE_COLUMNS}
+DEFAULT_PLACEHOLDER = 10
+SEARCH_PERMISSION = PermissionCode.COMPANY_SEARCH_ALL
+
+
+def redact_search_results(results: dict[str, dict]) -> tuple[dict[str, dict], list[str]]:
+    """
+    Return a copy of the provided results with sensitive columns redacted for non-free tickers.
+    """
+    if not isinstance(results, dict):
+        return {}, []
+
+    free_tickers = {ticker.upper() for ticker in FREE_TICKERS}
+    redacted_symbols: list[str] = []
+    filtered_results: dict[str, dict] = {}
+
+    for symbol, payload in results.items():
+        symbol_upper = symbol.upper()
+        if symbol_upper in free_tickers:
+            filtered_results[symbol] = payload
+            continue
+
+        redacted_symbols.append(symbol_upper)
+
+        if not isinstance(payload, dict):
+            filtered_results[symbol] = {}
+            continue
+
+        redacted_entry = {}
+        for key, value in payload.items():
+            normalized_key = key.upper() if isinstance(key, str) else key
+            if normalized_key in AVAILABLE_COLUMNS_SET:
+                redacted_entry[key] = value
+            else:
+                redacted_entry[key] = DEFAULT_PLACEHOLDER
+
+        filtered_results[symbol] = redacted_entry
+
+    return filtered_results, redacted_symbols
 
 
 class CompanyPageView(APIView):
@@ -79,8 +120,17 @@ class CompanySearchView(APIView):
         results_count = None
         if isinstance(results, (list, tuple)):
             results_count = len(results)
-        elif isinstance(results, dict) and "results" in results and isinstance(results["results"], (list, tuple)):
-            results_count = len(results["results"])
+        elif isinstance(results, dict):
+            results_count = len(results)
+
+        raw_results = results if isinstance(results, dict) else {}
+
+        has_full_access = isinstance(request.user, User) and request.user.has_permission(SEARCH_PERMISSION)
+        if has_full_access:
+            processed_results = raw_results
+            redacted_symbols: list[str] = []
+        else:
+            processed_results, redacted_symbols = redact_search_results(raw_results)
 
         if variant not in {"completion", "hint"}:
             track_event(
@@ -93,7 +143,7 @@ class CompanySearchView(APIView):
                     "results_count": results_count,
                 },
             )
-        return api_json_response(msg={"query": query, "results": results})
+        return api_json_response(msg={"query": query, "results": processed_results, "redacted": redacted_symbols})
 
 
 class CompanyWinnersView(APIView):
