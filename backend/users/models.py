@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from datetime import timedelta
@@ -34,31 +35,28 @@ class User(AbstractBaseUser, PermissionsMixin):
             ('is_paid', 'Owns a subscription'),
         ]
 
-    def _entitled_products(self):
-        """Collect active products user currently has access to via subscriptions or purchases."""
+    @cached_property
+    def _entitled_products(self) -> list:
+        """Return all active products this user currently has access to."""
         products = {}
 
-        try:
-            subscription = self.subscription
-        except Subscription.DoesNotExist:
-            subscription = None
-        if subscription and subscription.has_valid_access():
-            products[subscription.product_id] = subscription.product
+        subscription: Subscription | None = getattr(self, "subscription", None)
+        if subscription and subscription.has_valid_access() and subscription.product.is_active:
+            products[subscription.product.pk] = subscription.product
 
-        for purchase in self.purchases.select_related('product').all():
-            product = purchase.product
-            if product and product.is_active:
+        for purchase in self.purchases.select_related("product"):
+            product: Product = purchase.product
+            if product.is_active:
                 products[product.pk] = product
 
         return list(products.values())
-
+    
     def has_permission(self, permission_code: str) -> bool:
         if not permission_code:
             return False
 
         for product in self._entitled_products():
-            permissions = product.permissions or []
-            if permission_code in permissions:
+            if product.permissions.filter(name=permission_code).exists():
                 return True
         return False
 
@@ -73,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             elif isinstance(product_lookup, int):
                 if product.pk == product_lookup:
                     return True
-            else:
+            elif isinstance(product_lookup, str):
                 if str(product_lookup) == product.name:
                     return True
         return False
@@ -127,7 +125,7 @@ class Permission(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(blank=True)
-    #TODO: permissions = models.Field(default=list, blank=True)
+    permissions = models.ManyToManyField(Permission, related_name="products", blank=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

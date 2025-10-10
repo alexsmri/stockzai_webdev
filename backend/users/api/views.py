@@ -371,28 +371,19 @@ def view_consents(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def view_access(request):
-    user = request.user
-
-    subscriptions = Subscription
+    user: User = request.user
     products = user._entitled_products()
-    permissions = set()
-    product_payload = []
+
+    product_names = []
+    permission_names = set()
 
     for product in products:
-        product_permissions = list(product.permissions or [])
-        permissions.update(product_permissions)
-        product_payload.append(
-            {
-                "id": product.pk,
-                "name": product.name,
-                "description": product.description,
-                "permissions": product_permissions,
-            }
-        )
+        product_names.append(product.name)
+        permission_names.update(product.permissions.values_list("name", flat=True))
 
     msg = {
-        "products": product_payload,
-        "permissions": sorted(permissions),
+        "products": product_names,
+        "permissions": sorted(permission_names),
     }
 
     return api_json_response(msg=msg)
