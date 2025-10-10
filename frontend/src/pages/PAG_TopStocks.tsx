@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import COM_ListView from '../components/COM_ListView';
 import COM_DropdownSelect, { type TYP_DropdownConfig } from '../components/COM_DropdownSelect';
 import COM_MenuSelect, { type MenuSelectOptions } from '../components/COM_MenuSelect';
 import COM_Footer from '../components/COM_Footer';
+import COM_LeaderboardTable from '../components/COM_LeaderboardTable';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
-import type { ITF_ListViewColumnConfig } from '../types/interfaces';
 import type { TYP_ListViewRow } from '../types/types';
 
 const METRIC_OPTIONS: MenuSelectOptions = {
@@ -141,63 +140,6 @@ export default function PAG_TopStocks() {
     return config;
   }, [sectorValues]);
 
-  const leaderboardColumns = useMemo<ITF_ListViewColumnConfig[]>(() => {
-    const metricLabel = METRIC_OPTIONS[selectedMetric] ?? 'Score';
-    return [
-      {
-        id: 'rank',
-        title: '#',
-        key: 'rank',
-        defaultSorting: 'a',
-        isNumeric: true,
-        fallback: '-',
-        cellClassName: 'look-text-x1 look-priority-high',
-      },
-      {
-        id: 'symbol',
-        title: 'Symbol',
-        key: 'symbol',
-        defaultSorting: 'a',
-        fallback: '-',
-        cellClassName: 'look-text-x1 look-priority-high mod-text-wrap-gradient',
-      },
-      {
-        id: 'name',
-        title: 'Name',
-        key: 'name',
-        defaultSorting: 'a',
-        fallback: 'Unknown Company',
-        cellClassName: 'look-text-x1 look-priority-medium mod-text-wrap-gradient',
-      },
-      {
-        id: 'sector',
-        title: 'Sector',
-        key: 'sector',
-        defaultSorting: 'a',
-        fallback: 'Unknown Sector',
-        cellClassName: 'look-text-x1 look-priority-low mod-text-wrap-gradient',
-      },
-      {
-        id: 'sectorRanking',
-        title: 'Sector Rank',
-        key: 'sectorRanking',
-        defaultSorting: 'a',
-        isNumeric: true,
-        fallback: '-',
-        cellClassName: 'look-text-x1 look-priority-low',
-      },
-      {
-        id: 'score',
-        title: metricLabel,
-        key: 'score',
-        defaultSorting: 'd',
-        isNumeric: true,
-        fallback: '-',
-        cellClassName: 'look-text-x1 look-priority-high',
-      },
-    ];
-  }, [selectedMetric]);
-
   const leaderboardRows = useMemo<Array<[string, TYP_ListViewRow]>>(() => {
     if (!activeLeaderboard) {
       return [];
@@ -281,11 +223,11 @@ export default function PAG_TopStocks() {
         <COM_MenuSelect prOptions={METRIC_OPTIONS} prHandleChange={handleMetricChange} />
       </div>
       {selectedSector && (
-        <COM_ListView
+        <COM_LeaderboardTable
           prRows={leaderboardRows}
-          prColumnConfig={leaderboardColumns}
           prOnRowClick={(rowId) => handleRowClick(rowId)}
           prEmptyPlaceholder={listPlaceholder}
+          prMetricLabel={METRIC_OPTIONS[selectedMetric] ?? 'Score'}
         />
       )}
       <COM_Footer />

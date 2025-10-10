@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { ITF_ListViewColumnConfig } from '../types/interfaces';
-import type { TYP_ListViewRow, TYP_SortState } from '../types/types';
+import type { ITF_ListViewColumnConfig } from '../../types/interfaces';
+import type { TYP_ListViewRow, TYP_SortState } from '../../types/types';
 import {
   formatNumeric,
   formatText,
@@ -9,15 +9,22 @@ import {
   toComparableString,
   getDefaultOrderDirection,
   getOppositeOrderDirection,
-} from '../utils/formats';
+} from '../../utils/formats';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
 import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
+import COM_PaywallSearchResult from '../COM_PaywallSearchResult';
 
-export interface PI_ListView {
+export interface ITF_PaywallConfig {
+  columns?: string[];
+  rows?: string[];
+}
+
+export interface PI_DCOM_ListView {
   prRows: Array<[string, TYP_ListViewRow]>;
   prColumnConfig: ITF_ListViewColumnConfig[];
   prOnRowClick?: (rowId: string, row: TYP_ListViewRow) => void;
   prEmptyPlaceholder?: ReactNode;
+  prPaywallConfig?: ITF_PaywallConfig | null;
 }
 
 const DEFAULT_CELL_CLASS = 'look-text-x1 look-priority-low';
@@ -54,12 +61,13 @@ function resolveDisplay(
   return column.isNumeric ? formatNumeric(rawValue, fallback) : formatText(rawValue, fallback);
 }
 
-export default function COM_ListView({
+export default function DCOM_ListView({
   prRows,
   prColumnConfig,
   prOnRowClick,
   prEmptyPlaceholder = null,
-}: PI_ListView) {
+  prPaywallConfig = null,
+}: PI_DCOM_ListView) {
   const [stSort, setStSort] = useState<TYP_SortState>({ columnId: null, direction: null });
 
   const memColumnsById = useMemo(() => {
@@ -73,6 +81,35 @@ export default function COM_ListView({
   const memPreparedRows = useMemo(() => {
     return prRows.map(([rowId, rowData]) => ({ rowId, rowData }));
   }, [prRows]);
+
+  const memPaywallColumns = useMemo(() => {
+    if (!prPaywallConfig?.columns?.length) {
+      return null;
+    }
+    const normalized = prPaywallConfig.columns.reduce<Set<string>>((set, columnId) => {
+      if (typeof columnId === 'string' && columnId.trim().length > 0) {
+        set.add(columnId.trim());
+      }
+      return set;
+    }, new Set<string>());
+    return normalized.size ? normalized : null;
+  }, [prPaywallConfig?.columns]);
+
+  const memPaywalledRows = useMemo(() => {
+    if (!prPaywallConfig?.rows?.length) {
+      return null;
+    }
+    const normalized = prPaywallConfig.rows.reduce<Set<string>>((set, symbol) => {
+      if (typeof symbol === 'string') {
+        const trimmed = symbol.trim();
+        if (trimmed) {
+          set.add(trimmed.toUpperCase());
+        }
+      }
+      return set;
+    }, new Set<string>());
+    return normalized.size ? normalized : null;
+  }, [prPaywallConfig?.rows]);
 
   const memSortedRows = useMemo(() => {
     if (!stSort.columnId || !stSort.direction) {
@@ -180,29 +217,38 @@ export default function COM_ListView({
           {memSortedRows.map(({ rowId, rowData }) => {
             const key = rowId;
             const handleClick = prOnRowClick ? () => prOnRowClick(rowId, rowData) : undefined;
+            const symbolValue =
+              typeof rowData.symbol === 'string' && rowData.symbol.trim().length > 0
+                ? rowData.symbol
+                : rowId;
+            const normalizedSymbol = symbolValue.trim().toUpperCase();
+            const isPaywalled = memPaywalledRows ? memPaywalledRows.has(normalizedSymbol) : false;
 
             return (
-              <div key={key} className="area-grid-results look-div-subtle" onClick={handleClick}>
-                {prColumnConfig.map((column) => {
-                  const rawValue = resolveRawValue(column, rowId, rowData);
-                  const display = resolveDisplay(column, rowId, rowData, rawValue);
-                  const titleValue =
-                    typeof display === 'string'
-                      ? display
-                      : typeof display === 'number'
-                      ? String(display)
-                      : undefined;
+              <div key={key} style={{ position: 'relative' }}>
+                <div className="area-grid-results look-div-subtle" onClick={handleClick}>
+                  {prColumnConfig.map((column) => {
+                    const rawValue = resolveRawValue(column, rowId, rowData);
+                    const display = resolveDisplay(column, rowId, rowData, rawValue);
+                    const titleValue =
+                      typeof display === 'string'
+                        ? display
+                        : typeof display === 'number'
+                        ? String(display)
+                        : undefined;
+                    const needsBlur = isPaywalled && memPaywallColumns?.has(column.id);
+                    const className = `${column.cellClassName ?? DEFAULT_CELL_CLASS}${
+                      needsBlur ? ' mod-blur' : ''
+                    }`;
 
-                  return (
-                    <span
-                      key={column.id}
-                      className={column.cellClassName ?? DEFAULT_CELL_CLASS}
-                      title={titleValue}
-                    >
-                      {display}
-                    </span>
-                  );
-                })}
+                    return (
+                      <span key={column.id} className={className} title={titleValue}>
+                        {display}
+                      </span>
+                    );
+                  })}
+                </div>
+                <COM_PaywallSearchResult prIsRedacted={isPaywalled} />
               </div>
             );
           })}

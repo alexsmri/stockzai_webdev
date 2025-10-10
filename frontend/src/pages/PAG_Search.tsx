@@ -1,66 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import COM_ListView from '../components/COM_ListView';
 import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchCompletion from '../components/COM_SearchCompletion';
 import COM_Footer from '../components/COM_Footer';
+import COM_SearchTable from '../components/COM_SearchTable';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
-import type { VAI_SearchData, ITF_ListViewColumnConfig } from '../types/interfaces';
-
-const SEARCH_RESULTS_COLUMNS: ITF_ListViewColumnConfig[] = [
-  {
-    id: 'symbol',
-    title: 'Symbol',
-    valueGetter: (_, rowId) => rowId,
-    defaultSorting: 'a',
-    cellClassName: 'look-text-x1 look-priority-high mod-text-wrap-gradient',
-  },
-  {
-    id: 'name',
-    title: 'Name',
-    key: 'name',
-    defaultSorting: 'a',
-    fallback: 'Unknown Company',
-    cellClassName: 'look-text-x1 look-priority-medium mod-text-wrap-gradient',
-  },
-  {
-    id: 'sector',
-    title: 'Sector',
-    key: 'sector',
-    defaultSorting: 'a',
-    fallback: 'Unknown Sector',
-    cellClassName: 'look-text-x1 look-priority-low mod-text-wrap-gradient',
-  },
-  {
-    id: 'sectorRanking',
-    title: 'Sector Rank',
-    key: 'sectorRanking',
-    defaultSorting: 'a',
-    isNumeric: true,
-    fallback: '-',
-    cellClassName: 'look-text-x1 look-priority-low',
-  },
-  {
-    id: 'financial_score',
-    title: 'Financial Score',
-    key: 'financial_score',
-    defaultSorting: 'd',
-    isNumeric: true,
-    fallback: '-',
-    cellClassName: 'look-text-x1 look-priority-low',
-  },
-  {
-    id: 'valuation_score',
-    title: 'Valuation Score',
-    key: 'valuation_score',
-    defaultSorting: 'd',
-    isNumeric: true,
-    fallback: '-',
-    cellClassName: 'look-text-x1 look-priority-low',
-  },
-];
+import type { VAI_SearchData } from '../types/interfaces';
 
 export default function PAG_Search() {
   const navigate = useNavigate();
@@ -160,10 +107,10 @@ export default function PAG_Search() {
         )}
       </div>
       {showResults && (
-        <COM_ListView
+        <COM_SearchTable
           prRows={resultRows}
-          prColumnConfig={SEARCH_RESULTS_COLUMNS}
           prOnRowClick={(rowId) => handleRowClick(rowId)}
+          prRedactedSymbols={searchData?.redacted ?? null}
         />
       )}
       <COM_Footer />
