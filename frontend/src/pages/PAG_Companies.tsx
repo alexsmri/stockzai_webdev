@@ -1,17 +1,26 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import COM_KPIInfoCard from '../components/COM_KPIInfoCard';
 import DCOM_KPIInfoCard from '../components/dumb/DCOM_KPIInfoCard';
 import COM_SectionInfo from '../components/COM_SectionInfo';
 import COM_ScoreRadial from '../components/COM_ScoreRadial';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
-import { useCompaniesStoreSync } from '../hooks/hooks';
+import { useCompaniesStoreSync, useUserStoreSync } from '../hooks/hooks';
 import COM_LightboxKPI from '../components/COM_LightboxKPI';
 import COM_TableInfo from '../components/COM_TableInfo';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import NotFound from './PAG_404';
+import COM_Loading from '../components/COM_Loading';
+import COM_PremiumRoute from '../components/COM_PremiumRoute';
+import { useUserStore } from '../context/CTX_UserStore';
 
-type CompanyProfileRecord = {
+type TYP_AccessPayload = {
+  permissions?: string[] | null;
+  products?: string[] | null;
+  [key: string]: unknown;
+};
+
+type TYP_CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
   company_intel?: Record<string, Record<string, number>>;
   [key: string]: unknown;
@@ -19,9 +28,9 @@ type CompanyProfileRecord = {
 
 function PAG_CompaniesContent({ symbol }: { symbol: string }) {
   const store = useCompaniesStore();
-  const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);
+  const [companyData, setCompanyData] = useState<TYP_CompanyProfileRecord | null>(null);
 
-  useCompaniesStoreSync<CompanyProfileRecord>(store, 'PropertyCompanyProfile', setCompanyData, {
+  useCompaniesStoreSync<TYP_CompanyProfileRecord>(store, 'PropertyCompanyProfile', setCompanyData, {
     autoFetch: true,
     prUrlPaths: [symbol],
   });
@@ -93,12 +102,51 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
 
 function PAG_Companies() {
   const { symbol } = useParams<{ symbol: string }>();
+  const companiesStore = useCompaniesStore();
+  const userStore = useUserStore();
+  const [accessPayload, setAccessPayload] = useState<TYP_AccessPayload | null>(
+    userStore.read('PropertyAccess') as TYP_AccessPayload
+  );
+  const [freeTickers, setFreeTickers] = useState<string[] | null>(
+    companiesStore.read('PropertyFreeTickers') as string[]
+  );
+
+  useUserStoreSync(userStore, 'PropertyAccess', setAccessPayload, { autoFetch: true });
+  useCompaniesStoreSync(companiesStore, 'PropertyFreeTickers', setFreeTickers, { autoFetch: true });
 
   if (!symbol) {
     return <NotFound />;
   }
 
-  return <PAG_CompaniesContent symbol={symbol} />;
+  const permissionCode = 'company_page:all';
+  const permissions = Array.isArray(accessPayload?.permissions)
+    ? (accessPayload?.permissions as string[])
+    : [];
+  const hasCompanyPermission = permissions.includes(permissionCode);
+  const symbolUpper = symbol.toUpperCase();
+  const freeTickerSet =
+    Array.isArray(freeTickers) && freeTickers.length > 0
+      ? new Set(
+          freeTickers
+            .filter((ticker): ticker is string => typeof ticker === 'string' && ticker.length > 0)
+            .map((ticker) => ticker.toUpperCase())
+        )
+      : null;
+  const isFreeTicker = freeTickerSet?.has(symbolUpper) ?? false;
+
+  if (!accessPayload || !freeTickers) {
+    return <COM_Loading />;
+  }
+
+  if (!hasCompanyPermission && isFreeTicker) {
+    return <Navigate replace to={`/companies/page/free/${symbol}`} />;
+  }
+
+  return (
+    <COM_PremiumRoute prAccessConfig={{ permissions: [permissionCode] }}>
+      <PAG_CompaniesContent symbol={symbol} />
+    </COM_PremiumRoute>
+  );
 }
 
 export default PAG_Companies;
