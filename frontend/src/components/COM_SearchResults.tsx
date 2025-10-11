@@ -1,303 +1,103 @@
-﻿import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ICON_FirstPlace from '../assets/media/ICON_FirstPlace.svg?react';
-import ICON_Triangle from '../assets/media/ICON_FirstPlace.svg?react';
+import { useMemo, type ReactNode } from 'react';
+import DCOM_ListView from './dumb/DCOM_ListView';
+import type { ITF_ListViewColumnConfig } from '../types/interfaces';
+import type { TYP_ListViewRow } from '../types/types';
+import ICON_Star from '../assets/media/ICON_Star.svg?react';
+import ICON_Diamond from '../assets/media/ICON_Diamond.svg?react';
+import ICON_Cash from '../assets/media/ICON_Cash.svg?react';
+import ICON_Work from '../assets/media/ICON_Work.svg?react';
+import ICON_Company from '../assets/media/ICON_Company.svg?react';
+import ICON_Stocks from '../assets/media/ICON_Stocks.svg?react';
 
-import { useCompaniesStore } from '../context/CTX_CompanyStore';
-import { useCompaniesStoreSync } from '../hooks/hooks';
-import type { VAI_SearchData } from '../types/interfaces';
-import COM_PaywallSearchResult from './COM_PaywallSearchResult';
-
-type TYP_SearchResultEntry = Record<string, unknown>;
-type TYP_SortDirection = 'asc' | 'desc';
-type TYP_ColumnKey =
-  | 'symbol'
-  | 'name'
-  | 'sector'
-  | 'sectorRanking'
-  | 'financial_score'
-  | 'valuation_score';
-
-type TYP_SortCycle = {
-  columnId: TYP_ColumnKey | null;
-  direction: TYP_SortDirection | null;
-};
-
-interface ITF_ColumnConfig {
-  id: TYP_ColumnKey;
-  title: string;
-  key: TYP_ColumnKey;
-  icon: typeof ICON_FirstPlace;
-  defaultSorting: 'a' | 'd';
+interface PI_SearchTable {
+  prRows: Array<[string, TYP_ListViewRow]>;
+  prRedactedSymbols?: string[] | null;
+  prOnRowClick?: (rowId: string, row: TYP_ListViewRow) => void;
+  prEmptyPlaceholder?: ReactNode;
 }
 
-const NUMERIC_COLUMNS = new Set<TYP_ColumnKey>([
-  'sectorRanking',
-  'financial_score',
-  'valuation_score',
-]);
-
-const COLUMN_CONFIG: ITF_ColumnConfig[] = [
-  { id: 'symbol', title: 'Symbol', key: 'symbol', icon: ICON_FirstPlace, defaultSorting: 'a' },
-  { id: 'name', title: 'Name', key: 'name', icon: ICON_FirstPlace, defaultSorting: 'a' },
-  { id: 'sector', title: 'Sector', key: 'sector', icon: ICON_FirstPlace, defaultSorting: 'a' },
+const SEARCH_TABLE_COLUMNS: ITF_ListViewColumnConfig[] = [
+  {
+    id: 'symbol',
+    title: 'Symbol',
+    valueGetter: (_, rowId) => rowId,
+    defaultSorting: 'a',
+    cellClassName: 'look-text-x1 look-priority-high mod-text-wrap-gradient',
+    icon: ICON_Stocks,
+  },
+  {
+    id: 'name',
+    title: 'Name',
+    key: 'name',
+    defaultSorting: 'a',
+    fallback: 'Unknown Company',
+    cellClassName: 'look-text-x1 look-priority-medium mod-text-wrap-gradient',
+    icon: ICON_Company,
+  },
+  {
+    id: 'sector',
+    title: 'Sector',
+    key: 'sector',
+    defaultSorting: 'a',
+    fallback: 'Unknown Sector',
+    cellClassName: 'look-text-x1 look-priority-low mod-text-wrap-gradient',
+    icon: ICON_Work,
+  },
   {
     id: 'sectorRanking',
     title: 'Sector Rank',
     key: 'sectorRanking',
-    icon: ICON_FirstPlace,
     defaultSorting: 'a',
+    isNumeric: true,
+    fallback: '-',
+    cellClassName: 'look-text-x1 look-priority-low',
+    icon: ICON_Star,
   },
   {
     id: 'financial_score',
     title: 'Financial Score',
     key: 'financial_score',
-    icon: ICON_FirstPlace,
     defaultSorting: 'd',
+    isNumeric: true,
+    fallback: '-',
+    cellClassName: 'look-text-x1 look-priority-low',
+    icon: ICON_Cash,
   },
   {
     id: 'valuation_score',
     title: 'Valuation Score',
     key: 'valuation_score',
-    icon: ICON_FirstPlace,
     defaultSorting: 'd',
+    isNumeric: true,
+    fallback: '-',
+    cellClassName: 'look-text-x1 look-priority-low',
+    icon: ICON_Diamond,
   },
 ];
 
-function getColumnValue(column: ITF_ColumnConfig, symbol: string, company: TYP_SearchResultEntry) {
-  if (column.key === 'symbol') {
-    return symbol;
-  }
-  return company?.[column.key];
-}
+const PAYWALL_COLUMNS = ['sectorRanking', 'financial_score', 'valuation_score'];
 
-function getDisplayScore(value: unknown) {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    const rounded = Number(value.toFixed(2));
-    return Number.isInteger(rounded) ? rounded : value.toFixed(1);
-  }
-  if (typeof value === 'string' && value.trim().length > 0) {
-    return value;
-  }
-  return '-';
-}
-
-function getDisplayText(value: unknown, fallback: string) {
-  if (typeof value === 'string' && value.trim().length > 0) {
-    return value;
-  }
-  return fallback;
-}
-
-function getDisplayRank(value: unknown) {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-  if (typeof value === 'string' && value.trim().length > 0) {
-    return value;
-  }
-  return '-';
-}
-
-function getDefaultDirection(column: ITF_ColumnConfig): TYP_SortDirection {
-  return column.defaultSorting === 'd' ? 'desc' : 'asc';
-}
-
-function getOppositeDirection(direction: TYP_SortDirection): TYP_SortDirection {
-  return direction === 'asc' ? 'desc' : 'asc';
-}
-
-interface PI_SearchResults {
-  prQuery: string;
-}
-
-function COM_SearchResults({ prQuery }: PI_SearchResults) {
-  const utStore = useCompaniesStore();
-  const [data, setData] = useState<VAI_SearchData | null>(null);
-  const [sortState, setSortState] = useState<TYP_SortCycle>({ columnId: null, direction: null });
-
-  useEffect(() => {
-    if (!prQuery.trim()) {
-      setData(null);
-    }
-  }, [prQuery]);
-
-  useCompaniesStoreSync<VAI_SearchData>(utStore, 'PropertySearchResults', setData, {
-    autoFetch: prQuery.trim().length > 0,
-    prUrlPaths: prQuery ? [prQuery] : [],
-    prUrlParams: { unique: false, variant: 'search' },
-  });
-
-  const safeData = data;
-  const navigate = useNavigate();
-  const redactedSymbols = useMemo(() => {
-    if (!safeData?.redacted || !Array.isArray(safeData.redacted)) {
-      return new Set<string>();
-    }
-    return new Set(safeData.redacted.map((item) => String(item).toUpperCase()));
-  }, [safeData?.redacted]);
-
-  const sortedResults = useMemo(() => {
-    if (!safeData?.results || typeof safeData.results !== 'object' || safeData.query !== prQuery) {
-      return [] as Array<[string, TYP_SearchResultEntry]>;
-    }
-
-    const entries = Object.entries(safeData.results) as Array<[string, TYP_SearchResultEntry]>;
-
-    if (!sortState.columnId || !sortState.direction) {
-      return entries;
-    }
-
-    const column = COLUMN_CONFIG.find((item) => item.id === sortState.columnId);
-
-    if (!column) {
-      return entries;
-    }
-
-    const direction = sortState.direction;
-    const isNumeric = NUMERIC_COLUMNS.has(column.key);
-
-    return [...entries].sort((a, b) => {
-      const [symbolA, companyA] = a;
-      const [symbolB, companyB] = b;
-
-      const rawA = getColumnValue(column, symbolA, companyA);
-      const rawB = getColumnValue(column, symbolB, companyB);
-
-      if (isNumeric) {
-        const numberA = Number(rawA);
-        const numberB = Number(rawB);
-
-        if (!Number.isFinite(numberA) && !Number.isFinite(numberB)) {
-          return 0;
-        }
-        if (!Number.isFinite(numberA)) {
-          return 1;
-        }
-        if (!Number.isFinite(numberB)) {
-          return -1;
-        }
-
-        return direction === 'desc' ? numberB - numberA : numberA - numberB;
-      }
-
-      const textA = String(rawA).toLowerCase();
-      const textB = String(rawB).toLowerCase();
-
-      return direction === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
-    });
-  }, [safeData?.results, safeData?.query, sortState, prQuery]);
-
-  const handleSort = (column: ITF_ColumnConfig) => {
-    const defaultDirection = getDefaultDirection(column);
-    const oppositeDirection = getOppositeDirection(defaultDirection);
-
-    if (sortState.columnId !== column.id) {
-      setSortState({ columnId: column.id, direction: defaultDirection });
-      return;
-    }
-
-    if (sortState.direction === defaultDirection) {
-      setSortState({ columnId: column.id, direction: oppositeDirection });
-      return;
-    }
-
-    if (sortState.direction === oppositeDirection) {
-      setSortState({ columnId: null, direction: null });
-      return;
-    }
-
-    setSortState({ columnId: column.id, direction: defaultDirection });
-  };
-
-  if (!sortedResults.length) {
-    return null;
-  }
+export default function COM_SearchResults({
+  prRows,
+  prRedactedSymbols = null,
+  prOnRowClick,
+  prEmptyPlaceholder = null,
+}: PI_SearchTable) {
+  const paywallConfig = useMemo(
+    () => ({
+      columns: PAYWALL_COLUMNS,
+      rows: prRedactedSymbols ?? undefined,
+    }),
+    [prRedactedSymbols]
+  );
 
   return (
-    <div
-      className="area-flex-col mod-align-stretch"
-      style={{ minWidth: 'calc(var(--default-font-size) * 48)' }}
-    >
-      <div className="area-grid-results mod-padding-side">
-        {COLUMN_CONFIG.map((column) => {
-          const Icon = column.icon;
-          const isActive = sortState.columnId === column.id && sortState.direction !== null;
-          const sortDirection = isActive ? sortState.direction : null;
-
-          return (
-            <button
-              type="button"
-              key={column.id}
-              className={`look-button-ghost mod-button-auth look-text-x0${
-                isActive ? ' mod-selected' : ''
-              }`}
-              onClick={() => handleSort(column)}
-            >
-              <Icon style={{ width: 'calc(var(--default-font-size) * 1)' }} />
-              <span>{column.title}</span>
-              <ICON_Triangle
-                style={{
-                  width: 'calc(var(--default-font-size) * 1)',
-                  height: 'auto',
-                  transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none',
-                  visibility: isActive ? 'visible' : 'hidden',
-                }}
-              />
-            </button>
-          );
-        })}
-      </div>
-      <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
-        {sortedResults.map(([symbol, company]) => {
-          const symbolUpper = symbol.toUpperCase();
-          const isRedacted = redactedSymbols.has(symbolUpper);
-          const companyName = getDisplayText(company?.name, 'Unknown Company');
-          const sector = getDisplayText(company?.sector, 'Unknown Sector');
-          const sectorRank = getDisplayRank(company?.sectorRanking);
-          const financialScore = getDisplayScore(company?.financial_score);
-          const valuationScore = getDisplayScore(company?.valuation_score);
-
-          return (
-            <div key={symbol} style={{ position: 'relative' }}>
-              <div
-                className="area-grid-results look-div-subtle state-hover-scale"
-                onClick={() => {
-                  navigate(`/companies/page/${symbol}`);
-                }}
-              >
-                <span className="look-text-x1 look-priority-high mod-text-wrap-gradient">
-                  {symbol}
-                </span>
-                <span
-                  className="look-text-x1 look-priority-medium mod-text-wrap-gradient"
-                  title={companyName}
-                >
-                  {companyName}
-                </span>
-                <span
-                  className="look-text-x1 look-priority-low mod-text-wrap-gradient"
-                  title={sector}
-                >
-                  {sector}
-                </span>
-                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
-                  {sectorRank}
-                </span>
-                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
-                  {financialScore}
-                </span>
-                <span className={`look-text-x1 look-priority-low${isRedacted ? ' mod-blur' : ''}`}>
-                  {valuationScore}
-                </span>
-              </div>
-              <COM_PaywallSearchResult prIsRedacted={isRedacted} />
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <DCOM_ListView
+      prRows={prRows}
+      prColumnConfig={SEARCH_TABLE_COLUMNS}
+      prOnRowClick={prOnRowClick}
+      prEmptyPlaceholder={prEmptyPlaceholder}
+      prPaywallConfig={paywallConfig}
+    />
   );
 }
-
-export default COM_SearchResults;

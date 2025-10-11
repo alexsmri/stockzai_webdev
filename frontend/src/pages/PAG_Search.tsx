@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchCompletion from '../components/COM_SearchCompletion';
 import COM_Footer from '../components/COM_Footer';
-import COM_SearchTable from '../components/COM_SearchTable';
+import COM_SearchResults from '../components/COM_SearchResults';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
@@ -107,7 +107,7 @@ export default function PAG_Search() {
         )}
       </div>
       {showResults && (
-        <COM_SearchTable
+        <COM_SearchResults
           prRows={resultRows}
           prOnRowClick={(rowId) => handleRowClick(rowId)}
           prRedactedSymbols={searchData?.redacted ?? null}

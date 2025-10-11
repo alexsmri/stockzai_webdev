@@ -2,6 +2,11 @@ import { useMemo, type ReactNode } from 'react';
 import DCOM_ListView from './dumb/DCOM_ListView';
 import type { ITF_ListViewColumnConfig } from '../types/interfaces';
 import type { TYP_ListViewRow } from '../types/types';
+import ICON_Star from '../assets/media/ICON_Star.svg?react';
+import ICON_Ranking from '../assets/media/ICON_Ranking.svg?react';
+import ICON_Work from '../assets/media/ICON_Work.svg?react';
+import ICON_Company from '../assets/media/ICON_Company.svg?react';
+import ICON_Stocks from '../assets/media/ICON_Stocks.svg?react';
 
 interface PI_LeaderboardTable {
   prRows: Array<[string, TYP_ListViewRow]>;
@@ -20,6 +25,7 @@ const BASE_COLUMNS: ITF_ListViewColumnConfig[] = [
     isNumeric: true,
     fallback: '-',
     cellClassName: 'look-text-x1 look-priority-high',
+    icon: ICON_Star,
   },
   {
     id: 'symbol',
@@ -28,6 +34,7 @@ const BASE_COLUMNS: ITF_ListViewColumnConfig[] = [
     defaultSorting: 'a',
     fallback: '-',
     cellClassName: 'look-text-x1 look-priority-high mod-text-wrap-gradient',
+    icon: ICON_Stocks,
   },
   {
     id: 'name',
@@ -36,6 +43,7 @@ const BASE_COLUMNS: ITF_ListViewColumnConfig[] = [
     defaultSorting: 'a',
     fallback: 'Unknown Company',
     cellClassName: 'look-text-x1 look-priority-medium mod-text-wrap-gradient',
+    icon: ICON_Company,
   },
   {
     id: 'sector',
@@ -44,19 +52,17 @@ const BASE_COLUMNS: ITF_ListViewColumnConfig[] = [
     defaultSorting: 'a',
     fallback: 'Unknown Sector',
     cellClassName: 'look-text-x1 look-priority-low mod-text-wrap-gradient',
-  },
-  {
-    id: 'sectorRanking',
-    title: 'Sector Rank',
-    key: 'sectorRanking',
-    defaultSorting: 'a',
-    isNumeric: true,
-    fallback: '-',
-    cellClassName: 'look-text-x1 look-priority-low',
+    icon: ICON_Work,
   },
 ];
 
-const PAYWALL_COLUMNS = ['sectorRanking', 'score', 'financial_score', 'valuation_score', 'total_score'];
+const PAYWALL_COLUMNS = [
+  'sectorRanking',
+  'score',
+  'financial_score',
+  'valuation_score',
+  'total_score',
+];
 
 export default function COM_LeaderboardTable({
   prRows,
@@ -76,6 +82,7 @@ export default function COM_LeaderboardTable({
         isNumeric: true,
         fallback: '-',
         cellClassName: 'look-text-x1 look-priority-high',
+        icon: ICON_Ranking,
       },
     ];
   }, [prMetricLabel]);
