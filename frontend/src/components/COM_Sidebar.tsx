@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import LOGO_schwarzquer from '@/assets/media/LOGO_quadrat.svg?react';
 import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
@@ -73,6 +73,7 @@ function readUsername(data: any | null): string {
 export default function COM_Sidebar() {
   const { width } = useWindowDimensions();
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = width <= MOBILE_BREAKPOINT;
   const [stExpanded, setStExpanded] = useState<boolean>(!isMobile);
   const sidebarWidth = isMobile
@@ -114,6 +115,11 @@ export default function COM_Sidebar() {
   );
   useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   const username = readUsername(stCredentials);
+  const displayName = username || 'Profile';
+
+  const handleProfileNavigate = () => {
+    navigate('/users/edit');
+  };
 
   const placeholder = (
     <div
@@ -202,15 +208,23 @@ export default function COM_Sidebar() {
             </NavLink>
           ))}
         </nav>
-        <div
+        <button
+          type="button"
           className="area-flex-row mod-gap-s mod-align-left"
+          onClick={handleProfileNavigate}
+          aria-label="Edit profile"
           style={{
             width: '100%',
             marginTop: 'auto',
             justifyContent: showLabels ? 'flex-start' : 'center',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            color: 'inherit',
+            cursor: 'pointer',
           }}
         >
-          <div
+          <span
             aria-hidden
             style={{
               width: 'calc(var(--default-font-size) * 2.5)',
@@ -218,15 +232,16 @@ export default function COM_Sidebar() {
               borderRadius: '50%',
               backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
               flexShrink: 0,
+              display: 'inline-block',
             }}
           />
           {showLabels && (
             <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
-              <span className="look-text-x1 look-text-normal">{username}</span>
+              <span className="look-text-x1 look-text-normal look-text-clickable">{displayName}</span>
               <span className="look-text-x0 look-text-subtle">Free Plan</span>
             </div>
           )}
-        </div>
+        </button>
       </aside>
     </>
   );
