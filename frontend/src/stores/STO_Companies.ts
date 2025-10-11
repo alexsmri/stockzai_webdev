@@ -9,7 +9,8 @@ const ROUTE_CONFIG = {
   PropertySearchComparison: "/api/companies/search",
   PropertyCompanyWinners: "/api/companies/winners",
   PropertyCompanyLeaderboard: "/api/companies/leaderboard",
-  PropertyDistinctKPIValues: "/api/companies/distinct",
+  PropertyFreeTickers: "/api/companies/info/free-tickers",
+  PropertyDistinctKPIValues: "/api/companies/info/distinct-values",
 } as const;
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;

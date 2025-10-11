@@ -91,6 +91,14 @@ class CompanyFreePageView(APIView):
         return api_json_response(msg=intel)
 
 
+class CompanyFreeTickersView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = None
+
+    def get(self, request):
+        return api_json_response(msg=list(FREE_TICKERS))
+
+
 class KPIView(APIView):
     permission_classes = [AllowAny]
     serializer_class = None  # This should be set to the appropriate serializer class
