@@ -7,6 +7,7 @@ from companies.constants import FREE_TICKERS
 from companies.models import DBSnapshots
 from stockzAI.response import api_json_response
 from users.models import TrackingEvent, User, PermissionCode
+from users.middleware import require_permission
 from users.utils.tracking import track_event
 
 from ..db.DB_Handler import DB_Handler
@@ -61,6 +62,7 @@ class CompanyPageView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = None  # This should be set to the appropriate serializer class
 
+    @require_permission(PermissionCode.COMPANY_PAGE_ALL)
     def get(self, request, symbol):
         intel = db.dbq_get_company_data(symbol)
         latest_entries = intel["latest_entries"]

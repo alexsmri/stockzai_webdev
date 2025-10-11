@@ -40,12 +40,19 @@ def require_permission(required: Union[str, PermissionCode, Iterable[Union[str, 
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped(view_or_request, *args, **kwargs):
-            request = getattr(view_or_request, "request", view_or_request)
+            request = getattr(view_or_request, "request", None)
+            bound_self = None
+            if request is None:
+                request = view_or_request
+            else:
+                bound_self = view_or_request
             user, error_response = _ensure_user(request)
             if error_response:
                 return error_response
 
             if not required_permissions or any(user.has_permission(p) for p in required_permissions):
+                if bound_self is not None:
+                    return view_func(bound_self, *args, **kwargs)
                 return view_func(request, *args, **kwargs)
 
             return api_json_response(error="Permission denied.", status=403)
@@ -66,12 +73,19 @@ def require_product(required: Union[str, Iterable[str]]):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped(view_or_request, *args, **kwargs):
-            request = getattr(view_or_request, "request", view_or_request)
+            request = getattr(view_or_request, "request", None)
+            bound_self = None
+            if request is None:
+                request = view_or_request
+            else:
+                bound_self = view_or_request
             user, error_response = _ensure_user(request)
             if error_response:
                 return error_response
 
             if not required_products or any(user.has_product(p) for p in required_products):
+                if bound_self is not None:
+                    return view_func(bound_self, *args, **kwargs)
                 return view_func(request, *args, **kwargs)
 
             return api_json_response(error="Product access required.", status=403)
