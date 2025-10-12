@@ -15,6 +15,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   const [stPassword, setPassword] = useState('');
   const [stPasswordConfirm, setPasswordConfirm] = useState('');
   const [stConsentsNewsletter, setStConsentsNewsletter] = useState(false);
+  const [stConsentsTos, setStConsentsTos] = useState(false);
   const [stLoading, setStLoading] = useState(false);
 
   const utStore = useUserStore();
@@ -33,13 +34,18 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
       return;
     }
 
+    if (!stConsentsTos) {
+      handleAlertOpen('Please accept our privacy policy & terms to continue.', 'f');
+      return;
+    }
+
     setStLoading(true);
     try {
       const utRes = await utStore.post('ActionRegistration', {
         email: prEmail,
         username: prUsername,
         password: stPassword,
-        consents: { consents_newsletter: stConsentsNewsletter },
+        consents: { consents_newsletter: stConsentsNewsletter, consents_tos: stConsentsTos },
       });
 
       if (!utRes) {
@@ -100,13 +106,24 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
           >
             <input
               type="checkbox"
+              checked={stConsentsTos}
+              onChange={(e) => setStConsentsTos(e.target.checked)}
+            />
+            I accept the privacy policy and terms of service.
+          </label>
+          <label
+            className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
+            style={{ maxWidth: '15rem' }}
+          >
+            <input
+              type="checkbox"
               checked={stConsentsNewsletter}
               onChange={(e) => setStConsentsNewsletter(e.target.checked)}
             />
             Get stockz.ai newsletter for product updates & special offers (can be canceled at any
             time)
           </label>
-          <button className="look-button-auth" disabled={stLoading}>
+          <button className="look-button-auth" disabled={stLoading || !stConsentsTos}>
             {stLoading ? 'Creating Account...' : CONTINUE_LABEL}
           </button>
         </form>

@@ -7,7 +7,7 @@ import COM_Loading from './COM_Loading';
 interface EditProfileResponse {
   email: string;
   username: string;
-  consents?: { consents_newsletter?: boolean } | null;
+  consents?: { consents_newsletter?: boolean; consents_tos?: boolean } | null;
 }
 
 function COM_FormEditProfile() {

@@ -38,8 +38,7 @@ class RegisterUserView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         consents_data = self.request.data.get("consents") or {}
-        if consents_data:
-            UserConsents.objects.create(user=user, **consents_data)
+        UserConsents.objects.create(user=user, **consents_data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -266,7 +265,14 @@ def view_subscribe_newsletter_verify(request):
 @permission_classes([IsAuthenticated])
 def view_credentials(request):
     consents = UserConsents.objects.filter(user=request.user).first()
-    msg_consents = {"consents_newsletter": consents.consents_newsletter} if consents else {}
+    msg_consents = (
+        {
+            "consents_newsletter": consents.consents_newsletter,
+            "consents_tos": consents.consents_tos,
+        }
+        if consents
+        else {}
+    )
     user = request.user
     msg = {
         "email": user.email,
@@ -364,7 +370,14 @@ def view_unsubscribe_newsletter(request):
 @permission_classes([IsAuthenticated])
 def view_consents(request):
     consents = UserConsents.objects.filter(user=request.user).first()
-    msg = {"consents_newsletter": consents.consents_newsletter} if consents else {}
+    msg = (
+        {
+            "consents_newsletter": consents.consents_newsletter,
+            "consents_tos": consents.consents_tos,
+        }
+        if consents
+        else {}
+    )
     return api_json_response(msg=msg)
 
 
