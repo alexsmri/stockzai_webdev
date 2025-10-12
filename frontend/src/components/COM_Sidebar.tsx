@@ -237,7 +237,12 @@ export default function COM_Sidebar() {
           />
           {showLabels && (
             <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
-              <span className="look-text-x1 look-text-normal look-text-clickable">{displayName}</span>
+              <span
+                className="look-text-x1 look-text-normal look-text-clickable mod-padding-none"
+                style={{ justifyContent: 'initial' }}
+              >
+                {displayName}
+              </span>
               <span className="look-text-x0 look-text-subtle">Free Plan</span>
             </div>
           )}

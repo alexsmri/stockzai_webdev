@@ -1,4 +1,4 @@
-import ICON_Alert from "../assets/media/ICON_Alert.svg?react";
+import ICON_Crown from '../assets/media/ICON_Crown.svg?react';
 
 interface PI_PaywallSearchResult {
   prIsRedacted: boolean;
@@ -11,27 +11,20 @@ export default function COM_PaywallSearchResult({ prIsRedacted }: PI_PaywallSear
 
   return (
     <div
+      className="area-flex-row mod-justify-end"
       style={{
-        position: "absolute",
+        position: 'absolute',
         inset: 0,
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "flex-end",
-        pointerEvents: "none",
-        padding: "0.5rem",
+        pointerEvents: 'none',
+        paddingRight: 'calc(var(--default-font-size)*3)',
       }}
     >
-      <div
-        className="look-div-solid area-flex-row mod-align-center"
-        style={{
-          gap: "0.5rem",
-          padding: "0.75rem 1rem",
-          boxShadow: "0 8px 20px rgba(15, 23, 42, 0.25)",
-        }}
-      >
-        <ICON_Alert style={{ width: "1.25rem", height: "1.25rem" }} />
-        <span className="look-text-x0 look-priority-high">Get Pro to view this ticker</span>
-      </div>
+      <span className="look-text-x1 look-priority-medium">Get Pro</span>
+      <ICON_Crown
+        style={{ width: 'calc(var(--default-font-size) * 1)', height: 'auto' }}
+        fill="currentColor"
+        stroke="transparent"
+      />
     </div>
   );
 }

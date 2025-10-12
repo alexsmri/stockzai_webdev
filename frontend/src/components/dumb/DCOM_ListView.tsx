@@ -225,7 +225,7 @@ export default function DCOM_ListView({
             const isPaywalled = memPaywalledRows ? memPaywalledRows.has(normalizedSymbol) : false;
 
             return (
-              <div key={key} style={{ position: 'relative' }}>
+              <div key={key} style={{ position: 'relative' }} className="state-hover-scale">
                 <div className="area-grid-results look-div-subtle" onClick={handleClick}>
                   {prColumnConfig.map((column) => {
                     const rawValue = resolveRawValue(column, rowId, rowData);

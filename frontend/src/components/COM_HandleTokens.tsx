@@ -21,8 +21,16 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
   useUserStoreSync(utStore, 'ActionLogin', setTokens);
 
   useEffect(() => {
-    if (!tokens) {
+    const hasAccessToken =
+      tokens &&
+      typeof tokens === 'object' &&
+      tokens !== null &&
+      typeof (tokens as Record<string, unknown>).access === 'string' &&
+      (tokens as Record<string, unknown>).access;
+
+    if (!hasAccessToken) {
       setStValid(true);
+      return;
     }
     (async () => {
       try {
@@ -33,6 +41,13 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
     })();
   }, [tokens]);
 
+  useEffect(() => {
+    if (stValid === false) {
+      utStore.clear('ActionLogin');
+      utStore.clear('PropertyCredentials');
+    }
+  }, [stValid, utStore]);
+
   const refreshToken = async () => {
     if (tokens) {
       const refreshToken = tokens['refresh'];
@@ -40,15 +55,11 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
         const refreshed = await utStore.post('ActionRefreshToken', {
           refresh: refreshToken,
         });
-        if (
-          refreshed &&
-          utStore.read('ActionRefreshToken') &&
-          (utStore.read('ActionRefreshToken') as Record<string, any>['access'])
-        ) {
-          utStore.update('ActionLogin', {
-            refresh: refreshToken,
-            access: utStore.read('ActionRefreshToken') as Record<string, any>['access'],
-          });
+        const refreshedData = utStore.read('ActionRefreshToken') as { access?: unknown } | null;
+        const refreshedAccess = typeof refreshedData?.access === 'string' ? refreshedData.access : null;
+
+        if (refreshed && typeof refreshedAccess === 'string') {
+          utStore.update('ActionLogin', { refresh: refreshToken, access: refreshedAccess });
           setStValid(true);
         } else {
           setStValid(false);
@@ -61,7 +72,19 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
 
   const auth = async () => {
     if (tokens) {
-      const decoded = jwtDecode<DecodedToken>(tokens['access']);
+      const accessToken = tokens['access'];
+      if (typeof accessToken !== 'string' || !accessToken) {
+        setStValid(false);
+        return;
+      }
+
+      let decoded: DecodedToken;
+      try {
+        decoded = jwtDecode<DecodedToken>(accessToken);
+      } catch {
+        setStValid(false);
+        return;
+      }
       const tokenExpiration = decoded.exp;
 
       const now = Date.now() / 1000;
@@ -69,7 +92,7 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
         await refreshToken();
       } else {
         const tokenValid = await utStore.post('TokenLoginValidation', {
-          token: tokens['access'],
+          token: accessToken,
         });
         if (tokenValid) {
           setStValid(true);
@@ -82,11 +105,6 @@ function COM_HandleTokens(props: ITF_HandleTokenProps) {
 
   if (stValid === null) {
     return <COM_Loading />;
-  }
-
-  if (!stValid) {
-    utStore.clear('ActionLogin');
-    utStore.clear('PropertyCredentials');
   }
 
   return props.children;

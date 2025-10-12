@@ -1,6 +1,6 @@
 import Logo from '@/assets/media/LOGO_schwarzquer.svg?react';
-import Hamburger from '@/assets/media/ICON_Hamburger.svg?react';
-import HamburgerClose from '@/assets/media/ICON_HamburgerClose.svg?react';
+import ICON_Hamburger from '@/assets/media/ICON_Hamburger.svg?react';
+import ICON_Close from '@/assets/media/ICON_Close.svg?react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useStickyObserver, useUserStoreSync } from '../hooks/hooks';
 import { useRef, useState } from 'react';
@@ -68,7 +68,7 @@ export default function COM_Navbar() {
           {stIsOpen ? (
             <>{utMenuLinks}</>
           ) : (
-            <Hamburger
+            <ICON_Hamburger
               className="img-hamburger mod-cursor-pointer"
               onClick={() => {
                 toggleMenu();
@@ -106,7 +106,7 @@ export default function COM_Navbar() {
           {stIsOpen ? (
             <>
               <div className={MENU_CLASS_NAMES.closed}>
-                <HamburgerClose
+                <ICON_Close
                   className="img-hamburger mod-cursor-pointer"
                   onClick={() => {
                     toggleMenu();
