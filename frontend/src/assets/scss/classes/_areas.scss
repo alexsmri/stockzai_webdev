@@ -323,3 +323,17 @@
   mix-blend-mode: destination-out;
 }
 }
+
+.area-paywall {
+    position: fixed;
+    inset: 0px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    row-gap: u.scale-gap(1);
+    align-items: stretch;
+    justify-content: center;
+    backdrop-filter: blur(28px);
+    background-color: var(--color-primary-a70);
+    padding: u.scale-padding(2);
+}

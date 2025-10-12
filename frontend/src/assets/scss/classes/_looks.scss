@@ -315,6 +315,15 @@
     cursor: pointer;
     white-space: nowrap;
 
+  > svg,
+  > svg *,
+  > .icon,
+  > .icon * {
+    color: inherit;
+    fill: currentColor;
+    stroke: transparent;
+  }
+
   &:focus-visible {
     outline: u.scale-gap(0.1) solid var(--color-secondary-a20);
     outline-offset: u.scale-gap(0.2);
