@@ -37,3 +37,6 @@ db.sqlite3
 *.log
 .idea/
 .vscode/
+
+# SSL certificates
+nginx/certs/*.pem
