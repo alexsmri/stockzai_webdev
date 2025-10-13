@@ -9,6 +9,7 @@ interface Step {
   ref: RefObject<HTMLElement | null>;
   title: string;
   body: string;
+  continueClickObject?: RefObject<HTMLElement | null>;
 }
 
 interface PI_TutorialOverlay {
@@ -100,19 +101,64 @@ export default function COM_TutorialOverlay({
     return () => window.clearTimeout(timer);
   }, [activeStep, updateRect]);
 
-  useEffect(() => {
-    console.log('Active step ref:', activeStep?.ref?.current);
-    console.log('Rect:', rect);
-  }, [activeStep, rect]);
+  const handleNext = useCallback(() => {
+    setStepIndex((current) => {
+      if (current < prSteps.length - 1) {
+        return current + 1;
+      }
+      setShowCompletion(true);
+      setRect(null);
+      return current;
+    });
+  }, [prSteps.length]);
 
-  const handleNext = () => {
-    if (stepIndex < prSteps.length - 1) {
-      setStepIndex((current) => current + 1);
-      return;
+  useEffect(() => {
+    if (!activeStep?.continueClickObject || showCompletion) {
+      return undefined;
     }
-    setShowCompletion(true);
-    setRect(null);
-  };
+
+    const handleContinueClick = () => {
+      handleNext();
+    };
+
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    const attachListener = (element: HTMLElement | null) => {
+      if (!element || cancelled) {
+        return;
+      }
+      element.addEventListener('click', handleContinueClick, { once: true });
+      cleanup = () => {
+        element.removeEventListener('click', handleContinueClick);
+      };
+    };
+
+    const initialTarget = activeStep.continueClickObject.current;
+    if (initialTarget) {
+      attachListener(initialTarget);
+      return () => {
+        cancelled = true;
+        cleanup?.();
+      };
+    }
+
+    const observer = new MutationObserver(() => {
+      const element = activeStep.continueClickObject?.current;
+      if (element) {
+        attachListener(element);
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      cleanup?.();
+    };
+  }, [activeStep, handleNext, showCompletion]);
 
   const handleClose = () => {
     userStore.setTutorialCompleted(true);
@@ -143,7 +189,13 @@ export default function COM_TutorialOverlay({
           transform: 'translate(-50%, -50%)',
         };
 
-  const nextLabel = stepIndex === prSteps.length - 1 ? 'Finish' : 'Next';
+  const needsExternalClick = Boolean(activeStep?.continueClickObject);
+  const nextLabel =
+    needsExternalClick
+      ? 'Click highlighted area'
+      : stepIndex === prSteps.length - 1
+      ? 'Finish'
+      : 'Next';
 
   return (
     <>
@@ -160,7 +212,11 @@ export default function COM_TutorialOverlay({
             <div className="look-div-solid area-flex-col mod-align-stretch">
               <p className="look-text-x2">{activeStep.title}</p>
               <p className="look-text-x1">{activeStep.body}</p>
-              <button className="look-button-secondary" onClick={handleNext}>
+              <button
+                className="look-button-secondary"
+                onClick={handleNext}
+                disabled={needsExternalClick}
+              >
                 {nextLabel}
               </button>
             </div>
