@@ -19,6 +19,9 @@ services:
     networks:
       - default
       - SA-network-DEV
+    volumes:
+      - ./backend:/backend
+      - .:/workspace
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8000/health/"]
       interval: 30s
@@ -35,6 +38,9 @@ services:
       - default
       - SA-network-DEV
     env_file: ./backend/.env.dev
+    volumes:
+      - ./backend:/backend
+      - .:/workspace
 
   celery-beat:
     build:
@@ -45,6 +51,9 @@ services:
       - default
       - SA-network-DEV
     env_file: ./backend/.env.dev
+    volumes:
+      - ./backend:/backend
+      - .:/workspace
 
   
   frontend:
@@ -57,7 +66,15 @@ services:
       - 5173:5173
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/frontend
+      - ./backend:/backend
+      - .:/workspace
+      - frontend_node_modules:/frontend/node_modules
 
 networks:
   SA-network-DEV:
     external: true
+
+volumes:
+  frontend_node_modules:

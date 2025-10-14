@@ -2,6 +2,6 @@
   "name": "SAWEB-backend-DEV",
   "dockerComposeFile": "../../docker-compose.dev.yml",
   "service": "backend",
-  "workspaceFolder": "/backend",
+  "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose"
 }
