@@ -348,7 +348,7 @@
 
 .look-ui-gradient {
   background-color: transparent;
-  background-image: linear-gradient(45deg, hsla(var(--color-tertiary), 30%), hsla(var(--color-primary), 5%));
+  background-image: linear-gradient(45deg, var(--color-tertiary-a30), var(--color-secondary-a5) 70%);
 }
 
 .look-priority-high {
