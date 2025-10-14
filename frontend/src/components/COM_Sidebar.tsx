@@ -4,7 +4,6 @@ import LOGO_schwarzquer from '@/assets/media/LOGO_quadrat.svg?react';
 import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
-import ICON_Alert from '@/assets/media/ICON_Alert.svg?react';
 import ICON_Feedback from '@/assets/media/ICON_Feedback.svg?react';
 import { useWindowDimensions, useUserStoreSync } from '../hooks/hooks';
 import { useUserStore } from '../context/CTX_UserStore';
@@ -30,12 +29,6 @@ const NAV_ITEMS: NavItem[] = [
     to: '/companies/top-stocks',
     Icon: ICON_FirstPlace,
     isActive: (pathname) => pathname.startsWith('/companies/top-stocks'),
-  },
-  {
-    label: 'Alerts',
-    to: '/alerts',
-    Icon: ICON_Alert,
-    isActive: (pathname) => pathname.startsWith('/alerts'),
   },
   {
     label: 'Feedback',

@@ -16,7 +16,7 @@
     flex-grow: 1;
 }
 .area-application-body {
-    border-radius: u.scale-gap(1) 0 0 0;
+    border-radius: u.scale-gap(1) 0 0 u.scale-gap(1);
     background-color: var(--color-primary-subtle);
     padding: u.scale-padding(2);
     padding-top: u.scale-padding(1);

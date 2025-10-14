@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import COM_Sidebar from '../components/COM_Sidebar';
 import COM_Breadcrumbs from '../components/COM_Breadcrumbs';
+import COM_Footer from '../components/COM_Footer';
 
 export default function STR_ApplicationPage({
   prTitle,
@@ -21,6 +22,7 @@ export default function STR_ApplicationPage({
           {prTitle && <h1 className="look-text-x7 mod-align-left">{prTitle}</h1>}
           {children}
         </div>
+        <COM_Footer />
       </div>
     </div>
   );
