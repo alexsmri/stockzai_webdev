@@ -37,7 +37,8 @@ export default function COM_FormCode({
 }: ITF_FormCodeProps) {
   const utStore = useUserStore();
   const utCensoredEmail = prEmail ? censorEmail(prEmail) : 'your email';
-  const redirectPath = prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
+  const redirectPath =
+    prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);
@@ -116,7 +117,11 @@ export default function COM_FormCode({
     setIsResending(true);
     try {
       if (prMode === 'newsletter') {
-        const utTokenRes = await utStore.post('ActionSubscribeNewsletterRequest', {}, true);
+        const utTokenRes = (await utStore.post(
+          'ActionSubscribeNewsletterRequest',
+          {},
+          true
+        )) as Record<string, any>;
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
           handleAlertOpen('A new confirmation code has been sent.', 's');
@@ -124,7 +129,11 @@ export default function COM_FormCode({
           handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
         }
       } else {
-        const utTokenRes = await utStore.post('TokenVerificationRequest', { email: prEmail }, true);
+        const utTokenRes = (await utStore.post(
+          'TokenVerificationRequest',
+          { email: prEmail },
+          true
+        )) as Record<string, any>;
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
           handleAlertOpen('A new verification code has been sent.', 's');

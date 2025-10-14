@@ -20,4 +20,6 @@ export function Checkout() {
       items: [{ priceId: 'PRICE_ID_GOES_HERE', quantity: 1 }],
     });
   };
+
+  return openCheckout();
 }

@@ -14,10 +14,10 @@ export default function COM_FormSubscribe() {
 
   useEffect(() => {
     (async () => {
-      const [consents, credentials] = await Promise.all([
+      const [consents, credentials] = (await Promise.all([
         utStore.get('PropertyConsents'),
         utStore.get('PropertyCredentials'),
-      ]);
+      ])) as Record<string, any>[];
 
       if (consents?.consents_newsletter) {
         navigate('/users/edit', { replace: true });
@@ -39,8 +39,11 @@ export default function COM_FormSubscribe() {
 
     setStLoading(true);
     try {
-      const utRes = await utStore.post('ActionSubscribeNewsletterRequest', {}, true);
-      if (utRes?.uid) {
+      const utRes = (await utStore.post('ActionSubscribeNewsletterRequest', {}, true)) as
+        | Record<string, any>
+        | boolean
+        | null;
+      if (typeof utRes === 'object' && utRes?.uid) {
         const params = new URLSearchParams({ uid: utRes.uid });
         if (stEmail) {
           params.set('email', stEmail);

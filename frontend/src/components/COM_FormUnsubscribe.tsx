@@ -23,7 +23,7 @@ export default function COM_FormUnsubscribe() {
 
   useEffect(() => {
     (async () => {
-      const utSubscribed = await utStore.get('PropertyConsents');
+      const utSubscribed = (await utStore.get('PropertyConsents')) as Record<string, any>;
       if (!utSubscribed?.consents_newsletter) {
         navigate('/users/subscribe-newsletter', { replace: true });
       }

@@ -10,25 +10,26 @@ const TEXT_VARIANTS = [
   'look-text-x3',
   'look-text-x2',
   'look-text-x1',
-  'look-text-x0'
+  'look-text-x0',
 ];
 
 const TEXT_STATES = [
   { className: 'look-text-important', label: 'Important (80%)' },
   { className: 'look-text-normal', label: 'Normal (60%)' },
   { className: 'look-text-subtle', label: 'Subtle (40%)' },
-  { className: 'look-text-disabled', label: 'Disabled (Primary 40%)' }
+  { className: 'look-text-disabled', label: 'Disabled (Primary 40%)' },
 ];
 
 const MENU_SELECT_OPTIONS = {
   balance: 'Balance Sheet',
   cashflow: 'Cashflow Statement',
-  income: 'Income Statement'
+  income: 'Income Statement',
 };
 
 function PAG_Debug() {
   const [selectedMenuKey, setSelectedMenuKey] = useState('');
-  const selectedMenuLabel = MENU_SELECT_OPTIONS[selectedMenuKey];
+  const selectedMenuLabel =
+    MENU_SELECT_OPTIONS[selectedMenuKey as 'balance' | 'cashflow' | 'income'];
 
   return (
     <main
@@ -38,7 +39,7 @@ function PAG_Debug() {
         gap: '2rem',
         padding: '2rem',
         maxWidth: '48rem',
-        margin: '0 auto'
+        margin: '0 auto',
       }}
     >
       <section
@@ -86,10 +87,14 @@ function PAG_Debug() {
         <h2 className="look-text-x3 look-text-important">Container Tokens</h2>
         <div style={{ display: 'grid', gap: '1rem' }}>
           <div className="look-div-subtle">
-            <p className="look-text-x2 look-text-normal">Subtle surface, perfect for neutral panels.</p>
+            <p className="look-text-x2 look-text-normal">
+              Subtle surface, perfect for neutral panels.
+            </p>
           </div>
           <div className="look-div-solid state-hover-scale">
-            <p className="look-text-x2 look-text-important">Solid surface with hover scale applied.</p>
+            <p className="look-text-x2 look-text-important">
+              Solid surface with hover scale applied.
+            </p>
           </div>
         </div>
       </section>
@@ -100,15 +105,33 @@ function PAG_Debug() {
       >
         <h2 className="look-text-x3 look-text-important">Button States</h2>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button type="button" className="look-button-primary">Primary Button</button>
-          <button type="button" className="look-button-primary mod-button-auth">Primary Auth Variant</button>
-          <button type="button" className="look-button-primary" disabled>Primary Disabled</button>
-          <button type="button" className="look-button-secondary">Secondary Button</button>
-          <button type="button" className="look-button-secondary mod-button-auth">Secondary Auth Variant</button>
-          <button type="button" className="look-button-secondary" disabled>Secondary Disabled</button>
-          <button type="button" className="look-button-tertiary">Tertiary Button</button>
-          <button type="button" className="look-button-tertiary mod-button-auth">Tertiary Auth Variant</button>
-          <button type="button" className="look-button-tertiary" disabled>Tertiary Disabled</button>
+          <button type="button" className="look-button-primary">
+            Primary Button
+          </button>
+          <button type="button" className="look-button-primary mod-button-auth">
+            Primary Auth Variant
+          </button>
+          <button type="button" className="look-button-primary" disabled>
+            Primary Disabled
+          </button>
+          <button type="button" className="look-button-secondary">
+            Secondary Button
+          </button>
+          <button type="button" className="look-button-secondary mod-button-auth">
+            Secondary Auth Variant
+          </button>
+          <button type="button" className="look-button-secondary" disabled>
+            Secondary Disabled
+          </button>
+          <button type="button" className="look-button-tertiary">
+            Tertiary Button
+          </button>
+          <button type="button" className="look-button-tertiary mod-button-auth">
+            Tertiary Auth Variant
+          </button>
+          <button type="button" className="look-button-tertiary" disabled>
+            Tertiary Disabled
+          </button>
           <button type="button" className="look-button-ghost">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
               <path d="M6 0.75 7.763 4.36l3.862.308-2.924 2.39.9 3.77L6 9.46l-3.601 1.368.9-3.77L.375 4.668l3.862-.308z" />
