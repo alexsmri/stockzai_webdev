@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import COM_SearchBar from '../components/COM_SearchBar';
 import COM_SearchCompletion from '../components/COM_SearchCompletion';
-import COM_Footer from '../components/COM_Footer';
 import COM_SearchResults from '../components/COM_SearchResults';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
@@ -113,7 +112,6 @@ export default function PAG_Search() {
           prRedactedSymbols={searchData?.redacted ?? null}
         />
       )}
-      <COM_Footer />
     </STR_ApplicationPage>
   );
 }

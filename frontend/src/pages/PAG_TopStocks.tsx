@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import COM_DropdownSelect, { type TYP_DropdownConfig } from '../components/COM_DropdownSelect';
 import COM_MenuSelect, { type MenuSelectOptions } from '../components/COM_MenuSelect';
-import COM_Footer from '../components/COM_Footer';
 import COM_LeaderboardTable from '../components/COM_LeaderboardTable';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
@@ -230,7 +229,6 @@ export default function PAG_TopStocks() {
           prMetricLabel={METRIC_OPTIONS[selectedMetric] ?? 'Score'}
         />
       )}
-      <COM_Footer />
     </STR_ApplicationPage>
   );
 }

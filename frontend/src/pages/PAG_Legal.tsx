@@ -1,4 +1,3 @@
-import COM_Footer from '../components/COM_Footer';
 import COM_Navbar from '../components/COM_Navbar';
 import HTML_Contact from '../assets/html/contact.html?raw';
 import HTML_PRIVACY from '../assets/html/privacy_policy.html?raw';
@@ -74,7 +73,6 @@ export default function PAG_Legal() {
           )}
         </>
       )}
-      <COM_Footer />
     </>
   );
 }

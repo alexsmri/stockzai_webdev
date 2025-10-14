@@ -1,4 +1,3 @@
-import COM_Footer from '../components/COM_Footer';
 import COM_FormFeedback from '../components/COM_FormFeedback';
 import COM_Sidebar from '../components/COM_Sidebar';
 
@@ -14,7 +13,6 @@ export default function PAG_FormFeedback() {
         style={{ flex: 1, width: '100%' }}
       >
         <COM_FormFeedback />
-        <COM_Footer />
       </div>
     </div>
   );
