@@ -1,5 +1,4 @@
 import { type JSX } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ICON_ArrowLeft from '@/assets/media/ICON_ArrowLeft.svg?react';
 import COM_Plans from './COM_Plans';
 
@@ -9,9 +8,8 @@ interface PI_Paywall {
 }
 
 export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
-  const navigate = useNavigate();
   const handleBack = () => {
-    navigate('/companies/search');
+    window.history.back();
   };
 
   if (!prIsOpen) {

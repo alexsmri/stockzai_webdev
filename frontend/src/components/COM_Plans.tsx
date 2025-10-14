@@ -19,7 +19,7 @@ function COM_Plans() {
         </li>
       </ul>
       <button className="look-button-primary mod-button-auth mod-margin-t-xl" type="button">
-        See Plans
+        Unlock now
       </button>
     </div>
   );
