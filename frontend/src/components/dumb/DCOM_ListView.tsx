@@ -155,6 +155,8 @@ export default function DCOM_ListView({
     });
   }, [memPreparedRows, stSort, memColumnsById]);
 
+  const hasRows = memSortedRows.length > 0;
+
   const handleSort = (column: ITF_ListViewColumnConfig) => {
     const defaultDirection = getDefaultOrderDirection(column);
     const oppositeDirection = getOppositeOrderDirection(defaultDirection);
@@ -176,15 +178,11 @@ export default function DCOM_ListView({
     });
   };
 
-  if (!memPreparedRows.length) {
-    return prEmptyPlaceholder ?? null;
-  }
-
   return (
     <>
       <div
         className="area-flex-col mod-align-stretch"
-        style={{ minWidth: 'calc(var(--default-font-size) * 48)' }}
+        style={{ minWidth: 'calc(var(--default-font-size) * 48)', height: '100%' }}
       >
         <div className="area-grid-results mod-padding-side">
           {prColumnConfig.map((column) => {
@@ -213,46 +211,50 @@ export default function DCOM_ListView({
             );
           })}
         </div>
-        <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
-          {memSortedRows.map(({ rowId, rowData }) => {
-            const key = rowId;
-            const handleClick = prOnRowClick ? () => prOnRowClick(rowId, rowData) : undefined;
-            const symbolValue =
-              typeof rowData.symbol === 'string' && rowData.symbol.trim().length > 0
-                ? rowData.symbol
-                : rowId;
-            const normalizedSymbol = symbolValue.trim().toUpperCase();
-            const isPaywalled = memPaywalledRows ? memPaywalledRows.has(normalizedSymbol) : false;
+        {hasRows ? (
+          <div className="area-flex-col mod-align-stretch mod-gap-s mod-padding-none">
+            {memSortedRows.map(({ rowId, rowData }) => {
+              const key = rowId;
+              const handleClick = prOnRowClick ? () => prOnRowClick(rowId, rowData) : undefined;
+              const symbolValue =
+                typeof rowData.symbol === 'string' && rowData.symbol.trim().length > 0
+                  ? rowData.symbol
+                  : rowId;
+              const normalizedSymbol = symbolValue.trim().toUpperCase();
+              const isPaywalled = memPaywalledRows ? memPaywalledRows.has(normalizedSymbol) : false;
 
-            return (
-              <div key={key} style={{ position: 'relative' }} className="state-hover-scale">
-                <div className="area-grid-results look-div-subtle" onClick={handleClick}>
-                  {prColumnConfig.map((column) => {
-                    const rawValue = resolveRawValue(column, rowId, rowData);
-                    const display = resolveDisplay(column, rowId, rowData, rawValue);
-                    const titleValue =
-                      typeof display === 'string'
-                        ? display
-                        : typeof display === 'number'
-                        ? String(display)
-                        : undefined;
-                    const needsBlur = isPaywalled && memPaywallColumns?.has(column.id);
-                    const className = `${column.cellClassName ?? DEFAULT_CELL_CLASS}${
-                      needsBlur ? ' mod-blur' : ''
-                    }`;
+              return (
+                <div key={key} style={{ position: 'relative' }} className="state-hover-scale">
+                  <div className="area-grid-results look-div-subtle" onClick={handleClick}>
+                    {prColumnConfig.map((column) => {
+                      const rawValue = resolveRawValue(column, rowId, rowData);
+                      const display = resolveDisplay(column, rowId, rowData, rawValue);
+                      const titleValue =
+                        typeof display === 'string'
+                          ? display
+                          : typeof display === 'number'
+                          ? String(display)
+                          : undefined;
+                      const needsBlur = isPaywalled && memPaywallColumns?.has(column.id);
+                      const className = `${column.cellClassName ?? DEFAULT_CELL_CLASS}${
+                        needsBlur ? ' mod-blur' : ''
+                      }`;
 
-                    return (
-                      <span key={column.id} className={className} title={titleValue}>
-                        {display}
-                      </span>
-                    );
-                  })}
+                      return (
+                        <span key={column.id} className={className} title={titleValue}>
+                          {display}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <COM_PaywallSearchResult prIsRedacted={isPaywalled} />
                 </div>
-                <COM_PaywallSearchResult prIsRedacted={isPaywalled} />
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          prEmptyPlaceholder
+        )}
       </div>
     </>
   );

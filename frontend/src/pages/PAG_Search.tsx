@@ -16,7 +16,6 @@ export default function PAG_Search() {
   const [submittedQuery, setSubmittedQuery] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
-  const [showResults, setShowResults] = useState<boolean>(false);
   const [searchData, setSearchData] = useState<VAI_SearchData | null>(null);
 
   useEffect(() => {
@@ -26,11 +25,9 @@ export default function PAG_Search() {
     if (query) {
       setInput((prev) => (prev === query ? prev : query));
       setSubmittedQuery(query);
-      setShowResults(true);
       setShowCompletions(false);
     } else {
       setSubmittedQuery('');
-      setShowResults(false);
     }
   }, [location.search]);
 
@@ -68,7 +65,6 @@ export default function PAG_Search() {
     }
     setShowCompletions(false);
     setSubmittedQuery(query);
-    setShowResults(true);
     navigate(`/companies/search/?q=${query}`);
   };
 
@@ -105,13 +101,12 @@ export default function PAG_Search() {
           </div>
         )}
       </div>
-      {showResults && (
-        <COM_SearchResults
-          prRows={resultRows}
-          prOnRowClick={(rowId) => handleRowClick(rowId)}
-          prRedactedSymbols={searchData?.redacted ?? null}
-        />
-      )}
+      <COM_SearchResults
+        prRows={resultRows}
+        prOnRowClick={(rowId) => handleRowClick(rowId)}
+        prRedactedSymbols={searchData?.redacted ?? null}
+        prHasLoadedResults={Boolean(searchData)}
+      />
     </STR_ApplicationPage>
   );
 }

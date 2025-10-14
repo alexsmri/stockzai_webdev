@@ -14,6 +14,7 @@ interface PI_SearchTable {
   prRedactedSymbols?: string[] | null;
   prOnRowClick?: (rowId: string, row: TYP_ListViewRow) => void;
   prEmptyPlaceholder?: ReactNode;
+  prHasLoadedResults?: boolean;
 }
 
 const SEARCH_TABLE_COLUMNS: ITF_ListViewColumnConfig[] = [
@@ -81,7 +82,8 @@ export default function COM_SearchResults({
   prRows,
   prRedactedSymbols = null,
   prOnRowClick,
-  prEmptyPlaceholder = null,
+  prEmptyPlaceholder,
+  prHasLoadedResults = false,
 }: PI_SearchTable) {
   const paywallConfig = useMemo(
     () => ({
@@ -91,12 +93,24 @@ export default function COM_SearchResults({
     [prRedactedSymbols]
   );
 
+  const computedEmptyPlaceholder =
+    prRows.length > 0 ? null : (
+      <span className="look-text-x1 look-priority-low mod-center">
+        {prHasLoadedResults
+          ? 'No results matching query'
+          : 'Nothing to show here, enter your search first'}
+      </span>
+    );
+
+  const emptyPlaceholder =
+    prEmptyPlaceholder !== undefined ? prEmptyPlaceholder : computedEmptyPlaceholder;
+
   return (
     <DCOM_ListView
       prRows={prRows}
       prColumnConfig={SEARCH_TABLE_COLUMNS}
       prOnRowClick={prOnRowClick}
-      prEmptyPlaceholder={prEmptyPlaceholder}
+      prEmptyPlaceholder={emptyPlaceholder}
       prPaywallConfig={paywallConfig}
     />
   );
