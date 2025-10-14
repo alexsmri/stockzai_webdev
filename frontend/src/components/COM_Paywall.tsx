@@ -22,7 +22,9 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
     <div className="area-paywall">
       <div
         className="area-flex-col mod-center mod-padding-none"
-        style={{ width: 'min(640px, 100%)' }}
+        style={{
+          width: 'clamp(calc(--default-font-size) * 15), calc(--default-font-size) * 20), 80%)',
+        }}
       >
         <button
           type="button"
@@ -45,9 +47,8 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
           <span>Back</span>
         </button>
         <div
-          className="look-div-solid area-flex-col mod-align-center"
+          className="look-div-solid look-ui-gradient area-flex-col mod-align-center"
           style={{
-            width: 'min(640px, 100%)',
             boxShadow: '0 24px 48px rgba(15, 23, 42, 0.45)',
             borderRadius: '1rem',
             overflow: 'hidden',

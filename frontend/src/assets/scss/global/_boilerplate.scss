@@ -109,3 +109,9 @@ input[type="checkbox"]:checked{
 input[type="checkbox"]:checked:after{
     opacity: 1;
 }
+
+ul {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: u.scale-gap(2);
+}
