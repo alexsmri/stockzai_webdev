@@ -351,6 +351,11 @@
   background-image: linear-gradient(45deg, var(--color-tertiary-a30), var(--color-secondary-a5) 70%);
 }
 
+.look-gradient-image {
+  background-image: linear-gradient(45deg, var(--color-primary-a50) 0%, transparent 100%);
+  pointer-events: none;
+}
+
 .look-priority-high {
   color: var(--color-secondary-a80);
 }

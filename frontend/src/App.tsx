@@ -27,6 +27,7 @@ import PAG_Debug from './pages/PAG_Debug';
 import PAG_TopStocks from './pages/PAG_TopStocks';
 import PAG_Alerts from './pages/PAG_Alerts';
 import COM_PremiumRoute from './components/COM_PremiumRoute';
+import PAG_ChooseTicker from './pages/PAG_ChooseTicker';
 
 function Logout() {
   localStorage.clear();
@@ -100,6 +101,7 @@ function App() {
                       </COM_ProtectedRoute>
                     }
                   />
+                  <Route path="/onboarding/choose-ticker" element={<PAG_ChooseTicker />} />
                   <Route
                     path="/alerts"
                     element={

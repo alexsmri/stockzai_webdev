@@ -36,6 +36,22 @@
     align-items: center;
 }
 
+.area-image-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-width: u.scale-gap(11);
+    border-radius: u.scale-gap(1);
+    overflow: hidden;
+    background-color: var(--color-primary-subtle);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    isolation: isolate;
+    flex-grow: 1;
+}
+
 .area-flex-row {
     display: flex;
     flex-direction: row;

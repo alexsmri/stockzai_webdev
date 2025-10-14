@@ -11,3 +11,14 @@
     transform: scale(1.01);
   }
 }
+
+.state-hover-up {
+  cursor: pointer;
+  transition: transform 0.25s ease;
+  will-change: transform;
+
+  &:hover {
+    margin-bottom: u.scale-gap(0.5);
+    transform: translateY(calc(u.scale-gap(0.5) * -1));
+  }
+}

@@ -125,6 +125,13 @@
 .mod-center {
     margin: auto;
 }
+.mod-centersides {
+    margin: 0 auto;
+}
+.mod-bottomleft {
+    margin-top: auto;
+    margin-right: auto;
+}
 .mod-pos-sti {
     position: sticky;
     top: u.scale-gap(2)
