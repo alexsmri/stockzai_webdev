@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./backend/.env.staging
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+    env_file: ./backend/.env.staging
+    networks:
+      - default
+      - SA-network-DEV
+    volumes:
+      - static_volume:/backend/staticfiles
+      - media_volume:/backend/media
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', 'http://localhost:8000/health/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+  
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: celery -A stockzAI worker -l info -Q web
+    networks:
+      - default
+      - SA-network-DEV
+    env_file: ./backend/.env.staging
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: celery -A stockzAI beat -l info
+    networks:
+      - default
+      - SA-network-DEV
+    env_file: ./backend/.env.staging
+
+  frontend:
+    stdin_open: true
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    command: /bin/sh -c "rm -rf /output/* && cp -r /frontend/dist/* /output/"
+    env_file: ./frontend/.env.staging
+    depends_on:
+      - backend
+    volumes:
+      - frontend_build:/output
+
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - static_volume:/backend/staticfiles
+      - media_volume:/backend/media
+      - frontend_build:/var/www/frontend
+      - ./nginx/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/ssl:ro
+    ports:
+      - 80:80
+      - 443:443
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  frontend_build:
+
+networks:
+  SA-network-DEV:
+    external: true
