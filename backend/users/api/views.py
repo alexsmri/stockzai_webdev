@@ -8,9 +8,6 @@ from users.models import (
     TokenNewsletter,
     UserConsents,
     TrackingEvent,
-    Subscription,
-    Purchase,
-    Product
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics

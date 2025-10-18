@@ -18,6 +18,7 @@ from .views import (
     view_verification_token,
     view_verify,
 )
+from ..paddle import paddle_webhook
 
 app_name = "users_api"
 
@@ -51,4 +52,5 @@ urlpatterns = [
         view_subscribe_newsletter_verify,
         name="subscribe_newsletter_verify",
     ),
+    path("payments/webhook/", paddle_webhook, name="paddle_webhook")
 ]
