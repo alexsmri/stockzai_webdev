@@ -24,7 +24,6 @@ def webhook_customer_created(data: dict):
     email = data.get("email")
     marketing_consent = data.get("marketing_consent")
     paddle_id = data.get("id")
-    status = data.get("status")
 
     if email:
         is_active = True if status == "active" else False
