@@ -18,6 +18,20 @@ paddle = Client(API_KEY, options=options)
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
+
+def webhook_customer_created(data: dict):
+    name = data.get("name")
+    email = data.get("email")
+    marketing_consent = data.get("marketing_consent")
+    paddle_id = data.get("id")
+    status = data.get("status")
+
+    if email:
+        is_active = True if status == "active" else False
+        User.objects.get_or_create(email=email)
+
+
+
 def paddle_webhook(request):
     """
     Handle Paddle webhook events with signature verification.

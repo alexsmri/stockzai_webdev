@@ -26,8 +26,8 @@ def validate_permission_choices(value):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_('username'), max_length=30, unique=True)
     email = models.EmailField(_('email address'), unique=True)
+    username = models.CharField(_('username'), max_length=30, blank=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     phone = models.CharField(max_length=30, blank=True)
@@ -39,12 +39,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateField(default=timezone.now)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
 
     objects = UserManager()
 
     def __str__(self):
-        return self.username
+        return self.username or self.email
 
     class Meta:
         permissions = [
