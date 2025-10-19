@@ -2,7 +2,7 @@ from paddle_billing import Client, Options, Environment
 import os
 import json
 import logging
-from django.conf import settings
+from stockzAI.common.PaddleRequest import PaddleRequest
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from paddle_billing.Notifications import Secret, Verifier
@@ -24,8 +24,6 @@ options = Options(Environment.SANDBOX) if ENVIRONMENT == "sandbox" else None
 
 paddle = Client(API_KEY, options=options)
 logger = logging.getLogger(__name__)
-logger.info(ENVIRONMENT)
-logger.info(WEBHOOK_SECRET)
 
 def util_get_expires_at(interval: str):
     if interval not in ALLOWED_INTERVALS.keys():
@@ -44,11 +42,13 @@ def util_get_expires_at(interval: str):
 
 def util_verify_signature(request):
     raw_body = request.body.decode("utf-8")
+    logger.info(raw_body)
     headers = {"Paddle-Signature": request.headers.get("Paddle-Signature")}
+    logger.info(headers)
 
     if not headers["Paddle-Signature"]:
         return False
-    paddle_request = Request(body=raw_body, headers=headers)
+    paddle_request = PaddleRequest.create_from_body(body=raw_body, headers=headers)
 
     verifier = Verifier()
     try:
@@ -125,8 +125,7 @@ def paddle_webhook(request):
     """
 
     try:
-        verifier = Verifier()
-        integrity_check = verifier.verify(request, Secret(WEBHOOK_SECRET))
+        integrity_check = util_verify_signature(request)
         if not integrity_check:
             logger.warning("❌ Invalid Paddle webhook signature")
             return JsonResponse({"error": "Invalid signature"}, status=403)

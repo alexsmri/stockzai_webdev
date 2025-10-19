@@ -1,4 +1,4 @@
-from .response import api_json_response
+from .common.response import api_json_response
 from django.db import connection
 import logging
 from django.conf import settings

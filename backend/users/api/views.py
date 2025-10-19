@@ -16,7 +16,7 @@ from .serializers import UserSerializer, TokenLoginSerializer, TokenRefreshSeria
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from stockzAI.response import api_json_response
+from stockzAI.common.response import api_json_response
 from users.tokens import make_otp, password_reset_token
 from users.utils.tracking import track_event
 from rest_framework.decorators import permission_classes, api_view

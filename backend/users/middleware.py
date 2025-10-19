@@ -3,7 +3,7 @@ from typing import Iterable, Union
 
 from django.http import HttpRequest
 
-from stockzAI.response import api_json_response
+from stockzAI.common.response import api_json_response
 from users.models import PermissionCode
 
 

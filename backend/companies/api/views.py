@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from companies.constants import FREE_TICKERS
 from companies.models import DBSnapshots
-from stockzAI.response import api_json_response
+from stockzAI.common.response import api_json_response
 from users.models import TrackingEvent, User, PermissionCode
 from users.middleware import require_permission
 from users.utils.tracking import track_event
