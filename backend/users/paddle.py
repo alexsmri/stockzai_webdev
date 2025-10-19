@@ -48,7 +48,7 @@ def util_verify_signature(request):
 
     if not headers["Paddle-Signature"]:
         return False
-    paddle_request = PaddleRequest.create_from_body(body=raw_body, headers=headers)
+    paddle_request = PaddleRequest.create(body=raw_body, headers=headers)
 
     verifier = Verifier()
     try:
@@ -58,9 +58,9 @@ def util_verify_signature(request):
         return False
 
     if not verified:
-        logger.warning("❌ Invalid Paddle webhook signature")
-        return False
-    return True
+        logger.warning("Invalid Paddle webhook signature")
+
+    return verified
 
 def webhook_customer_created(data: dict):
     email = data.get("email")
@@ -118,6 +118,29 @@ def webhook_transaction_completed(data: dict):
         logger.exception(f"Exception '{exc}' occured when handling paddle transaction f{transaction_id}")
         return
 
+def webhook_product_created_or_updated(data: dict):
+    paddle_id = data.get("id")
+    verbose_name = data.get("name")
+    custom_data = data.get("custom_data")
+    status = data.get("status")
+
+    is_active = True if status == "active" else False
+
+    try:
+        if not custom_data:
+            return
+        name = custom_data.get("name")
+        product, _ = Product.objects.get_or_create(name=name)
+        product.paddle_id = paddle_id
+        product.verbose_name = verbose_name if not product.verbose_name else product.verbose_name
+        product.is_active = is_active
+        product.save()
+        return True
+    
+    except Exception as exc:
+        logger.exception(f"Exception '{exc}' occured when creating paddle product '{verbose_name}, {paddle_id}'")
+        return
+
 @csrf_exempt
 def paddle_webhook(request):
     """
@@ -127,7 +150,6 @@ def paddle_webhook(request):
     try:
         integrity_check = util_verify_signature(request)
         if not integrity_check:
-            logger.warning("❌ Invalid Paddle webhook signature")
             return JsonResponse({"error": "Invalid signature"}, status=403)
 
         payload = json.loads(request.body)
@@ -142,7 +164,12 @@ def paddle_webhook(request):
         
         if event_type == "transaction.completed":
             out = webhook_transaction_completed(data)
-        return HttpResponse("OK", status=200)
+        
+        if event_type in ["product.created", "product.updated"]:
+            out = webhook_product_created_or_updated(data)
+        
+        msg = "OK" if out else "Error"
+        return HttpResponse(msg, status=200)
 
     except Exception as e:
         logger.exception("❌ Paddle webhook failed")

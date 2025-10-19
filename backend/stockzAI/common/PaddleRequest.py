@@ -7,5 +7,5 @@ class PaddleRequest:
         self.body = body.encode() if isinstance(body, str) else body
 
     @staticmethod
-    def create_from_body(body: str, headers: Headers) -> "PaddleRequest":
+    def create(body: str, headers: Headers) -> "PaddleRequest":
         return PaddleRequest(headers=headers, body=body)
