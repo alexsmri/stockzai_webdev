@@ -97,7 +97,7 @@ def webhook_transaction_completed(data: dict):
         logger.exception(f"Exception '{exc}' occured when handling paddle transaction f{transaction_id}")
         return
 
-
+@csrf_exempt
 def paddle_webhook(request):
     """
     Handle Paddle webhook events with signature verification.

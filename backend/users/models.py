@@ -134,8 +134,8 @@ class UserConsents(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    paddle_id = models.CharField(max_length=128, unique=True)
-    verbose_name = models.CharField(max_length=128)
+    paddle_id = models.CharField(max_length=128, unique=True, blank=True)
+    verbose_name = models.CharField(max_length=128, blank=True)
     description = models.TextField(blank=True)
     permissions = models.JSONField(default=list, blank=True, validators=[validate_permission_choices])
     is_active = models.BooleanField(default=True)
