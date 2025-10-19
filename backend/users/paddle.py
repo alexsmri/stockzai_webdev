@@ -130,6 +130,9 @@ def webhook_product_created_or_updated(data: dict):
         if not custom_data:
             return
         name = custom_data.get("name")
+        if not name:
+            return
+        
         product, _ = Product.objects.get_or_create(name=name)
         product.paddle_id = paddle_id
         product.verbose_name = verbose_name if not product.verbose_name else product.verbose_name
