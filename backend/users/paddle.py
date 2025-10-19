@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from paddle_billing.Notifications import Secret, Verifier
 from .models import Product, Purchase, Subscription, User
+from paddle_billing.Notifications.Requests.Request import Request
 from datetime import datetime
 
 ALLOWED_INTERVALS = {
@@ -18,12 +19,13 @@ ALLOWED_INTERVALS = {
 
 API_KEY = os.getenv("PADDLE_API_KEY")
 WEBHOOK_SECRET = os.getenv("PADDLE_WEBHOOK_SECRET")
-
-environment = os.getenv("PADDLE_API_KEY")
-options = Options(Environment.SANDBOX) if environment == "sandbox" else None
+ENVIRONMENT = os.getenv("PADDLE_ENVIRONMENT")
+options = Options(Environment.SANDBOX) if ENVIRONMENT == "sandbox" else None
 
 paddle = Client(API_KEY, options=options)
 logger = logging.getLogger(__name__)
+logger.info(ENVIRONMENT)
+logger.info(WEBHOOK_SECRET)
 
 def util_get_expires_at(interval: str):
     if interval not in ALLOWED_INTERVALS.keys():
@@ -40,6 +42,25 @@ def util_get_expires_at(interval: str):
 
     return expires_at
 
+def util_verify_signature(request):
+    raw_body = request.body.decode("utf-8")
+    headers = {"Paddle-Signature": request.headers.get("Paddle-Signature")}
+
+    if not headers["Paddle-Signature"]:
+        return False
+    paddle_request = Request(body=raw_body, headers=headers)
+
+    verifier = Verifier()
+    try:
+        verified = verifier.verify(paddle_request, Secret(WEBHOOK_SECRET))
+    except Exception as e:
+        logger.exception("Verification exception")
+        return False
+
+    if not verified:
+        logger.warning("❌ Invalid Paddle webhook signature")
+        return False
+    return True
 
 def webhook_customer_created(data: dict):
     email = data.get("email")
@@ -102,9 +123,9 @@ def paddle_webhook(request):
     """
     Handle Paddle webhook events with signature verification.
     """
-    verifier = Verifier()
 
     try:
+        verifier = Verifier()
         integrity_check = verifier.verify(request, Secret(WEBHOOK_SECRET))
         if not integrity_check:
             logger.warning("❌ Invalid Paddle webhook signature")
