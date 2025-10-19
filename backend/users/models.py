@@ -134,12 +134,14 @@ class UserConsents(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
+    paddle_id = models.CharField(max_length=128, unique=True)
+    verbose_name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
     permissions = models.JSONField(default=list, blank=True, validators=[validate_permission_choices])
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return self.verbose_name
 
 
 class Pricing(models.Model):
@@ -166,7 +168,7 @@ class Pricing(models.Model):
         unique_together = ('product', 'name', 'interval')
 
     def __str__(self):
-        return f"{self.product.name} - {self.name} ({self.interval})"
+        return f"{self.product.verbose_name} - {self.name} ({self.interval})"
 
 
 class Subscription(models.Model):
@@ -178,7 +180,6 @@ class Subscription(models.Model):
     cancel_at_period_end = models.BooleanField(default=False)
     provider = models.CharField(max_length=64, blank=True)
     provider_subscription_id = models.CharField(max_length=128, blank=True)
-    provider_plan_id = models.CharField(max_length=128, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
