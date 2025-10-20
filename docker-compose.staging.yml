@@ -54,7 +54,7 @@ services:
     stdin_open: true
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.staging
     command: /bin/sh -c "rm -rf /output/* && cp -r /frontend/dist/* /output/"
     env_file: ./frontend/.env.staging
     depends_on:

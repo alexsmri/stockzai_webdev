@@ -1,0 +1,11 @@
+FROM node:20 AS build
+
+WORKDIR /frontend
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN bash -c "source ./load-env.sh .env.staging && npm run build"
