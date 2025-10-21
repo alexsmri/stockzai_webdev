@@ -15,6 +15,11 @@ import os
 from datetime import timedelta
 from celery.schedules import crontab
 
+
+def env_list(var_name: str) -> list:
+    """Return a list of comma separated values from an environment variable, skipping blanks."""
+    return [item for item in os.getenv(var_name, "").split(",") if item]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -27,9 +32,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS")
 
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -184,6 +189,8 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 FRONTEND_URL=os.getenv('FRONTEND_URL')
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://SACOM-redis:6379/1")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://SACOM-redis:6379/2")
