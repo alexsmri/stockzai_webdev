@@ -19,28 +19,42 @@ export default function COM_PremiumRoute({ children, prAccessConfig }: PI_Premiu
   const [accessPayload, setAccessPayload] = useState<ITF_AccessConfig | null>(
     userStore.read('PropertyAccess') as ITF_AccessConfig | null
   );
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
   const [stLoading, setStLoading] = useState<boolean>(true);
 
   useUserStoreSync(userStore, 'PropertyAccess', setAccessPayload, { autoFetch: true });
-  let hasAccess = false;
 
   const hasOverlap = (prCategory: 'permissions' | 'products') => {
-    if (accessPayload && prAccessConfig[prCategory] && accessPayload[prCategory]) {
-      for (const value in prAccessConfig[prCategory]) {
-        if (accessPayload[prCategory].includes(value)) {
-          return true;
-        }
-      }
+    const required = prAccessConfig[prCategory] ?? [];
+    const granted = accessPayload?.[prCategory] ?? [];
+
+    if (!required.length || !granted.length) {
+      return false;
     }
-    return false;
+
+    return required.some((item) => granted.includes(item));
   };
 
   useEffect(() => {
-    if (accessPayload !== null && typeof accessPayload === 'object') {
-      hasAccess = hasOverlap('products') || hasOverlap('permissions') ? true : false;
+    const requiresAccess = Boolean(
+      prAccessConfig.products?.length || prAccessConfig.permissions?.length
+    );
+
+    if (!requiresAccess) {
+      setHasAccess(true);
       setStLoading(false);
+      return;
     }
-  }, [accessPayload]);
+
+    const accessLoaded = accessPayload !== null && typeof accessPayload === 'object';
+
+    if (!accessLoaded) {
+      return;
+    }
+
+    setHasAccess(hasOverlap('products') || hasOverlap('permissions'));
+    setStLoading(false);
+  }, [accessPayload, prAccessConfig]);
 
   if (stLoading) {
     return <COM_Loading />;
