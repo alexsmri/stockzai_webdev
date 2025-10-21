@@ -55,10 +55,7 @@ def util_get_user(paddle_id: str):
         logger.warning(f"Failed to fetch Paddle customer {paddle_id}: {exc}")
         return None
     
-    # TS yields this error rn: AttributeError: 'Customer' object has no attribute 'get'
-    data = getattr(customer, "data", None) or customer.get("data") or {}
-    email = data.get("email")
-
+    email = customer.email
     if not email:
         logger.warning(f"Paddle customer {paddle_id} has no email field")
         return None
