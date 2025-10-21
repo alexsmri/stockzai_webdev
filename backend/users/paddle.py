@@ -43,6 +43,36 @@ def util_verify_signature(request):
 
     return verified
 
+def util_get_user(paddle_id: str):
+    user = User.objects.filter(paddle_id=paddle_id).first()
+
+    if user:
+        return user
+    
+    try:
+        customer = paddle.customers.get(paddle_id)
+    except Exception as exc:
+        logger.warning(f"Failed to fetch Paddle customer {paddle_id}: {exc}")
+        return None
+    
+    # TS yields this error rn: AttributeError: 'Customer' object has no attribute 'get'
+    data = getattr(customer, "data", None) or customer.get("data") or {}
+    email = data.get("email")
+
+    if not email:
+        logger.warning(f"Paddle customer {paddle_id} has no email field")
+        return None
+    
+    user = User.objects.filter(email=email).first()
+    if not user:
+        logger.warning(f"Local user with email {email} not found for Paddle ID {paddle_id}")
+        return None
+
+    user.paddle_id = paddle_id
+    user.save(update_fields=["paddle_id"])
+    logger.info(f"Linked Paddle customer {paddle_id} to user {user.id}")
+    return user
+
 def webhook_customer_created(data: dict):
     email = data.get("email")
     paddle_id = data.get("id")
@@ -63,12 +93,16 @@ def webhook_transaction_completed(data: dict):
     subscription_id = data.get("subscription_id")
     transaction_id = data.get("id")
 
+    user = util_get_user(customer_id)
+    if not user:
+        logger.warning(f"User {customer_id} not found by util_get_user")
+        return
+    
     try:
         if not items:
             logger.warning("Paddle transaction %s has no items", transaction_id)
             return False
-
-        user = User.objects.get(paddle_id=customer_id)
+        
 
         handled_item = False
         for item in items:
