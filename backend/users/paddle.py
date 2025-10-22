@@ -9,9 +9,13 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from paddle_billing import Client, Options, Environment
 from paddle_billing.Notifications import Secret, Verifier
+from paddle_billing.Resources.Subscriptions.Operations import CancelSubscription, ResumeSubscription
 
 from stockzAI.common.PaddleRequest import PaddleRequest
 from .models import Product, Purchase, Subscription, User
+from stockzAI.common.response import api_json_response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 API_KEY = os.getenv("PADDLE_API_KEY")
 WEBHOOK_SECRET = os.getenv("PADDLE_WEBHOOK_SECRET")
@@ -223,7 +227,105 @@ def paddle_webhook(request):
         logger.exception("Paddle webhook failed")
         return JsonResponse({"error": str(e)}, status=500)
 
+def _parse_plan_name(payload: dict):
+    if not isinstance(payload, dict):
+        return None
+    plan_name = payload.get("plan_name") or payload.get("plan")
+    if isinstance(plan_name, str):
+        return plan_name.strip()
+    return None
 
 
+def _find_user_subscription(user: User, plan_name: str | None) -> Subscription | None:
+    queryset = Subscription.objects.filter(user=user)
+    if plan_name:
+        queryset = queryset.filter(product__name=plan_name)
+    subscription = queryset.filter(is_active=True).first()
+    if subscription:
+        return subscription
+    return queryset.first()
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def view_cancel_plan(request):
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return api_json_response(error="Invalid payload.", status=400)
+
+    plan_name = _parse_plan_name(payload)
+    if not plan_name:
+        return api_json_response(error="Plan name is required.", status=400)
+
+    subscription = _find_user_subscription(request.user, plan_name)
+    if not subscription or subscription.product.name != plan_name:
+        return api_json_response(error="Subscription not found.", status=404)
+
+    if subscription.cancel_at_period_end:
+        return api_json_response(
+            msg={
+                "cancel_at_period_end": True,
+                "provider_subscription_id": subscription.provider_subscription_id,
+            }
+        )
+
+    if subscription.provider.lower() == "paddle" and subscription.provider_subscription_id:
+        try:
+            paddle.subscriptions.cancel(subscription.provider_subscription_id, CancelSubscription())
+        except Exception as exc:
+            logger.exception("Failed to cancel Paddle subscription %s", subscription.provider_subscription_id)
+            return api_json_response(error=f"Failed to cancel subscription: {exc}", status=400)
+
+    subscription.cancel_at_period_end = True
+    subscription.save(update_fields=["cancel_at_period_end"])
+
+    return api_json_response(
+        msg={
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "provider_subscription_id": subscription.provider_subscription_id,
+        }
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def view_resume_plan(request):
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return api_json_response(error="Invalid payload.", status=400)
+
+    plan_name = _parse_plan_name(payload)
+    if not plan_name:
+        return api_json_response(error="Plan name is required.", status=400)
+
+    subscription = _find_user_subscription(request.user, plan_name)
+    if not subscription or subscription.product.name != plan_name:
+        return api_json_response(error="Subscription not found.", status=404)
+
+    if not subscription.cancel_at_period_end:
+        return api_json_response(
+            msg={
+                "cancel_at_period_end": subscription.cancel_at_period_end,
+                "provider_subscription_id": subscription.provider_subscription_id,
+            }
+        )
+
+    if subscription.provider.lower() == "paddle" and subscription.provider_subscription_id:
+        try:
+            paddle.subscriptions.resume(subscription.provider_subscription_id, ResumeSubscription())
+        except Exception as exc:
+            logger.exception("Failed to resume Paddle subscription %s", subscription.provider_subscription_id)
+            return api_json_response(error=f"Failed to resume subscription: {exc}", status=400)
+
+    subscription.cancel_at_period_end = False
+    subscription.is_active = True
+    subscription.save(update_fields=["cancel_at_period_end", "is_active"])
+
+    return api_json_response(
+        msg={
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "provider_subscription_id": subscription.provider_subscription_id,
+        }
+    )

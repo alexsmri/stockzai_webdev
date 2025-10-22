@@ -190,6 +190,14 @@ export abstract class STO_Base<TValidKey extends string> {
         return this.data[key] as Record<string, unknown>;
     }
 
+    set(key: TValidKey, setData: any): any {
+        this.ensureKeyInitialized(key);
+        this.data[key] = setData;
+        this.persist(key);
+        this.notify(key);
+        return this.data[key];
+    }
+
     clear(key: TValidKey): void {
         this.ensureKeyInitialized(key);
         this.data[key] = {};

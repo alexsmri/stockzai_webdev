@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import LOGO_schwarzquer from '@/assets/media/LOGO_quadrat.svg?react';
 import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
@@ -66,7 +66,6 @@ function readUsername(data: any | null): string {
 export default function COM_Sidebar() {
   const { width } = useWindowDimensions();
   const location = useLocation();
-  const navigate = useNavigate();
   const isMobile = width <= MOBILE_BREAKPOINT;
   const [stExpanded, setStExpanded] = useState<boolean>(!isMobile);
   const sidebarWidth = isMobile
@@ -111,7 +110,7 @@ export default function COM_Sidebar() {
   const displayName = username || 'Profile';
 
   const handleProfileNavigate = () => {
-    navigate('/users/edit');
+    userStore.set('StateEditing', true);
   };
 
   const placeholder = (

@@ -5,6 +5,7 @@ const ROUTE_CONFIG = {
   PropertyConsents: "/api/users/consents/",
   PropertyTutorialCompleted: "/local/users/tutorial-completed/",
   PropertyAccess: "/api/users/access/",
+  PropertySubscriptions: "/api/users/subscriptions/",
   ActionVerification: "/api/users/verification/",
   ActionRegistrationCheck: "/api/users/register/check/",
   TokenVerificationRequest: "/api/users/verification/token/",
@@ -19,6 +20,9 @@ const ROUTE_CONFIG = {
   ActionUnsubscribeNewsletter: "/api/users/unsubscribe-newsletter/",
   ActionSubscribeNewsletterRequest: "/api/users/subscribe-newsletter/token/",
   ActionSubscribeNewsletterVerify: "/api/users/subscribe-newsletter/verify/",
+  ActionCancelSubscription: "/api/users/subscriptions/cancel/",
+  ActionResumeSubscription: "/api/users/subscriptions/resume/",
+  StateEditing: ""
 } as const;
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;
@@ -29,6 +33,7 @@ const PERSISTED_KEYS: ValidKeys[] = [
   "ActionRefreshToken",
   "PropertyTutorialCompleted",
   "PropertyAccess",
+  "PropertySubscriptions",
 ];
 
 export default class STO_Users extends STO_Base<ValidKeys> {

@@ -11,7 +11,6 @@ import { PRV_CompaniesStore } from './context/CTX_CompanyStore';
 import PA_PasswordResetRequest from './pages/PAG_PasswordResetRequest';
 import PAG_PasswordReset from './pages/PAG_PasswordReset';
 import COM_Loading from './components/COM_Loading';
-import PAG_EditProfile from './pages/PAG_EditProfile';
 import { PRV_Alert } from './context/CTX_Alert';
 import PAG_Legal from './pages/PAG_Legal';
 import COM_HandleTokens from './components/COM_HandleTokens';
@@ -65,14 +64,6 @@ function App() {
                   <Route
                     path="/users/password-reset/token/request"
                     element={<PA_PasswordResetRequest />}
-                  />
-                  <Route
-                    path="/users/edit"
-                    element={
-                      <COM_ProtectedRoute>
-                        <PAG_EditProfile />
-                      </COM_ProtectedRoute>
-                    }
                   />
                   <Route path="/users/password-reset" element={<PAG_PasswordReset />} />
                   <Route

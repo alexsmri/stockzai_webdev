@@ -8,6 +8,7 @@ from users.models import (
     TokenNewsletter,
     UserConsents,
     TrackingEvent,
+    Subscription,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
@@ -376,6 +377,29 @@ def view_consents(request):
         else {}
     )
     return api_json_response(msg=msg)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def view_get_subscriptions(request):
+    subscriptions = (
+        Subscription.objects.filter(user=request.user)
+        .select_related("product")
+        .order_by("-updated_at")
+    )
+    response_payload = [
+        {
+            "product": subscription.product.name,
+            "expires_at": subscription.expires_at.isoformat() if subscription.expires_at else None,
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "provider": subscription.provider,
+            "provider_subscription_id": subscription.provider_subscription_id,
+        }
+        for subscription in subscriptions
+        if subscription.is_active
+    ]
+    logger.info(subscriptions)
+    return api_json_response(msg=response_payload)
 
 
 @api_view(["GET"])
