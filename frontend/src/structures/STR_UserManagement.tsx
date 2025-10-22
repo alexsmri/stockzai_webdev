@@ -78,57 +78,61 @@ export default function STR_UserManagement() {
   }, [stOpen]);
 
   const renderContent = activeTab === 'account' ? <COM_FormEditUser /> : <COM_UserPlans />;
-
+  // height still looks shit sometimes (changes when menu changes)
   return (
     <COM_Lightbox isOpen={stOpen} onClose={() => {}}>
       <div
-        className="area-flex-col look-div-subtle"
+        className="look-div-subtle mod-padding-none mod-center"
         style={{
           position: 'relative',
+          backgroundColor: 'var(--color-primary)',
           width: 'min(72rem, 100%)',
-          maxHeight: 'calc(100vh - calc(var(--default-font-size) * 4))',
-          overflow: 'hidden',
+          height: 'clamp(calc(var(--default-font-size) * 30), 80%, 80%)',
         }}
       >
-        <button
-          type="button"
-          onClick={handleClose}
-          aria-label="Close user management"
-          className="look-button-ghost mod-button-auth"
+        <div
+          className="area-flex-col look-div-subtle"
           style={{
-            position: 'absolute',
-            top: 'calc(var(--default-font-size) * 0.5)',
-            right: 'calc(var(--default-font-size) * 0.5)',
-            zIndex: 2,
-            background: 'rgba(15, 23, 42, 0.05)',
-            borderRadius: '50%',
-            width: 'calc(var(--default-font-size) * 2.5)',
-            height: 'calc(var(--default-font-size) * 2.5)',
-            display: 'grid',
-            placeItems: 'center',
+            overflow: 'hidden',
           }}
         >
-          <ICON_Close
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="Close user management"
+            className="look-button-ghost mod-button-auth"
             style={{
-              width: 'calc(var(--default-font-size) * 1.2)',
-              height: 'calc(var(--default-font-size) * 1.2)',
-            }}
-          />
-        </button>
-        <div
-          className="area-flex-row"
-          style={{ flex: 1, alignItems: 'stretch', minHeight: '24rem', position: 'relative' }}
-        >
-          <COM_SidebarUsers activeTab={activeTab} onSelect={handleSelect} />
-          <div
-            className="area-flex-col mod-padding-xl mod-gap-xl"
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              paddingTop: 'calc(var(--default-font-size) * 3)',
+              position: 'absolute',
+              top: 'calc(var(--default-font-size) * 0.5)',
+              right: 'calc(var(--default-font-size) * 0.5)',
+              zIndex: 2,
+              background: 'rgba(15, 23, 42, 0.05)',
+              borderRadius: '50%',
+              width: 'calc(var(--default-font-size) * 2.5)',
+              height: 'calc(var(--default-font-size) * 2.5)',
+              display: 'grid',
+              placeItems: 'center',
             }}
           >
-            {renderContent}
+            <ICON_Close
+              style={{
+                width: 'calc(var(--default-font-size) * 1.2)',
+                height: 'calc(var(--default-font-size) * 1.2)',
+              }}
+            />
+          </button>
+          <div className="area-flex-row" style={{ width: '100%', minHeight: '24rem' }}>
+            <COM_SidebarUsers activeTab={activeTab} onSelect={handleSelect} />
+            <div
+              className="area-flex-col mod-padding-xl mod-gap-xl"
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                paddingTop: 'calc(var(--default-font-size) * 3)',
+              }}
+            >
+              {renderContent}
+            </div>
           </div>
         </div>
       </div>

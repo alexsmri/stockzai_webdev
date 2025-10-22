@@ -54,15 +54,10 @@ export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersPr
 
   return (
     <aside
-      className="area-flex-col mod-gap-xl mod-padding-xl"
-      style={{
-        width: 'min(20rem, 30vw)',
-        minWidth: '16rem',
-        borderRight: '1px solid var(--color-secondary-a10)',
-      }}
+      className="area-sidebar-users area-flex-col mod-align-left"
       aria-label="User management navigation"
     >
-      <div className="area-flex-col mod-gap-m mod-padding-none">
+      <div className="area-flex-row mod-align-center mod-padding-none">
         <div
           aria-hidden
           style={{
@@ -73,31 +68,25 @@ export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersPr
             flexShrink: 0,
           }}
         />
-        <div className="area-flex-col mod-gap-s mod-padding-none">
-          <span className="look-text-x2 look-text-bold">{displayName}</span>
-          <span className="look-text-x0 look-text-subtle">Manage your account</span>
-        </div>
+        <span
+          className="look-text-x1 mod-centerheight mod-text-wrap-gradient mod-align-left"
+          style={{ flex: 1 }}
+        >
+          {displayName}
+        </span>
       </div>
-      <nav className="area-flex-col mod-gap-s mod-padding-none" style={{ width: '100%' }}>
+      <nav className="area-flex-col mod-align-left mod-padding-none" style={{ width: '100%' }}>
         {NAV_ITEMS.map((item) => {
           const isActive = activeTab === item.key;
           return (
             <button
               key={item.key}
               type="button"
-              className={[
-                'look-button-ghost',
-                'mod-button-auth',
-                'area-flex-row',
-                'mod-gap-s',
-                'mod-align-left',
-                isActive ? 'mod-selected' : '',
-              ]
+              className={['look-button-ghost', 'mod-button-auth', isActive ? 'mod-selected' : '']
                 .filter(Boolean)
                 .join(' ')}
               onClick={() => onSelect(item.key)}
               aria-pressed={isActive}
-              style={{ justifyContent: 'flex-start' }}
             >
               {item.label}
             </button>

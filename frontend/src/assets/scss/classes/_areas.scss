@@ -68,7 +68,6 @@
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(0.5rem);
-    padding-top: var(--height-navbar);
     overflow-y: scroll;
 }
 
@@ -266,6 +265,11 @@
     inset: 0 auto 0 0;
     height: 100vh;
     box-shadow: 0 0 2rem var(--color-primary-a40);
+}
+
+.area-sidebar-users {
+    width: var(--sidebar-width-expanded);
+    min-width: var(--sidebar-width-expanded);
 }
 
 .area-searchbar {
