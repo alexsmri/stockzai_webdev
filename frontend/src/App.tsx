@@ -28,6 +28,7 @@ import PAG_Alerts from './pages/PAG_Alerts';
 import COM_PremiumRoute from './components/COM_PremiumRoute';
 import PAG_ChooseTicker from './pages/PAG_ChooseTicker';
 import PAG_Checkout from './pages/PAG_Checkout';
+import STR_UserManagement from './structures/STR_UserManagement';
 
 function Logout() {
   localStorage.clear();
@@ -53,6 +54,7 @@ function App() {
             <PRV_Lightbox>
               <BrowserRouter>
                 <COM_LightboxTimed />
+                <STR_UserManagement />
                 <Routes>
                   <Route path="/" element={<Navigate to="/companies/search" replace />} />
                   <Route path="/legal/:page" element={<PAG_Legal />} />

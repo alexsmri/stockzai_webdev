@@ -16,11 +16,8 @@ function isValidTab(value: string | null): value is SidebarUsersTab {
 
 export default function STR_UserManagement() {
   const store = useUserStore();
-
-  const [stOpen, setStOpen] = useState<boolean | null>(
-    store.read('StateEditing') as boolean | null
-  );
-  useUserStoreSync(store, 'StateEditing', setStOpen);
+  const [stOpen, setStOpen] = useState<boolean>(Boolean(store.read('StateEditing')));
+  useUserStoreSync(store, 'StateEditing', (value) => setStOpen(Boolean(value)));
 
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = useMemo<SidebarUsersTab>(() => {
@@ -36,9 +33,9 @@ export default function STR_UserManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTab]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     store.set('StateEditing', false);
-  };
+  }, [store]);
 
   const handleSelect = useCallback(
     (tab: SidebarUsersTab) => {
@@ -56,6 +53,9 @@ export default function STR_UserManagement() {
   );
 
   useEffect(() => {
+    if (!stOpen) {
+      return undefined;
+    }
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -64,20 +64,23 @@ export default function STR_UserManagement() {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [handleClose]);
+  }, [handleClose, stOpen]);
 
   useEffect(() => {
+    if (!stOpen) {
+      return undefined;
+    }
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, [stOpen]);
 
   const renderContent = activeTab === 'account' ? <COM_FormEditUser /> : <COM_UserPlans />;
 
   return (
-    <COM_Lightbox isOpen={Boolean(stOpen)} onClose={() => {}}>
+    <COM_Lightbox isOpen={stOpen} onClose={() => {}}>
       <div
         className="area-flex-col look-div-subtle"
         style={{
