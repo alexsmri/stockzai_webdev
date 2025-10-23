@@ -310,31 +310,33 @@
 }
 
 .area-tutorial-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-
-  .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    pointer-events: all; 
-    transition: clip-path 0.3s ease;
-    mask: url(#hole-mask);
-    -webkit-mask: url(#hole-mask);
-  }
+    z-index: 4;
+    pointer-events: none;
 
-  .tooltip {
-    position: absolute;
-    z-index: 10000;
-    background: #111;
-    color: #fff;
-    border-radius: 8px;
-    padding: 1rem;
-    pointer-events: all;
-    width: 250px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      pointer-events: all; 
+      transition: clip-path 0.3s ease;
+      mask: url(#hole-mask);
+      -webkit-mask: url(#hole-mask);
+      z-index: 0;
+    }
+
+    .tooltip {
+      position: absolute;
+      z-index: 1;
+      background: #111;
+      color: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      pointer-events: all;
+      width: clamp(16rem, 90vw, 20rem);
+      max-width: 90vw;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
   }
 
   .hole {

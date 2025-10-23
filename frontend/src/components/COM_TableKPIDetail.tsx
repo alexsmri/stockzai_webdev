@@ -21,7 +21,12 @@ const ROLE_BLOB_LOOKUP = {
   valuation: 'valScoresDict',
 };
 
-export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
+interface PI_TableKPIDetail {
+  prKPI: string;
+  prOnMount?: (element: HTMLDivElement | null) => void;
+}
+
+export default function COM_TableKPIDetail({ prKPI, prOnMount }: PI_TableKPIDetail) {
   const store = useCompaniesStore();
   const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);
   const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
@@ -66,7 +71,7 @@ export default function COM_TableKPIDetail({ prKPI }: { prKPI: string }) {
   }
 
   return (
-    <div data-tutorial="kpi-details-table">
+    <div data-tutorial="kpi-details-table" ref={prOnMount}>
       <DCOM_TableInfo prTitle="Details" prData={tableData} prType="table" />
     </div>
   );

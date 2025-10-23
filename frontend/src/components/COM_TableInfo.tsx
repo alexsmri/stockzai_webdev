@@ -16,9 +16,16 @@ interface ITF_TableInfoProps {
     | 'valuation'
     | 'blobs';
   prFree?: boolean;
+  prFocusKPI?: string;
+  prOnFocusKPIRef?: (element: HTMLParagraphElement | null) => void;
 }
 
-export default function COM_TableInfo({ prTableRole, prFree = false }: ITF_TableInfoProps) {
+export default function COM_TableInfo({
+  prTableRole,
+  prFree = false,
+  prFocusKPI,
+  prOnFocusKPIRef,
+}: ITF_TableInfoProps) {
   const store = useCompaniesStore();
   const text = getRoleText(prTableRole);
   const storeKey = prFree ? 'PropertyCompanyProfileFree' : 'PropertyCompanyProfile';
@@ -36,7 +43,13 @@ export default function COM_TableInfo({ prTableRole, prFree = false }: ITF_Table
         <h3 className="look-text-x2 look-text-normal">{text}</h3>
         <div className="look-div-subtle">
           {Object.entries(flattenedData).map(([key, value]) => (
-            <COM_KPIInfo prTableRole={prTableRole} prKPI={key} prValue={value} />
+            <COM_KPIInfo
+              key={key}
+              prTableRole={prTableRole}
+              prKPI={key}
+              prValue={value}
+              prAttachRef={prFocusKPI === key ? prOnFocusKPIRef : undefined}
+            />
           ))}
         </div>
       </div>

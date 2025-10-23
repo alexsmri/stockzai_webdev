@@ -22,18 +22,23 @@ type CompanyProfileRecord = {
 const TUTORIAL_STEPS = [
   {
     key: 'scores',
-    title: 'Demo Score Title',
-    body: 'Demo text guiding users through the score section with financial and valuation scores.',
+    title: 'Start with the Scores',
+    body: 'Review the aggregate financial and valuation scores here.',
   },
   {
-    key: 'pe-label',
-    title: 'Demo KPI Title',
-    body: 'Demo text instructing users to click on the P/E Ratio label to open more details.',
+    key: 'risk',
+    title: 'Review Risk Scores',
+    body: 'This panel highlights upcoming risk indicators alongside the basics.',
+  },
+  {
+    key: 'profit-margin',
+    title: 'Open Profit Margin Details',
+    body: 'Click Profit Margin to launch the KPI lightbox.',
   },
   {
     key: 'kpi-details',
-    title: 'Demo KPI Details Title',
-    body: 'Demo text highlighting the KPI details table that appears in the lightbox.',
+    title: 'Explore KPI Details',
+    body: 'Use the lightbox table to compare history and percentile performance.',
   },
 ];
 
@@ -48,9 +53,10 @@ function PAG_CompaniesFreeContent({
   const [companyDataFree, setCompanyDataFree] = useState<CompanyProfileRecord | null>(null);
   const [isTutorialActive, setIsTutorialActive] = useState(shouldShowTutorial);
   const scoreSectionRef = useRef<HTMLDivElement | null>(null);
-  const peLabelRef = useRef<HTMLElement | null>(null);
-  const kpiDetailsRef = useRef<HTMLElement | null>(null);
-  const { stIsOpen: isLightboxOpen } = useLightbox();
+  const riskSectionRef = useRef<HTMLDivElement | null>(null);
+  const profitMarginRef = useRef<HTMLParagraphElement | null>(null);
+  const kpiDetailsRef = useRef<HTMLDivElement | null>(null);
+  const { stIsOpen: isLightboxOpen, handleLBOpen } = useLightbox();
 
   useCompaniesStoreSync<CompanyProfileRecord>(
     store,
@@ -79,32 +85,9 @@ function PAG_CompaniesFreeContent({
   }, [shouldShowTutorial]);
 
   useEffect(() => {
-    const assignLabelRef = () => {
-      const selectors = ['trailingPE', 'priceToEarnings', 'pe_ratio'];
-      const element =
-        selectors
-          .map((key) => document.querySelector<HTMLElement>(`[data-kpi="${key}"]`))
-          .find((node): node is HTMLElement => Boolean(node)) ?? null;
-      peLabelRef.current = element;
-    };
-    assignLabelRef();
-    const raf = window.requestAnimationFrame(assignLabelRef);
-    return () => window.cancelAnimationFrame(raf);
-  }, [companyDataFree]);
-
-  useEffect(() => {
     if (!isLightboxOpen) {
       kpiDetailsRef.current = null;
-      return;
     }
-    const assignDetailsRef = () => {
-      kpiDetailsRef.current = document.querySelector<HTMLElement>(
-        '[data-tutorial="kpi-details-table"]'
-      );
-    };
-    assignDetailsRef();
-    const raf = window.requestAnimationFrame(assignDetailsRef);
-    return () => window.cancelAnimationFrame(raf);
   }, [isLightboxOpen]);
 
   const latestEntries = companyDataFree?.latest_entries ?? {};
@@ -120,10 +103,15 @@ function PAG_CompaniesFreeContent({
   const tutorialSteps = useMemo(() => {
     return [
       { ...TUTORIAL_STEPS[0], ref: scoreSectionRef },
-      { ...TUTORIAL_STEPS[1], ref: peLabelRef },
-      { ...TUTORIAL_STEPS[2], ref: kpiDetailsRef },
+      { ...TUTORIAL_STEPS[1], ref: riskSectionRef },
+      {
+        ...TUTORIAL_STEPS[2],
+        ref: profitMarginRef,
+        onContinue: () => handleLBOpen('profitMargins'),
+      },
+      { ...TUTORIAL_STEPS[3], ref: kpiDetailsRef },
     ];
-  }, [scoreSectionRef, peLabelRef, kpiDetailsRef]);
+  }, [scoreSectionRef, riskSectionRef, profitMarginRef, kpiDetailsRef, handleLBOpen]);
 
   const handleTutorialFinish = () => {
     setIsTutorialActive(false);
@@ -133,9 +121,12 @@ function PAG_CompaniesFreeContent({
     <STR_ApplicationPage>
       <div className="area-flex-col mod-padding-xl mod-align-stretch">
         <div className="area-flex-wrap mod-flex-grow-children mod-padding-none">
-          <COM_LightboxKPI />
+          <COM_LightboxKPI
+            prOnDetailsRef={(element) => {
+              kpiDetailsRef.current = element;
+            }}
+          />
           <div
-            ref={scoreSectionRef}
             className="area-flex-col mod-align-stretch mod-padding-none"
             style={{ maxWidth: '25%' }}
           >
@@ -143,16 +134,23 @@ function PAG_CompaniesFreeContent({
               <DCOM_KPIInfoCard prLabel="Symbol" prValue={symbolValue} />
               <COM_KPIInfoCard prTableRole="basics" prKPI="name" prValue={nameValue} />
             </div>
-            <COM_SectionInfo title="Scores." prShowChange={true}>
-              <div className="area-flex-row mod-padding-none mod-gap-s">
-                <COM_ScoreRadial KPI="financial_score" />
-                <COM_ScoreRadial KPI="valuation_score" />
-              </div>
-            </COM_SectionInfo>
+            <div ref={scoreSectionRef}>
+              <COM_SectionInfo title="Scores." prShowChange={true}>
+                <div className="area-flex-row mod-padding-none mod-gap-s">
+                  <COM_ScoreRadial KPI="financial_score" />
+                  <COM_ScoreRadial KPI="valuation_score" />
+                </div>
+              </COM_SectionInfo>
+            </div>
           </div>
           <COM_SectionInfo title="Basics.">
             <COM_TableInfo prTableRole="basics" />
           </COM_SectionInfo>
+          <div ref={riskSectionRef}>
+            <COM_SectionInfo title="Risk Scores.">
+              <COM_TableInfo prTableRole="basics" />
+            </COM_SectionInfo>
+          </div>
         </div>
         <div className="area-flex-wrap mod-flex-grow-children mod-align-start mod-padding-none">
           <COM_SectionInfo
@@ -161,7 +159,14 @@ function PAG_CompaniesFreeContent({
               valuation: 'Valuation Ratios',
             }}
           >
-            <COM_TableInfo prTableRole="ratios" prFree={true} />
+            <COM_TableInfo
+              prTableRole="ratios"
+              prFree={true}
+              prFocusKPI="profitMargins"
+              prOnFocusKPIRef={(element) => {
+                profitMarginRef.current = element;
+              }}
+            />
             <COM_TableInfo prTableRole="valuation" prFree={true} />
           </COM_SectionInfo>
           <COM_SectionInfo

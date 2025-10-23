@@ -15,7 +15,6 @@ import { PRV_Alert } from './context/CTX_Alert';
 import PAG_Legal from './pages/PAG_Legal';
 import COM_HandleTokens from './components/COM_HandleTokens';
 import PAG_FormFeedback from './pages/PAG_FormFeedback';
-import COM_LightboxTimed from './components/COM_LightboxTimed';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
 import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
@@ -53,7 +52,6 @@ function App() {
           <PRV_Alert>
             <PRV_Lightbox>
               <BrowserRouter>
-                <COM_LightboxTimed />
                 <STR_UserManagement />
                 <Routes>
                   <Route path="/" element={<Navigate to="/companies/search" replace />} />

@@ -13,7 +13,11 @@ import type { TYP_APIResponseKPI } from '../types/types';
 
 const KPI_BLOB_ROLES = ['ratios', 'valuation'];
 
-export default function COM_LightboxKPI() {
+interface PI_LightboxKPI {
+  prOnDetailsRef?: (element: HTMLDivElement | null) => void;
+}
+
+export default function COM_LightboxKPI({ prOnDetailsRef }: PI_LightboxKPI = {}) {
   const { stIsOpen: isOpen, stSelectedKPI: selectedKPI, handleClose: close } = useLightbox();
   const store = useCompaniesStore();
   const [kpiCatalog, setKpiCatalog] = useState<TYP_APIResponseKPI | null>(null);
@@ -42,7 +46,9 @@ export default function COM_LightboxKPI() {
           )}
           <div className="area-flex-wrap mod-flex-grow-children">
             <COM_ChartLine KPI={selectedKPI} />
-            {KPI_BLOB_ROLES.includes(utRole) && <COM_TableKPIDetail prKPI={selectedKPI} />}
+            {KPI_BLOB_ROLES.includes(utRole) && (
+              <COM_TableKPIDetail prKPI={selectedKPI} prOnMount={prOnDetailsRef} />
+            )}
           </div>
         </div>
       </COM_Lightbox>

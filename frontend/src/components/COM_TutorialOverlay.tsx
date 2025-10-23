@@ -10,6 +10,7 @@ interface Step {
   title: string;
   body: string;
   continueClickObject?: RefObject<HTMLElement | null>;
+  onContinue?: () => void;
 }
 
 interface PI_TutorialOverlay {
@@ -102,6 +103,9 @@ export default function COM_TutorialOverlay({
   }, [activeStep, updateRect]);
 
   const handleNext = useCallback(() => {
+    if (activeStep?.onContinue) {
+      activeStep.onContinue();
+    }
     setStepIndex((current) => {
       if (current < prSteps.length - 1) {
         return current + 1;
@@ -110,7 +114,7 @@ export default function COM_TutorialOverlay({
       setRect(null);
       return current;
     });
-  }, [prSteps.length]);
+  }, [activeStep, prSteps.length]);
 
   useEffect(() => {
     if (!activeStep?.continueClickObject || showCompletion) {
@@ -160,6 +164,20 @@ export default function COM_TutorialOverlay({
     };
   }, [activeStep, handleNext, showCompletion]);
 
+  useEffect(() => {
+    if (!activeStep || showCompletion) {
+      return undefined;
+    }
+    const target = activeStep.ref.current;
+    if (!target) {
+      return undefined;
+    }
+    const raf = window.requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [activeStep, showCompletion]);
+
   const handleClose = () => {
     userStore.setTutorialCompleted(true);
     setShowCompletion(false);
@@ -180,8 +198,8 @@ export default function COM_TutorialOverlay({
   const tooltipStyle =
     rect && !showCompletion
       ? {
-          top: Math.min(y + h + 16, window.innerHeight - 240),
-          left: Math.min(x, window.innerWidth - 320),
+          top: Math.max(Math.min(y + h + 16, window.innerHeight - 240), 16),
+          left: Math.max(Math.min(x, window.innerWidth - 320), 16),
         }
       : {
           top: '50%',
@@ -189,7 +207,7 @@ export default function COM_TutorialOverlay({
           transform: 'translate(-50%, -50%)',
         };
 
-  const needsExternalClick = Boolean(activeStep?.continueClickObject);
+  const needsExternalClick = Boolean(activeStep?.continueClickObject && !activeStep?.onContinue);
   const nextLabel =
     needsExternalClick
       ? 'Click highlighted area'
@@ -199,13 +217,17 @@ export default function COM_TutorialOverlay({
 
   return (
     <>
-      <svg width="100vw" height="100vh" style={{ position: 'fixed' }}>
+      <svg
+        width="100vw"
+        height="100vh"
+        style={{ position: 'fixed', zIndex: 5, pointerEvents: 'none' }}
+      >
         <mask id="hole-mask">
           <rect width="100%" height="100%" fill="white" />
           <rect x={x} y={y} width={w} height={h} fill="black" />
         </mask>
       </svg>
-      <div className="area-tutorial-overlay">
+      <div className="area-tutorial-overlay mod-z-5">
         <div className="overlay" />
         <div className="tooltip" style={tooltipStyle}>
           {!showCompletion && activeStep ? (
