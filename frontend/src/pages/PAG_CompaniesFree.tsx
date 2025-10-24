@@ -116,7 +116,7 @@ function PAG_CompaniesFreeContent({
   const handleTutorialFinish = () => {
     setIsTutorialActive(false);
   };
-
+  // Looks shit on mobile, especially the Scores / Name / SYMBOL Section. Gotta fix
   return (
     <STR_ApplicationPage>
       <div className="area-flex-col mod-padding-xl mod-align-stretch">
