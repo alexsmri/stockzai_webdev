@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env*
+
+# SSL certificates
+nginx/certs/*.pem

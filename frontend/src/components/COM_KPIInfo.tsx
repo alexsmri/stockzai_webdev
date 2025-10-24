@@ -19,6 +19,11 @@ interface ITF_KPIInfoProps {
 
 export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfoProps) {
   const { handleLBOpen } = useLightbox();
+  const utText = getKPIText(prKPI);
+  if (!utText) {
+    return null;
+  }
+
   return (
     <>
       {!ROLES_NO_INDICATORS.includes(prTableRole) ? (
@@ -28,7 +33,7 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
               className="look-button-ghost mod-align-left mod-text-wrap"
               onClick={() => handleLBOpen(prKPI)}
             >
-              {getKPIText(prKPI)}
+              {utText}
             </p>
             <p>{formatLargeNumber(prValue)}</p>
           </div>
@@ -36,7 +41,7 @@ export default function COM_KPIInfo({ prTableRole, prKPI, prValue }: ITF_KPIInfo
         </div>
       ) : (
         <div key={prKPI} className="area-flex-row mod-space-between">
-          <p className="mod-align-left">{getKPIText(prKPI)}</p>
+          <p className="mod-align-left">{utText}</p>
           <p className="mod-align-right">{formatLargeNumber(prValue)}</p>
         </div>
       )}
