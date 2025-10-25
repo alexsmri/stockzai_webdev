@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import LOGO_schwarzquer from '@/assets/media/LOGO_quadrat.svg?react';
 import ICON_Expand from '@/assets/media/ICON_Expand.svg?react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
 import ICON_Feedback from '@/assets/media/ICON_Feedback.svg?react';
+import ICON_User from '@/assets/media/ICON_User.svg?react';
 import { useWindowDimensions, useUserStoreSync } from '../hooks/hooks';
 import { useUserStore } from '../context/CTX_UserStore';
 import { MOBILE_BREAKPOINT } from '../constants';
@@ -66,6 +67,7 @@ function readUsername(data: any | null): string {
 export default function COM_Sidebar() {
   const { width } = useWindowDimensions();
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = width <= MOBILE_BREAKPOINT;
   const [stExpanded, setStExpanded] = useState<boolean>(!isMobile);
   const sidebarWidth = isMobile
@@ -106,11 +108,24 @@ export default function COM_Sidebar() {
     userStore.read('PropertyCredentials')
   );
   useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
+  const [stLoginTokens, setStLoginTokens] = useState<any | null>(userStore.read('ActionLogin'));
+  useUserStoreSync(userStore, 'ActionLogin', setStLoginTokens);
+  const isAuthenticated = Boolean(
+    (stLoginTokens && typeof stLoginTokens === 'object' && stLoginTokens?.access) ||
+      (stCredentials && typeof stCredentials === 'object')
+  );
   const username = readUsername(stCredentials);
   const displayName = username || 'Profile';
 
   const handleProfileNavigate = () => {
     userStore.set('StateEditing', true);
+  };
+
+  const handleSignUpNavigate = () => {
+    navigate('/users/register');
+    if (isMobile) {
+      setStExpanded(false);
+    }
   };
 
   const placeholder = (
@@ -200,45 +215,72 @@ export default function COM_Sidebar() {
             </NavLink>
           ))}
         </nav>
-        <button
-          type="button"
-          className="area-flex-row mod-gap-s mod-align-left"
-          onClick={handleProfileNavigate}
-          aria-label="Edit profile"
-          style={{
-            width: '100%',
-            marginTop: 'auto',
-            justifyContent: showLabels ? 'flex-start' : 'center',
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            color: 'inherit',
-            cursor: 'pointer',
-          }}
-        >
-          <span
-            aria-hidden
+        {isAuthenticated ? (
+          <button
+            type="button"
+            className="area-flex-row mod-gap-s mod-align-left"
+            onClick={handleProfileNavigate}
+            aria-label="Edit profile"
             style={{
-              width: 'calc(var(--default-font-size) * 2.5)',
-              height: 'calc(var(--default-font-size) * 2.5)',
-              borderRadius: '50%',
-              backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
-              flexShrink: 0,
-              display: 'inline-block',
+              width: '100%',
+              marginTop: 'auto',
+              justifyContent: showLabels ? 'flex-start' : 'center',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              color: 'inherit',
+              cursor: 'pointer',
             }}
-          />
-          {showLabels && (
-            <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
-              <span
-                className="look-text-x1 look-text-normal look-text-clickable mod-padding-none"
-                style={{ justifyContent: 'initial' }}
-              >
-                {displayName}
-              </span>
-              <span className="look-text-x0 look-text-subtle">Free Plan</span>
-            </div>
-          )}
-        </button>
+          >
+            <span
+              aria-hidden
+              style={{
+                width: 'calc(var(--default-font-size) * 2.5)',
+                height: 'calc(var(--default-font-size) * 2.5)',
+                borderRadius: '50%',
+                backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
+                flexShrink: 0,
+                display: 'inline-block',
+              }}
+            />
+            {showLabels && (
+              <div className="area-flex-col mod-gap-none mod-padding-none mod-align-left">
+                <span
+                  className="look-text-x1 look-text-normal look-text-clickable mod-padding-none"
+                  style={{ justifyContent: 'initial' }}
+                >
+                  {displayName}
+                </span>
+                <span className="look-text-x0 look-text-subtle">Free Plan</span>
+              </div>
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={['area-flex-row', 'look-button-ghost', 'mod-button-auth']
+              .filter(Boolean)
+              .join(' ')}
+            style={{
+              width: '100%',
+              marginTop: 'auto',
+              justifyContent: showLabels ? 'center' : 'center',
+            }}
+            onClick={handleSignUpNavigate}
+            aria-label="Sign Up"
+          >
+            {showLabels ? (
+              <span style={{ width: '100%', textAlign: 'center' }}>Sign Up</span>
+            ) : (
+              <ICON_User
+                style={{
+                  width: 'calc(var(--default-font-size) * 1.3)',
+                  height: 'calc(var(--default-font-size) * 1.3)',
+                }}
+              />
+            )}
+          </button>
+        )}
       </aside>
     </>
   );
