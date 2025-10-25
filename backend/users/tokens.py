@@ -1,6 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator as PWRGenerator
-import random
-import math
+import secrets
+import string
 
 class PasswordResetTokenGenerator(PWRGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -9,11 +9,8 @@ class PasswordResetTokenGenerator(PWRGenerator):
         )
 
 def make_otp(digits: int):
-
-    otp = ""
-    for _ in range(digits):
-        digit = math.floor(random.random() * 10)
-        otp += str(digit)
-    return otp
+    digits = max(1, int(digits))
+    alphabet = string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(digits))
 
 password_reset_token = PasswordResetTokenGenerator()

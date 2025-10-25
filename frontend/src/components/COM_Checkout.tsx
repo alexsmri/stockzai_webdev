@@ -74,7 +74,11 @@ export default function COM_Checkout({
     initializePaddle({
       environment: PADDLE_ENVIRONMENT,
       token: PADDLE_CLIENT_TOKEN,
-      eventCallback: (data) => console.log('Paddle event:', data),
+      eventCallback: (data) => {
+        if (import.meta.env.DEV) {
+          console.debug('Paddle event:', data);
+        }
+      },
     })
       .then((paddleInstance) => {
         if (isCancelled) {
@@ -129,14 +133,18 @@ export default function COM_Checkout({
     setIsOpening(true);
 
     try {
+      const settings = {
+        displayMode,
+        allowLogout: false,
+        ...(resolvedSuccessUrl ? { successUrl: resolvedSuccessUrl } : {}),
+        ...(theme ? { theme } : {}),
+      } as Parameters<Paddle['Checkout']['open']>[0]['settings'];
+
       paddle.Checkout.open({
         items: checkoutItems,
         customer: { email },
         customData,
-        settings: {
-          displayMode: 'overlay',
-          allowLogout: false,
-        },
+        settings,
       });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unable to open Paddle checkout.';
@@ -176,7 +184,6 @@ export default function COM_Checkout({
           {checkoutError}
         </p>
       )}
-      {!paddle && <p style={{ color: 'red' }}>⚠️ Paddle not initialized</p>}
       <button
         type="button"
         className="look-button-auth"

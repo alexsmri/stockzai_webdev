@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
 from paddle_billing import Client, Options, Environment
 from paddle_billing.Notifications import Secret, Verifier
@@ -27,12 +28,14 @@ logger = logging.getLogger(__name__)
 
 def util_verify_signature(request):
     raw_body = request.body.decode("utf-8")
-    logger.info(raw_body)
-    headers = {"Paddle-Signature": request.headers.get("Paddle-Signature")}
-    logger.info(headers)
+    logger.debug("Paddle webhook payload: %s", raw_body)
 
-    if not headers["Paddle-Signature"]:
+    signature = request.headers.get("Paddle-Signature")
+    if not signature:
+        logger.warning("Missing Paddle-Signature header on webhook request")
         return False
+
+    headers = {"Paddle-Signature": signature}
     paddle_request = PaddleRequest.create(body=raw_body, headers=headers)
 
     verifier = Verifier()
@@ -124,7 +127,7 @@ def webhook_transaction_completed(data: dict):
                 continue
 
             if billing_cycle:
-                if Subscription.objects.filter(provider_subscription_id=subscription_id).exists():
+                if subscription_id and Subscription.objects.filter(provider_subscription_id=subscription_id).exists():
                     logger.info(f"Transaction {transaction_id} already processed.")
                     return True
                 
@@ -140,12 +143,22 @@ def webhook_transaction_completed(data: dict):
                     subscription.provider_subscription_id = subscription_id
                 subscription.product = product
                 subscription.provider = "paddle"
+                expires_at = None
                 billing_period = data.get("billing_period") or {}
-                expires_at = billing_period.get("ends_at")
+                expires_at_str = billing_period.get("ends_at") if isinstance(billing_period, dict) else None
+
+                if expires_at_str:
+                    parsed = parse_datetime(expires_at_str)
+                    if parsed:
+                        if timezone.is_naive(parsed):
+                            parsed = timezone.make_aware(parsed, timezone.utc)
+                        expires_at = parsed
+                    else:
+                        logger.warning("Unable to parse Paddle subscription expiry %s", expires_at_str)
 
                 if expires_at:
                     subscription.expires_at = expires_at
-                    
+
                 subscription.is_active = True
                 subscription.cancel_at_period_end = False
                 subscription.save()
@@ -166,7 +179,7 @@ def webhook_transaction_completed(data: dict):
 
         return handled_item
     except Exception as exc:
-        logger.exception(f"Exception '{exc}' occured when handling paddle transaction f{transaction_id}")
+        logger.exception("Exception '%s' occurred when handling paddle transaction %s", exc, transaction_id)
         return
 
 def webhook_product_created_or_updated(data: dict):
@@ -192,7 +205,7 @@ def webhook_product_created_or_updated(data: dict):
         return True
     
     except Exception as exc:
-        logger.exception(f"Exception '{exc}' occured when creating paddle product '{verbose_name}, {paddle_id}'")
+        logger.exception("Exception '%s' occurred when creating paddle product '%s, %s'", exc, verbose_name, paddle_id)
         return
 
 @csrf_exempt

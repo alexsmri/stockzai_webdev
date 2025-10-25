@@ -16,7 +16,7 @@ function COM_Plans({
   prFooter,
 }: PlansProps) {
   const liStyle = { marginBottom: 'calc(var(--default-font-size) * 0.5)' };
-  const buttonLabel = prIsLoading ? 'Please wait…' : prButtonLabel ?? 'Unlock now';
+  const buttonLabel = prIsLoading ? 'Please wait...' : prButtonLabel ?? 'Unlock now';
 
   const handleClick = () => {
     if (prDisabled || prIsLoading) {
@@ -30,7 +30,7 @@ function COM_Plans({
       <h2 className="look-text-x3 mod-left look-priority-medium">Pro</h2>
       <h2 className="look-text-x3 mod-align-left look-priority-low">
         Unlock everything for just <br />
-        <span className="look-priority-high">10$</span>/one-time
+        <span className="look-priority-high">$10</span>/one-time
       </h2>
       <ul className="mod-padding-s">
         <li className="look-text-x1 look-priority-normal" style={liStyle}>

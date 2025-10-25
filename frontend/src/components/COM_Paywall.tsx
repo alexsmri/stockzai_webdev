@@ -21,7 +21,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
       <div
         className="area-flex-col mod-center mod-padding-none"
         style={{
-          width: 'clamp(calc(--default-font-size) * 15), calc(--default-font-size) * 20), 80%)',
+          width: 'clamp(calc(var(--default-font-size) * 15), calc(var(--default-font-size) * 20), 80%)',
         }}
       >
         <button

@@ -37,14 +37,14 @@ function COM_ProtectedRoute({ children }: { children: JSX.Element }) {
         const refreshed = await utStore.post('ActionRefreshToken', {
           refresh: refreshToken,
         });
-        if (
-          refreshed &&
-          utStore.read('ActionRefreshToken') &&
-          (utStore.read('ActionRefreshToken') as Record<string, any>['access'])
-        ) {
+        const refreshedPayload = utStore.read('ActionRefreshToken') as { access?: string } | null;
+        const refreshedAccess =
+          typeof refreshedPayload?.access === 'string' ? refreshedPayload.access : null;
+
+        if (refreshed && refreshedAccess) {
           utStore.update('ActionLogin', {
             refresh: refreshToken,
-            access: utStore.read('ActionRefreshToken') as Record<string, any>['access'],
+            access: refreshedAccess,
           });
           setIsAuthorized(true);
         } else {

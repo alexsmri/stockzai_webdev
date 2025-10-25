@@ -13,7 +13,10 @@ api.interceptors.request.use(
                 config.headers.Authorization = `Bearer ${parsedToken["access"]}`;
             }
         }
-        console.log(`[REQ] ${config.method?.toUpperCase()} ${config.url}`, config);
+        if (import.meta.env.DEV) {
+            const method = config.method?.toUpperCase() ?? "GET";
+            console.debug(`[REQ] ${method} ${config.url}`);
+        }
         return config;
     }, 
     (error) => {

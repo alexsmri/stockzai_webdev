@@ -145,17 +145,29 @@ export abstract class STO_Base<TValidKey extends string> {
             const url = this.buildUrl(this.routes[key], prUrlPaths, prUrlParams);
             const response = await api.post(url, postData);
             if (response?.data?.msg !== undefined) {
-                this.data[key] = response.data.msg;
+                const message = response.data.msg;
+                const errorMessage = response?.data?.error;
+                this.data[key] = message;
                 this.persist(key);
-                this.status[key] = "success";
-                this.error[key] = null;
-                return returnData ? response.data.msg : true;
+                if (errorMessage) {
+                    this.status[key] = "error";
+                    this.error[key] = errorMessage;
+                } else {
+                    this.status[key] = "success";
+                    this.error[key] = null;
+                }
+                if (returnData) {
+                    return message;
+                }
+                return errorMessage ? false : message;
             }
             this.status[key] = "error";
             this.error[key] = response?.data?.error ?? "Unexpected response format";
             return false;
-        } catch (error) {
-            this.error[key] = error;
+        } catch (error: unknown) {
+            const maybeResponse = (error as { response?: { data?: { error?: unknown } } }).response;
+            const responseError = maybeResponse?.data?.error;
+            this.error[key] = responseError ?? (error instanceof Error ? error.message : error);
             this.status[key] = "error";
             return false;
         } finally {

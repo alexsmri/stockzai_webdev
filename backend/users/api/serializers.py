@@ -9,9 +9,12 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "first_name", "last_name", "phone"]
-        extra_kwargs = {"id": {"read_only": True},
-                        "password": {"write_only": True}}
+        fields = ["id", "email", "username", "password"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "password": {"write_only": True},
+            "username": {"required": False, "allow_blank": True},
+        }
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
