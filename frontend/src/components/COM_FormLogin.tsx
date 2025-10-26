@@ -40,7 +40,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
     const utRes = await utStore.post('ActionLogin', { email, password });
     if (!utRes) {
       const utError = utStore.getError('ActionLogin') as string;
-      utError && handleAlertOpen(utError, 'f');
+      utError && handleAlertOpen('An error occurred', utError, 'f');
     }
     setStLoading(false);
   };

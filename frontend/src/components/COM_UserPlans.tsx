@@ -88,7 +88,7 @@ export default function COM_UserPlans() {
       <div className="area-flex-col mod-gap-s mod-padding-none">
         {isCancellationScheduled ? (
           <span className="look-text-x0 look-text-subtle">
-            Cancellation scheduled — resume to keep your access.
+            Cancellation scheduled - resume to keep your access.
           </span>
         ) : null}
         {expiresAt ? (
@@ -124,9 +124,9 @@ export default function COM_UserPlans() {
           const errorMessage =
             (userStore.getError('ActionResumeSubscription') as string) ??
             'Failed to resume subscription.';
-          handleAlertOpen(errorMessage, 'f');
+          handleAlertOpen('An error occurred', errorMessage, 'f');
         } else {
-          handleAlertOpen('Subscription resumed successfully.', 's');
+          handleAlertOpen('Success', 'Subscription resumed successfully.', 's');
           await refreshSubscriptionData();
         }
       } else {
@@ -135,9 +135,13 @@ export default function COM_UserPlans() {
           const errorMessage =
             (userStore.getError('ActionCancelSubscription') as string) ??
             'Failed to schedule cancellation.';
-          handleAlertOpen(errorMessage, 'f');
+          handleAlertOpen('An error occurred', errorMessage, 'f');
         } else {
-          handleAlertOpen('Cancellation scheduled at period end.', 'i');
+          handleAlertOpen(
+            'Cancellation scheduled',
+            'Cancellation scheduled at period end.',
+            'i'
+          );
           await refreshSubscriptionData();
         }
       }

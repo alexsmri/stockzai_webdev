@@ -25,17 +25,21 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (stPassword !== stPasswordConfirm) {
-      handleAlertOpen('Passwords do not match.', 'f');
+      handleAlertOpen('Check passwords', 'Passwords do not match.', 'f');
       return;
     }
 
     if (!stPassword) {
-      handleAlertOpen('Please choose a password.', 'f');
+      handleAlertOpen('Missing password', 'Please choose a password.', 'f');
       return;
     }
 
     if (!stConsentsTos) {
-      handleAlertOpen('Please accept our privacy policy & terms to continue.', 'f');
+      handleAlertOpen(
+        'Action required',
+        'Please accept our privacy policy & terms to continue.',
+        'f'
+      );
       return;
     }
 
@@ -50,7 +54,12 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
 
       if (!utRes) {
         const utError = utStore.getError('ActionRegistration') as string;
-        handleAlertOpen(utError || 'Could not create your account. Please try again.', 'f', 5000);
+        handleAlertOpen(
+          'An error occurred',
+          utError || 'Could not create your account. Please try again.',
+          'f',
+          { timeout: 5000 }
+        );
         return;
       }
 
@@ -60,7 +69,12 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
         true
       )) as Record<string, any> | null;
       if (!utTokenRes?.uid) {
-        handleAlertOpen('Unable to send verification code. Please try again.', 'f', 5000);
+        handleAlertOpen(
+          'An error occurred',
+          'Unable to send verification code. Please try again.',
+          'f',
+          { timeout: 5000 }
+        );
         return;
       }
 

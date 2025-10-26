@@ -1,12 +1,24 @@
 import { createContext, useContext, useState } from 'react';
-import COM_Alert from '../components/COM_Alert';
+import COM_Alert, { type ITF_AlertButton } from '../components/COM_Alert';
 import { sleep } from '../utils/functions';
 
-const DEFAULT_ALERT_TYPE = 'i';
+type TTAlertType = 's' | 'i' | 'w' | 'f';
+
+const DEFAULT_ALERT_TYPE: TTAlertType = 'i';
 const DEFAULT_ALERT_TIMEOUT = 3000;
 
+interface ITF_AlertOptions {
+  timeout?: number;
+  button?: ITF_AlertButton;
+}
+
 interface ITF_AlertContext {
-  handleAlertOpen: (prMessage: string, prType: 's' | 'i' | 'w' | 'f', prTimeout?: number) => void;
+  handleAlertOpen: (
+    prTitle: string,
+    prMessage: string,
+    prType?: TTAlertType,
+    prOptions?: ITF_AlertOptions
+  ) => void;
   handleAlertClose: () => void;
 }
 
@@ -14,26 +26,33 @@ const CTX_Alert = createContext<ITF_AlertContext | undefined>(undefined);
 
 export const PRV_Alert = ({ children }: { children: React.ReactNode }) => {
   const [stIsOpen, setStIsOpen] = useState(false);
+  const [stTitle, setStTitle] = useState<string>('');
   const [stMessage, setStMessage] = useState<string>('');
-  const [stType, setStType] = useState<'s' | 'i' | 'w' | 'f'>(DEFAULT_ALERT_TYPE);
+  const [stType, setStType] = useState<TTAlertType>(DEFAULT_ALERT_TYPE);
   const [stTimeout, setStTimeout] = useState<number>(DEFAULT_ALERT_TIMEOUT);
+  const [stButton, setStButton] = useState<ITF_AlertButton | undefined>(undefined);
   const [stCurrentAlertId, setStCurrentAlertId] = useState(0);
 
   const handleAlertOpen = (
+    prTitle: string,
     prMessage: string,
-    prType: 's' | 'i' | 'w' | 'f' = 'i',
-    prTimeout: number = DEFAULT_ALERT_TIMEOUT
+    prType: TTAlertType = DEFAULT_ALERT_TYPE,
+    prOptions: ITF_AlertOptions = {}
   ) => {
+    const nextTimeout = prOptions.timeout ?? DEFAULT_ALERT_TIMEOUT;
+
+    setStTitle(prTitle);
     setStMessage(prMessage);
     setStType(prType);
-    setStTimeout(prTimeout);
+    setStTimeout(nextTimeout);
+    setStButton(prOptions.button);
 
     const alertId = Date.now();
     setStCurrentAlertId(alertId);
     setStIsOpen(true);
 
     (async () => {
-      await sleep(prTimeout);
+      await sleep(nextTimeout);
       setStCurrentAlertId((latestId) => {
         if (latestId !== alertId) return latestId;
         setStIsOpen(false);
@@ -57,9 +76,12 @@ export const PRV_Alert = ({ children }: { children: React.ReactNode }) => {
       <COM_Alert
         prId={stCurrentAlertId}
         prSignal={stIsOpen}
+        prTitle={stTitle}
         prMessage={stMessage}
         prType={stType}
         prTimeout={stTimeout}
+        prButton={stButton}
+        prOnClose={handleAlertClose}
       />
       {children}
     </CTX_Alert.Provider>

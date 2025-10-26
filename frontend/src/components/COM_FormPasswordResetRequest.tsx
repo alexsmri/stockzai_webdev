@@ -11,13 +11,21 @@ export default function COM_FormPasswordResetRequest() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!stEmail) {
-      handleAlertOpen('Email not entered', 'f');
+      handleAlertOpen('Missing email', 'Please enter your email address.', 'f');
     } else {
       const utRes = await utStore.post('TokenPasswordResetRequest', { email: stEmail });
       if (utRes) {
-        handleAlertOpen('An email has been sent to you to reset your password', 's');
+        handleAlertOpen(
+          'Success',
+          'We sent you a password reset email. Please check your inbox.',
+          's'
+        );
       } else {
-        handleAlertOpen('An error occured', 'f');
+        handleAlertOpen(
+          'An error occurred',
+          'We could not send the reset email. Please try again.',
+          'f'
+        );
       }
     }
   };

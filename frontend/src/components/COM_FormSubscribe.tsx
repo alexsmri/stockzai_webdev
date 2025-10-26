@@ -51,10 +51,14 @@ export default function COM_FormSubscribe() {
         if (stUsername) {
           params.set('username', stUsername);
         }
-        handleAlertOpen('We just sent you a confirmation code.', 's');
+        handleAlertOpen('Success', 'We just sent you a confirmation code.', 's');
         navigate(`/users/subscribe-newsletter/verify?${params.toString()}`);
       } else {
-        handleAlertOpen('Could not start the subscription. Please try again.', 'f');
+        handleAlertOpen(
+          'An error occurred',
+          'Could not start the subscription. Please try again.',
+          'f'
+        );
       }
     } finally {
       setStLoading(false);

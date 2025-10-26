@@ -49,7 +49,7 @@ function COM_FormEditProfile() {
     }
 
     if (stUsername === utInitialUsername) {
-      handleAlertOpen('Username is unchanged.', 'i');
+      handleAlertOpen('No changes detected', 'Username is unchanged.', 'i');
       setStLoading(false);
       return;
     }
@@ -61,11 +61,12 @@ function COM_FormEditProfile() {
 
       if (utRes) {
         setStSuccess(true);
-        handleAlertOpen('Username changed successfully.', 's');
+        handleAlertOpen('Success', 'Username changed successfully.', 's');
         utStore.update('PropertyCredentials', { username: stUsername });
       } else {
-        const utMessage = (utStore.getError('ActionEditProfile') as string) || 'An error occured.';
-        handleAlertOpen(utMessage, 'f');
+        const utMessage =
+          (utStore.getError('ActionEditProfile') as string) || 'An unexpected error occurred.';
+        handleAlertOpen('An error occurred', utMessage, 'f');
       }
     } finally {
       setStLoading(false);

@@ -124,9 +124,13 @@ export default function COM_FormCode({
         )) as Record<string, any>;
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
-          handleAlertOpen('A new confirmation code has been sent.', 's');
+          handleAlertOpen('Code sent', 'A new confirmation code has been sent.', 's');
         } else {
-          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+          handleAlertOpen(
+            'An error occurred',
+            'Could not resend the code. Please try again shortly.',
+            'f'
+          );
         }
       } else {
         const utTokenRes = (await utStore.post(
@@ -136,9 +140,13 @@ export default function COM_FormCode({
         )) as Record<string, any>;
         if (utTokenRes?.uid) {
           setCooldown(REGISTRATION_RESEND_COOLDOWN_SECONDS);
-          handleAlertOpen('A new verification code has been sent.', 's');
+          handleAlertOpen('Code sent', 'A new verification code has been sent.', 's');
         } else {
-          handleAlertOpen('Could not resend the code. Please try again shortly.', 'f');
+          handleAlertOpen(
+            'An error occurred',
+            'Could not resend the code. Please try again shortly.',
+            'f'
+          );
         }
       }
     } finally {
@@ -162,19 +170,19 @@ export default function COM_FormCode({
 
         if (!utValid) {
           const utError = utStore.getError('ActionSubscribeNewsletterVerify') as string | undefined;
-          handleAlertOpen(utError || 'Wrong code. Try again.', 'f');
+          handleAlertOpen('An error occurred', utError || 'Wrong code. Try again.', 'f');
           return;
         }
 
         await utStore.get('PropertyConsents');
-        handleAlertOpen('Newsletter subscription confirmed.', 's');
+        handleAlertOpen('Success', 'Newsletter subscription confirmed.', 's');
         navigate(redirectPath);
         return;
       }
 
       const utValid = await utStore.post('ActionVerification', { token: value, uid: prUid });
       if (!utValid) {
-        handleAlertOpen('Wrong code. Try again.', 'f');
+        handleAlertOpen('An error occurred', 'Wrong code. Try again.', 'f');
         return;
       }
 
@@ -186,7 +194,11 @@ export default function COM_FormCode({
       }
 
       if (!storedPassword) {
-        handleAlertOpen('Account verified! Please log in to continue.', 'i');
+        handleAlertOpen(
+          'Verification complete',
+          'Account verified! Please log in to continue.',
+          'i'
+        );
         navigate('/users/login');
         return;
       }
@@ -197,14 +209,19 @@ export default function COM_FormCode({
       });
       if (!loginRes) {
         clearTemporaryPassword();
-        handleAlertOpen('Account verified. Please log in manually.', 'w', 5000);
+        handleAlertOpen(
+          'Manual login required',
+          'Account verified. Please log in manually.',
+          'w',
+          { timeout: 5000 }
+        );
         navigate('/users/login');
         return;
       }
 
       clearTemporaryPassword();
       await utStore.get('PropertyCredentials');
-      handleAlertOpen(`Welcome to stockz.ai, ${prUsername || 'there'}!`, 's');
+      handleAlertOpen('Welcome', `Welcome to stockz.ai, ${prUsername || 'there'}!`, 's');
       navigate(redirectPath);
     } finally {
       setIsSubmitting(false);
