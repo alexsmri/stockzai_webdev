@@ -189,7 +189,7 @@ export function getKPIText(KPI: string) {
     quickRatio: "Quick Ratio",
     DividendPerShare: "Dividend per Share",
     sector: "Sector",
-    fullTimeEmployees: "Employees",
+    fullTimeEmployees: "Employees (FT)",
     currency: "Currency",
     country: "Country",
     countriesAML: "AML Country Exposure",
@@ -226,9 +226,10 @@ export function getKPIText(KPI: string) {
     EBITDA: "EBITDA",
     FreeCashFlow: "Free Cash Flow",
     OrdinarySharesNumber: "Number of Shares",
+    averageVolume: "Daily Volume (avg.)"
   };
 
-  return KPI_TITLE_LOOKUP[KPI] || KPI;
+  return KPI_TITLE_LOOKUP[KPI] || null;
 }
 
 export function getRoleText(role: string) {

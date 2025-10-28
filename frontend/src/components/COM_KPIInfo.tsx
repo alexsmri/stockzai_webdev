@@ -26,18 +26,22 @@ export default function COM_KPIInfo({
   prAttachRef,
 }: ITF_KPIInfoProps) {
   const { handleLBOpen } = useLightbox();
+  const utText = getKPIText(prKPI);
+  if (!utText) {
+    return null;
+  }
   const isInteractive = !ROLES_NO_INDICATORS.includes(prTableRole);
 
   if (isInteractive) {
     return (
-      <div className="area-flex-row mod-space-between">
+      <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
         <p
           ref={prAttachRef}
           className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-gradient"
           data-kpi={prKPI}
           onClick={() => handleLBOpen(prKPI)}
         >
-          {getKPIText(prKPI)}
+          {utText}
         </p>
         <div className="area-flex-row mod-gap-s mod-padding-none">
           <p className="look-text-x1 look-text-normal">{formatLargeNumber(prValue)}</p>
@@ -46,15 +50,12 @@ export default function COM_KPIInfo({
       </div>
     );
   }
-
   return (
     <div className="area-flex-row mod-space-between">
       <p className="look-text-x1 look-text-subtle mod-align-left" data-kpi={prKPI}>
-        {getKPIText(prKPI)}
+        {utText}
       </p>
-      <p className="look-text-x1 look-text-normal mod-align-right">
-        {formatLargeNumber(prValue)}
-      </p>
+      <p className="look-text-x1 look-text-normal mod-align-right">{formatLargeNumber(prValue)}</p>
     </div>
   );
 }
