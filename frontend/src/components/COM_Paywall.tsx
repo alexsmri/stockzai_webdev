@@ -1,6 +1,7 @@
 import { type JSX } from 'react';
 import ICON_ArrowLeft from '@/assets/media/ICON_ArrowLeft.svg?react';
 import COM_Plans from './COM_Plans';
+import { scale } from '../utils/functions';
 
 interface PI_Paywall {
   prIsOpen: boolean;
@@ -21,7 +22,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
       <div
         className="area-flex-col mod-center mod-padding-none"
         style={{
-          width: 'clamp(calc(var(--default-font-size) * 15), calc(var(--default-font-size) * 20), 80%)',
+          width: `clamp(${scale(15)}, ${scale(20)}, 80%)`,
         }}
       >
         <button
@@ -39,7 +40,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
           aria-label="Go back to search"
         >
           <ICON_ArrowLeft
-            style={{ width: 'calc(var(--default-font-size) * 1.3)', height: 'auto', flexShrink: 0 }}
+            style={{ width: scale(1.3), height: 'auto', flexShrink: 0 }}
             fill="currentColor"
           />
           <span>Back</span>

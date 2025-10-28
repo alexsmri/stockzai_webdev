@@ -5,6 +5,7 @@ import IMG_Nvidia from '../assets/media/IMG_Nvidia.webp';
 import IMG_Google from '../assets/media/IMG_Google.webp';
 import IMG_Amazon from '../assets/media/IMG_Amazon.webp';
 import { useNavigate } from 'react-router-dom';
+import { scale } from '../utils/functions';
 
 const REDIRECT_URL = '/companies/page/free/';
 const CARD_CONFIG = [
@@ -35,9 +36,8 @@ export default function PAG_ChooseTicker() {
       <section
         className="area-flex-wrap mod-centersides mod-gap-l"
         style={{
-          width: 'clamp(calc(var(--default-font-size) * 11), 70%, 90%)',
-          height:
-            'clamp(calc(var(--default-font-size) * 30), 30vh, calc(var(--default-font-size) * 50))',
+          width: `clamp(${scale(11)}, 70%, 90%)`,
+          height: `clamp(${scale(30)}, 30vh, ${scale(50)})`,
         }}
       >
         {CARD_CONFIG.map(({ symbol, name, image }) => (

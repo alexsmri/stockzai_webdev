@@ -7,6 +7,7 @@ import COM_UserPlans from '../components/COM_UserPlans';
 import COM_Lightbox from '../components/COM_Lightbox';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
+import { scale } from '../utils/functions';
 
 const TAB_PARAM_KEY = 'view';
 
@@ -87,7 +88,7 @@ export default function STR_UserManagement() {
           position: 'relative',
           backgroundColor: 'var(--color-primary)',
           width: 'min(72rem, 100%)',
-          height: 'clamp(calc(var(--default-font-size) * 30), 80%, 80%)',
+          height: `clamp(${scale(30)}, 80%, 80%)`,
         }}
       >
         <div
@@ -103,21 +104,21 @@ export default function STR_UserManagement() {
             className="look-button-ghost mod-button-auth"
             style={{
               position: 'absolute',
-              top: 'calc(var(--default-font-size) * 0.5)',
-              right: 'calc(var(--default-font-size) * 0.5)',
+              top: scale(0.5),
+              right: scale(0.5),
               zIndex: 2,
               background: 'rgba(15, 23, 42, 0.05)',
               borderRadius: '50%',
-              width: 'calc(var(--default-font-size) * 2.5)',
-              height: 'calc(var(--default-font-size) * 2.5)',
+              width: scale(2.5),
+              height: scale(2.5),
               display: 'grid',
               placeItems: 'center',
             }}
           >
             <ICON_Close
               style={{
-                width: 'calc(var(--default-font-size) * 1.2)',
-                height: 'calc(var(--default-font-size) * 1.2)',
+                width: scale(1.2),
+                height: scale(1.2),
               }}
             />
           </button>
@@ -128,7 +129,7 @@ export default function STR_UserManagement() {
               style={{
                 flex: 1,
                 overflowY: 'auto',
-                paddingTop: 'calc(var(--default-font-size) * 3)',
+                paddingTop: scale(3),
               }}
             >
               {renderContent}

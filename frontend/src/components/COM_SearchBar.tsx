@@ -1,5 +1,6 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import ICON_Search from '@/assets/media/ICON_Search.svg?react';
+import { scale } from '../utils/functions';
 
 interface ITF_SearchBarProps {
   input: string;
@@ -8,7 +9,7 @@ interface ITF_SearchBarProps {
   handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ICON_WIDTH = 'calc(var(--default-font-size) * 1.5)';
+const ICON_WIDTH = scale(1.5);
 export default function COM_SearchBar({
   input,
   submit = true,

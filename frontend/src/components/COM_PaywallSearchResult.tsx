@@ -1,4 +1,5 @@
 import ICON_Crown from '../assets/media/ICON_Crown.svg?react';
+import { scale } from '../utils/functions';
 
 interface PI_PaywallSearchResult {
   prIsRedacted: boolean;
@@ -16,12 +17,12 @@ export default function COM_PaywallSearchResult({ prIsRedacted }: PI_PaywallSear
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        paddingRight: 'calc(var(--default-font-size)*3)',
+        paddingRight: scale(3),
       }}
     >
       <span className="look-text-x1 look-priority-medium">Get Pro</span>
       <ICON_Crown
-        style={{ width: 'calc(var(--default-font-size) * 1)', height: 'auto' }}
+        style={{ width: scale(1), height: 'auto' }}
         fill="currentColor"
         stroke="transparent"
       />

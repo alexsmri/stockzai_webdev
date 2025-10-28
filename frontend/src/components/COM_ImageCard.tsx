@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { scale } from '../utils/functions';
 
 type COM_ImageCardProps = {
   image: string;
@@ -21,7 +22,7 @@ export default function COM_ImageCard({ image, title, subtitle, handleClick }: C
       <div className="mod-wh-full look-gradient-image" style={{ position: 'absolute', inset: 0 }} />
       <div
         className="area-flex-col mod-align-left mod-bottomleft"
-        style={{ position: 'relative', width: 'calc(var(--default-font-size) * 10)' }}
+        style={{ position: 'relative', width: scale(10) }}
       >
         <span className="look-text-x2">{title}</span>
         <span className="look-text-x1 look-priority-medium">{subtitle}</span>

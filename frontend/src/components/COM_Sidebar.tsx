@@ -9,6 +9,7 @@ import ICON_User from '@/assets/media/ICON_User.svg?react';
 import { useWindowDimensions, useUserStoreSync } from '../hooks/hooks';
 import { useUserStore } from '../context/CTX_UserStore';
 import { MOBILE_BREAKPOINT } from '../constants';
+import { scale } from '../utils/functions';
 
 type NavItem = {
   label: string;
@@ -40,10 +41,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const SIDEBAR_SELECTED_CLASS = 'mod-selected';
-const MENU_LINK_PADDING = 'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
-const LOGO_PADDING_EXPANDED =
-  'calc(var(--default-font-size) * 0.5) calc(var(--default-font-size) * 1)';
-const LOGO_PADDING = 'calc(var(--default-font-size) * 0.5) 0';
+const MENU_LINK_PADDING = `${scale(0.5)} ${scale(1)}`;
+const LOGO_PADDING_EXPANDED = `${scale(0.5)} ${scale(1)}`;
+const LOGO_PADDING = `${scale(0.5)} 0`;
 
 function readUsername(data: any | null): string {
   if (!data || typeof data !== 'object') {
@@ -159,8 +159,8 @@ export default function COM_Sidebar() {
             >
               <ICON_Expand
                 style={{
-                  width: 'calc(var(--default-font-size) * 1.1)',
-                  height: 'calc(var(--default-font-size) * 1.1)',
+                  width: scale(1.1),
+                  height: scale(1.1),
                   transform: stExpanded ? 'rotate(180deg)' : 'none',
                   transition: 'transform 0.3s ease',
                 }}
@@ -170,7 +170,7 @@ export default function COM_Sidebar() {
           <LOGO_schwarzquer
             style={{
               width: 'auto',
-              height: 'calc(var(--default-font-size) * 2.8)',
+              height: scale(2.8),
               alignSelf: showLabels ? 'flex-start' : 'center',
               padding: showLabels ? LOGO_PADDING_EXPANDED : LOGO_PADDING,
             }}
@@ -207,8 +207,8 @@ export default function COM_Sidebar() {
             >
               <item.Icon
                 style={{
-                  width: 'calc(var(--default-font-size) * 1.2)',
-                  height: 'calc(var(--default-font-size) * 1.2)',
+                  width: scale(1.2),
+                  height: scale(1.2),
                 }}
               />
               {showLabels && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
@@ -235,8 +235,8 @@ export default function COM_Sidebar() {
             <span
               aria-hidden
               style={{
-                width: 'calc(var(--default-font-size) * 2.5)',
-                height: 'calc(var(--default-font-size) * 2.5)',
+                width: scale(2.5),
+                height: scale(2.5),
                 borderRadius: '50%',
                 backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
                 flexShrink: 0,
@@ -274,8 +274,8 @@ export default function COM_Sidebar() {
             ) : (
               <ICON_User
                 style={{
-                  width: 'calc(var(--default-font-size) * 1.3)',
-                  height: 'calc(var(--default-font-size) * 1.3)',
+                  width: scale(1.3),
+                  height: scale(1.3),
                 }}
               />
             )}

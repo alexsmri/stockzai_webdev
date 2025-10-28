@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { scale } from '../utils/functions';
 
 interface PlansProps {
   prButtonLabel?: string;
@@ -8,14 +9,8 @@ interface PlansProps {
   prFooter?: ReactNode;
 }
 
-function COM_Plans({
-  prButtonLabel,
-  prOnAction,
-  prDisabled,
-  prIsLoading,
-  prFooter,
-}: PlansProps) {
-  const liStyle = { marginBottom: 'calc(var(--default-font-size) * 0.5)' };
+function COM_Plans({ prButtonLabel, prOnAction, prDisabled, prIsLoading, prFooter }: PlansProps) {
+  const liStyle = { marginBottom: scale(0.5) };
   const buttonLabel = prIsLoading ? 'Please wait...' : prButtonLabel ?? 'Unlock now';
 
   const handleClick = () => {

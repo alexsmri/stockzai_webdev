@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
+import { scale } from '../utils/functions';
 
 export type SidebarUsersTab = 'account' | 'plans';
 
@@ -61,8 +62,8 @@ export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersPr
         <div
           aria-hidden
           style={{
-            width: 'calc(var(--default-font-size) * 2.5)',
-            height: 'calc(var(--default-font-size) * 2.5)',
+            width: scale(2.5),
+            height: scale(2.5),
             borderRadius: '50%',
             backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
             flexShrink: 0,

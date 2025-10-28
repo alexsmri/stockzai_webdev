@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, SVGProps } from 'react';
 import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
+import { scale } from '../utils/functions';
 
 export type TYP_DropdownOption = {
   label: string;
@@ -97,7 +98,7 @@ export default function COM_DropdownSelect({
         <span className="look-text-x1 look-text-normal">{buttonLabel}</span>
         <ICON_Triangle
           style={{
-            width: 'calc(var(--default-font-size) * 1)',
+            width: scale(1),
             height: 'auto',
             transform: isOpen ? 'rotate(180deg)' : 'none',
           }}
@@ -116,7 +117,7 @@ export default function COM_DropdownSelect({
                 className="look-button-ghost"
                 onClick={() => selectOption(key)}
               >
-                {Icon && <Icon style={{ width: 'calc(var(--default-font-size) * 1)' }} />}
+                {Icon && <Icon style={{ width: scale(1) }} />}
                 <span className="look-text-x1 look-text-subtle">{option.label}</span>
               </button>
             );

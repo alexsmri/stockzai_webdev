@@ -1,5 +1,12 @@
 const KPI_SCORING_ZERO = -1;
 
+export function scale(multiplier: number): string {
+  if (!Number.isFinite(multiplier)) {
+    throw new Error(`calcSize expects a finite number, received: ${multiplier}`);
+  }
+  return `calc(var(--default-font-size) * ${multiplier})`;
+}
+
 export function getScoreColor(score: number): string {
   if (score >= 6.6) {
     return "#00D26D";

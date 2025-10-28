@@ -10,6 +10,7 @@ import {
   getDefaultOrderDirection,
   getOppositeOrderDirection,
 } from '../../utils/formats';
+import { scale } from '../../utils/functions';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
 import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
 import COM_PaywallSearchResult from '../COM_PaywallSearchResult';
@@ -182,7 +183,7 @@ export default function DCOM_ListView({
     <>
       <div
         className="area-flex-col mod-align-stretch"
-        style={{ minWidth: 'calc(var(--default-font-size) * 48)', height: '100%' }}
+        style={{ minWidth: scale(48), height: '100%' }}
       >
         <div className="area-grid-results mod-padding-side">
           {prColumnConfig.map((column) => {
@@ -197,11 +198,11 @@ export default function DCOM_ListView({
                 className={`${column.headerClassName ?? DEFAULT_HEADER_CLASS}`}
                 onClick={() => handleSort(column)}
               >
-                <Icon style={{ width: 'calc(var(--default-font-size) * 1)' }} />
+                <Icon style={{ width: scale(1) }} />
                 <span>{column.title}</span>
                 <ICON_Triangle
                   style={{
-                    width: 'calc(var(--default-font-size) * 1)',
+                    width: scale(1),
                     height: 'auto',
                     transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none',
                     visibility: isActive ? 'visible' : 'hidden',
