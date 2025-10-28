@@ -1,6 +1,7 @@
 import type { ITF_ListViewColumnConfig } from "../types/interfaces";
 import type { TYP_SortDirection } from "../types/types";
 import type { ReactNode } from "react";
+import { getRiskLevelMeta, type RiskFactorKey } from "./risk";
 
 const PERCENTILE_MULTIPLICATION = 1;
 
@@ -128,4 +129,57 @@ export function formatText(value: unknown, fallback: string): ReactNode {
     }
   }
   return fallback;
+}
+
+const RISK_LEVEL_CONTEXT = [
+  'very low',
+  'low',
+  'balanced',
+  'elevated',
+  'high',
+  'critical',
+] as const;
+
+const RISK_LEVEL_ACTION = [
+  'No immediate mitigation required.',
+  'Routine monitoring is sufficient.',
+  'Set triggers for potential intervention.',
+  'Increase monitoring and prepare contingency actions.',
+  'Mitigation planning should start now.',
+  'Immediate mitigation is recommended.',
+] as const;
+
+type RiskTextGenerator = (context: {
+  level: number;
+  label: string;
+  descriptor: string;
+  action: string;
+}) => string;
+
+const RISK_TEXT_GENERATORS: Record<RiskFactorKey, RiskTextGenerator> = {
+  countriesAML: ({ descriptor, action, label }) =>
+    `Operating jurisdictions show ${descriptor} anti-money laundering enforcement (${label} risk). ${action}`,
+  countriesFSI: ({ descriptor, action, label }) =>
+    `Cross-border exposure to financial secrecy hubs is ${descriptor} (${label} risk). ${action}`,
+  marketCap: ({ descriptor, action, label }) =>
+    `Market capitalization resilience appears ${descriptor}, shaping downside protection at a ${label.toLowerCase()} level. ${action}`,
+  volume: ({ descriptor, action, label }) =>
+    `Trading volume signals ${descriptor} liquidity support with a ${label.toLowerCase()} risk flag. ${action}`,
+  price: ({ descriptor, action, label }) =>
+    `Recent price action reflects ${descriptor} volatility, pointing to a ${label.toLowerCase()} drawdown risk. ${action}`,
+  freeFloat: ({ descriptor, action, label }) =>
+    `Free float availability is ${descriptor}, keeping ownership concentration at a ${label.toLowerCase()} risk. ${action}`,
+  altmanZScore: ({ descriptor, action, label }) =>
+    `The Altman Z-Score indicates a ${descriptor} probability of financial distress (${label} risk). ${action}`,
+};
+
+export function getRiskFactorText(key: RiskFactorKey, rawValue: unknown): string {
+  const { level, label } = getRiskLevelMeta(rawValue);
+  const descriptor = RISK_LEVEL_CONTEXT[level] ?? 'unknown';
+  const action = RISK_LEVEL_ACTION[level] ?? '';
+  const generator = RISK_TEXT_GENERATORS[key];
+  if (generator) {
+    return generator({ level, label, descriptor, action });
+  }
+  return `${label} risk level detected. ${action}`.trim();
 }

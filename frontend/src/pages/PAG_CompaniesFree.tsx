@@ -12,6 +12,7 @@ import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import NotFound from './PAG_404';
 import COM_TutorialOverlay from '../components/COM_TutorialOverlay';
 import { useLightbox } from '../context/CTX_Lightbox';
+import COM_SectionRisk from '../components/COM_SectionRisk';
 
 type CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
@@ -147,9 +148,7 @@ function PAG_CompaniesFreeContent({
             <COM_TableInfo prTableRole="basics" />
           </COM_SectionInfo>
           <div ref={riskSectionRef}>
-            <COM_SectionInfo title="Risk Scores.">
-              <COM_TableInfo prTableRole="basics" />
-            </COM_SectionInfo>
+            <COM_SectionRisk />
           </div>
         </div>
         <div className="area-flex-wrap mod-flex-grow-children mod-align-start mod-padding-none">

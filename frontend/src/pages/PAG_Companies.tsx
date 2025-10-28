@@ -8,6 +8,7 @@ import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync, useUserStoreSync } from '../hooks/hooks';
 import COM_LightboxKPI from '../components/COM_LightboxKPI';
 import COM_TableInfo from '../components/COM_TableInfo';
+import COM_SectionRisk from '../components/COM_SectionRisk';
 import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import NotFound from './PAG_404';
 import COM_Loading from '../components/COM_Loading';
@@ -69,6 +70,7 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
               </div>
             </COM_SectionInfo>
           </div>
+          <COM_SectionRisk />
           <COM_SectionInfo title="Basics.">
             <COM_TableInfo prTableRole="basics" />
           </COM_SectionInfo>
