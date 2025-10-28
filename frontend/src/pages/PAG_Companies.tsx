@@ -55,10 +55,7 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
       <div className="area-flex-col mod-padding-xl mod-align-stretch">
         <div className="area-flex-wrap mod-flex-grow-children mod-padding-none">
           <COM_LightboxKPI />
-          <div
-            className="area-flex-col mod-align-stretch mod-padding-none"
-            style={{ maxWidth: '25%' }}
-          >
+          <div className="area-flex-col mod-align-stretch mod-padding-none">
             <div className="area-flex-row mod-padding-none mod-flex-grow-children mod-gap-s">
               <DCOM_KPIInfoCard prLabel="Symbol" prValue={symbolValue} />
               <COM_KPIInfoCard prTableRole="basics" prKPI="name" prValue={nameValue} />
