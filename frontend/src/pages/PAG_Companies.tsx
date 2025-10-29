@@ -14,6 +14,7 @@ import NotFound from './PAG_404';
 import COM_Loading from '../components/COM_Loading';
 import COM_PremiumRoute from '../components/COM_PremiumRoute';
 import { useUserStore } from '../context/CTX_UserStore';
+import { COMPANY_PAGE_SECTION_WIDTH } from '../constants';
 
 type TYP_AccessPayload = {
   permissions?: string[] | null;
@@ -55,8 +56,14 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
       <div className="area-flex-col mod-padding-xl mod-align-stretch">
         <div className="area-flex-wrap mod-flex-grow-children mod-padding-none">
           <COM_LightboxKPI />
-          <div className="area-flex-col mod-align-stretch mod-padding-none">
-            <div className="area-flex-row mod-padding-none mod-flex-grow-children mod-gap-s">
+          <div
+            className="area-flex-col mod-align-stretch mod-padding-none"
+            style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
+          >
+            <div
+              className="area-flex-row mod-padding-none mod-flex-grow-children mod-gap-s"
+              style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
+            >
               <DCOM_KPIInfoCard prLabel="Symbol" prValue={symbolValue} />
               <COM_KPIInfoCard prTableRole="basics" prKPI="name" prValue={nameValue} />
             </div>

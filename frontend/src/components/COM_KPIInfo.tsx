@@ -37,7 +37,7 @@ export default function COM_KPIInfo({
       <div className="area-flex-row mod-space-between mod-w-full mod-padding-none">
         <p
           ref={prAttachRef}
-          className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-gradient"
+          className="look-text-x1 look-text-clickable mod-align-left mod-text-wrap-ellipsis mod-padding-none"
           data-kpi={prKPI}
           onClick={() => handleLBOpen(prKPI)}
         >
@@ -51,11 +51,16 @@ export default function COM_KPIInfo({
     );
   }
   return (
-    <div className="area-flex-row mod-space-between">
-      <p className="look-text-x1 look-text-subtle mod-align-left" data-kpi={prKPI}>
+    <div className="area-flex-row mod-space-between mod-w-full mod-padding-none mod-flex-grow-children">
+      <p
+        className="look-text-x1 look-text-subtle mod-align-left mod-text-wrap-ellipsis"
+        data-kpi={prKPI}
+      >
         {utText}
       </p>
-      <p className="look-text-x1 look-text-normal mod-align-right">{formatLargeNumber(prValue)}</p>
+      <p className="look-text-x1 look-text-normal mod-align-right mod-text-wrap-ellipsis">
+        {formatLargeNumber(prValue)}
+      </p>
     </div>
   );
 }

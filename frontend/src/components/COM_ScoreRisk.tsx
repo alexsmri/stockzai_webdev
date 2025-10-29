@@ -19,7 +19,7 @@ const GAUGE_ARC_LENGTH = CIRCUMFERENCE - GAUGE_GAP_LENGTH;
 const BASE_DASH_ARRAY = `${GAUGE_ARC_LENGTH} ${GAUGE_GAP_LENGTH}`;
 const GAUGE_ROTATION = 90 + GAUGE_GAP_ANGLE / 2;
 
-export default function COM_RiskScore() {
+export default function COM_ScoreRisk() {
   const store = useCompaniesStore();
   const [companyData, setCompanyData] = useState<CompanyProfileRecord | null>(null);
 
@@ -54,7 +54,7 @@ export default function COM_RiskScore() {
           cy="50"
           r={RADIUS}
           stroke={BASE_STROKE}
-          strokeWidth="6"
+          strokeWidth="4"
           fill="none"
           strokeLinecap="round"
           strokeDasharray={BASE_DASH_ARRAY}
@@ -66,7 +66,7 @@ export default function COM_RiskScore() {
           cy="50"
           r={RADIUS}
           stroke={activeStroke}
-          strokeWidth="6"
+          strokeWidth="4"
           fill="none"
           strokeLinecap="round"
           strokeDasharray={activeDashArray}

@@ -42,7 +42,7 @@ function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
             cy="50"
             r="42"
             stroke="rgba(255, 255, 255, 0.04)"
-            strokeWidth="3%"
+            strokeWidth="4"
             fill="none"
             strokeLinecap="round"
             strokeDasharray="264"
@@ -54,7 +54,7 @@ function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
             cy="50"
             r="42"
             stroke={color}
-            strokeWidth="3%"
+            strokeWidth="4"
             fill="none"
             strokeLinecap="round"
             strokeDasharray="264"
@@ -63,7 +63,7 @@ function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
           ></circle>
 
           <text
-            className="mod-cursor-pointer"
+            className="look-text-x0 mod-cursor-pointer"
             x="50%"
             y="53%"
             textAnchor="middle"

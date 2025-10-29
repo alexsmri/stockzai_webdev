@@ -1,6 +1,7 @@
 import { Children, useEffect, useMemo, useState, type ReactNode } from 'react';
 import COM_IndicatorChange from './COM_IndicatorChange';
 import COM_MenuSelect from './COM_MenuSelect';
+import { COMPANY_PAGE_SECTION_WIDTH } from '../constants';
 
 const ROLE_CHANGE_KPIS: Record<string, string> = {
   'Scores.': 'totalScore',
@@ -11,7 +12,7 @@ const NO_MENU_CLASS = 'area-flex-wrap mod-space-around mod-gap-l mod-flex-grow-c
 
 interface InfoSectionProps {
   title?: string;
-  subitle?: string;
+  subtitle?: string;
   children: ReactNode;
   prShowChange?: boolean;
   prMenuOptions?: Record<string, string>;
@@ -19,7 +20,7 @@ interface InfoSectionProps {
 
 function COM_SectionInfo({
   title,
-  subitle,
+  subtitle,
   children,
   prShowChange,
   prMenuOptions,
@@ -88,7 +89,10 @@ function COM_SectionInfo({
   const showControlArea = Boolean((menuEntries && prMenuOptions) || (shouldShowChange && title));
 
   return (
-    <div className="area-flex-col mod-align-stretch look-div-subtle">
+    <div
+      className="area-flex-col mod-align-stretch look-div-subtle"
+      style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
+    >
       <div className="area-flex-row mod-space-between">
         {title && (
           <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>
@@ -104,7 +108,7 @@ function COM_SectionInfo({
           </div>
         )}
       </div>
-      {subitle && <p>{subitle}</p>}
+      {subtitle && <p>{subtitle}</p>}
       <div className={prMenuOptions ? MENU_CLASS : NO_MENU_CLASS}>{renderedContent}</div>
     </div>
   );

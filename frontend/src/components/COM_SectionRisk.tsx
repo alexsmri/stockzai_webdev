@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import { parseRiskScoresDict, type RiskFactorKey, type RiskLevel } from '../utils/risk';
-import COM_RiskScore from './COM_RiskScore';
+import COM_ScoreRisk from './COM_ScoreRisk';
 import COM_RiskDetail from './COM_RiskDetail';
 import COM_Tooltip from './COM_Tooltip';
+import { COMPANY_PAGE_SECTION_WIDTH } from '../constants';
 
 type CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
@@ -44,11 +45,14 @@ export default function COM_SectionRisk() {
   );
 
   return (
-    <div className="look-div-subtle area-flex-col mod-gap-m mod-padding-m">
+    <div
+      className="look-div-subtle area-flex-col mod-gap-m mod-padding-m"
+      style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
+    >
       <div className="area-flex-row mod-space-between mod-align-center">
         <h3 className="look-text-x0 look-text-subtle">Risk Factors.</h3>
       </div>
-      <COM_RiskScore />
+      <COM_ScoreRisk />
       <div className="area-flex-row mod-gap-s mod-padding-none">
         <p className="look-text-x1 look-priority-low">{label}</p>
         <COM_Tooltip prContent={tooltipContent} prLabel="How we score risk" />
