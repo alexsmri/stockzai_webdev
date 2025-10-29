@@ -92,7 +92,7 @@ export default function COM_Alert({
   const AlertIcon = ALERT_ICON_LOOKUP[prType];
 
   return (
-    <div className="mod-z-2" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}>
+    <div className="mod-z-5" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}>
       <div
         className={`look-div-subtle ${stAnimating ? 'fade-in-alert' : 'fade-out-alert'}`}
         style={{
