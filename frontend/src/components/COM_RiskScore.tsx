@@ -11,6 +11,13 @@ type CompanyProfileRecord = {
 const RADIUS = 42;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const BASE_STROKE = 'rgba(255, 255, 255, 0.1)';
+// Tachymeter styling: leave a gap at the bottom and sweep clockwise from left to right.
+const GAUGE_GAP_ANGLE = 90;
+const GAUGE_GAP_RATIO = GAUGE_GAP_ANGLE / 360;
+const GAUGE_GAP_LENGTH = CIRCUMFERENCE * GAUGE_GAP_RATIO;
+const GAUGE_ARC_LENGTH = CIRCUMFERENCE - GAUGE_GAP_LENGTH;
+const BASE_DASH_ARRAY = `${GAUGE_ARC_LENGTH} ${GAUGE_GAP_LENGTH}`;
+const GAUGE_ROTATION = 90 + GAUGE_GAP_ANGLE / 2;
 
 export default function COM_RiskScore() {
   const store = useCompaniesStore();
@@ -35,7 +42,9 @@ export default function COM_RiskScore() {
 
   const { label, color } = getRiskLevelMeta(score);
   const activeStroke = withAlpha(color, 0.8);
-  const dashOffset = CIRCUMFERENCE - (score / 5) * CIRCUMFERENCE;
+  const progress = Math.min(Math.max(score / 5, 0), 1);
+  const activeArcLength = GAUGE_ARC_LENGTH * progress;
+  const activeDashArray = `${activeArcLength} ${CIRCUMFERENCE - activeArcLength}`;
 
   return (
     <div className="area-flex-row mod-gap-m mod-align-center mod-padding-none">
@@ -48,9 +57,9 @@ export default function COM_RiskScore() {
           strokeWidth="6"
           fill="none"
           strokeLinecap="round"
-          strokeDasharray={CIRCUMFERENCE}
+          strokeDasharray={BASE_DASH_ARRAY}
           strokeDashoffset="0"
-          transform="rotate(-90 50 50)"
+          transform={`rotate(${GAUGE_ROTATION} 50 50)`}
         />
         <circle
           cx="50"
@@ -60,9 +69,9 @@ export default function COM_RiskScore() {
           strokeWidth="6"
           fill="none"
           strokeLinecap="round"
-          strokeDasharray={CIRCUMFERENCE}
-          strokeDashoffset={dashOffset}
-          transform="rotate(-90 50 50)"
+          strokeDasharray={activeDashArray}
+          strokeDashoffset="0"
+          transform={`rotate(${GAUGE_ROTATION} 50 50)`}
         />
         <text
           x="50%"
