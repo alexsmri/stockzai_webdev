@@ -4,7 +4,12 @@ import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { TYP_APIResponseKPI } from '../types/types';
 import { getKPIText } from '../utils/functions';
 import { getRiskFactorText } from '../utils/formats';
-import { getRiskLevelMeta, parseRiskScoresDict, withAlpha, type RiskFactorKey } from '../utils/risk';
+import {
+  getRiskLevelMeta,
+  parseRiskScoresDict,
+  withAlpha,
+  type RiskFactorKey,
+} from '../utils/risk';
 
 type CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
@@ -51,11 +56,11 @@ export default function COM_RiskDetail({ prRiskKey }: PRI_RiskDetail) {
   const description = getRiskFactorText(prRiskKey, severity);
 
   return (
-    <div className="look-div-subtle area-flex-col mod-gap-xxs mod-padding-s">
-      <div className="area-flex-row mod-space-between mod-align-center">
+    <div className="rea-flex-col mod-padding-none mod-align-left">
+      <div className="area-flex-row mod-padding-none mod-align-center">
         <p className="look-text-x0 look-priority-low">{kpiLabel}</p>
         <span
-          className="look-text-x0 look-text-normal"
+          className="look-text-x0 look-text-normal mod-centerheight"
           style={{
             color: severityColor,
             backgroundColor: severityBackground,
@@ -67,7 +72,7 @@ export default function COM_RiskDetail({ prRiskKey }: PRI_RiskDetail) {
           {label} ({severity}/5)
         </span>
       </div>
-      <p className="look-text-x1">{description}</p>
+      <p className="look-text-x1 look-priority-medium">{description}</p>
     </div>
   );
 }

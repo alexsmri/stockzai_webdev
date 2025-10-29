@@ -41,7 +41,7 @@ export default function COM_TableInfo({
     <>
       <div className="area-flex-col mod-align-stretch">
         <h3 className="look-text-x2 look-text-normal">{text}</h3>
-        <div className="look-div-subtle">
+        <div className="area-flex-col mod-align-stretch look-div-subtle mod-gap-s">
           {Object.entries(flattenedData).map(([key, value]) => (
             <COM_KPIInfo
               key={key}

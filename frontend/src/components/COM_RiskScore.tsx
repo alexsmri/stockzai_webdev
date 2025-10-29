@@ -25,7 +25,7 @@ export default function COM_RiskScore() {
     if (riskScoreRaw === null) {
       return null;
     }
-    const clamped = Math.min(Math.max(riskScoreRaw, 0), 5);
+    const clamped = Math.min(Math.max(riskScoreRaw / 2, 0), 5);
     return clamped;
   }, [riskScoreRaw]);
 

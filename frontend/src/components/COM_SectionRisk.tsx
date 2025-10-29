@@ -50,10 +50,10 @@ export default function COM_SectionRisk() {
       </div>
       <COM_RiskScore />
       <div className="area-flex-row mod-gap-s mod-padding-none">
-        <p className="look-text-x1 look-text-normal">{label}</p>
+        <p className="look-text-x1 look-priority-low">{label}</p>
         <COM_Tooltip prContent={tooltipContent} prLabel="How we score risk" />
       </div>
-      <div className="area-flex-col mod-gap-s mod-align-stretch">
+      <div className="area-flex-col mod-align-left">
         {factorCount > 0 ? (
           orderedKeys.map((riskKey) => <COM_RiskDetail key={riskKey} prRiskKey={riskKey} />)
         ) : (
