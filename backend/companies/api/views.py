@@ -1,5 +1,6 @@
 ﻿import logging
 from django.http import Http404
+from django.conf import settings
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
@@ -136,7 +137,10 @@ class CompanySearchView(APIView):
         raw_results = results if isinstance(results, dict) else {}
 
         has_full_access = isinstance(request.user, User) and request.user.has_permission(SEARCH_PERMISSION)
-        if has_full_access:
+        if not settings.PAYWALL_ENABLED:
+            processed_results = raw_results
+            redacted_symbols: list[str] = []
+        elif has_full_access:
             processed_results = raw_results
             redacted_symbols: list[str] = []
         else:

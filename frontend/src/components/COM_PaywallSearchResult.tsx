@@ -1,12 +1,13 @@
 import ICON_Crown from '../assets/media/ICON_Crown.svg?react';
 import { scale } from '../utils/functions';
+import { PAYWALL_ENABLED } from '../constants';
 
 interface PI_PaywallSearchResult {
   prIsRedacted: boolean;
 }
 
 export default function COM_PaywallSearchResult({ prIsRedacted }: PI_PaywallSearchResult) {
-  if (!prIsRedacted) {
+  if (!PAYWALL_ENABLED || !prIsRedacted) {
     return null;
   }
 

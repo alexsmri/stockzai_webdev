@@ -2,6 +2,7 @@ import { type JSX } from 'react';
 import ICON_ArrowLeft from '@/assets/media/ICON_ArrowLeft.svg?react';
 import COM_Plans from './COM_Plans';
 import { scale } from '../utils/functions';
+import { PAYWALL_ENABLED } from '../constants';
 
 interface PI_Paywall {
   prIsOpen: boolean;
@@ -13,7 +14,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
     window.history.back();
   };
 
-  if (!prIsOpen) {
+  if (!PAYWALL_ENABLED || !prIsOpen) {
     return null;
   }
 

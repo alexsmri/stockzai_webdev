@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import COM_Plans from './COM_Plans';
+import COM_SubscriptionComingSoon from './COM_SubscriptionComingSoon';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useAlert } from '../context/CTX_Alert';
 import COM_Loading from './COM_Loading';
+import { PAYWALL_ENABLED } from '../constants';
 
 type SubscriptionSummary = {
   product: string;
@@ -43,6 +45,10 @@ function formatDate(value?: string | null): string | null {
 }
 
 export default function COM_UserPlans() {
+  if (!PAYWALL_ENABLED) {
+    return <COM_SubscriptionComingSoon />;
+  }
+
   const userStore = useUserStore();
   const { handleAlertOpen } = useAlert();
   const navigate = useNavigate();

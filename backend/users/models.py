@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta
 
 from .managers import UserManager
+from django.conf import settings
 
 
 class PermissionCode(models.TextChoices):
@@ -66,6 +67,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return list(products.values())
     
     def has_permission(self, permission_code: str | PermissionCode) -> bool:
+        if not settings.PAYWALL_ENABLED:
+            return True
         if not permission_code:
             return False
         code = permission_code.value if isinstance(permission_code, PermissionCode) else permission_code
@@ -77,6 +80,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def has_product(self, product_lookup) -> bool:
+        if not settings.PAYWALL_ENABLED:
+            return True
         if product_lookup is None:
             return False
 

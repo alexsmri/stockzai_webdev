@@ -1,17 +1,10 @@
-import Logo from '@/assets/media/LOGO_schwarzquer.svg?react';
-import { useNavigate } from 'react-router-dom';
-
 export default function COM_FooterAuth() {
-  const navigate = useNavigate();
   return (
     <>
-      <div className="area-flex-col mod-bottom">
-        <Logo
-          className="img-logo mod-cursor-pointer"
-          onClick={() => {
-            navigate('/');
-          }}
-        />
+      <div className="area-flex-wrap mod-center mod-gap-l">
+        <a href="/companies/search" className="look-button-subtle">
+          Search
+        </a>
         <a href="/legal/data" className="look-button-subtle">
           Data Protection
         </a>

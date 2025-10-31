@@ -33,7 +33,7 @@ export default function COM_FormPasswordResetRequest() {
   return (
     <>
       <h1 className="look-text-x4">Reset Password</h1>
-      <div className="area-flex-col look-div-container mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="email"

@@ -180,7 +180,7 @@ export default function PAG_TopStocks() {
   const listPlaceholder = useMemo(() => {
     if (isLoading) {
       return (
-        <div className="mod-padding-side look-text-x0 look-priority-low">Loading leaderboard�</div>
+        <div className="mod-padding-side look-text-x0 look-priority-low">Loading leaderboard</div>
       );
     }
     if (loadError) {

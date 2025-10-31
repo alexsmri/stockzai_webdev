@@ -8,6 +8,7 @@ import ICON_Cash from '../assets/media/ICON_Cash.svg?react';
 import ICON_Work from '../assets/media/ICON_Work.svg?react';
 import ICON_Company from '../assets/media/ICON_Company.svg?react';
 import ICON_Stocks from '../assets/media/ICON_Stocks.svg?react';
+import { PAYWALL_ENABLED } from '../constants';
 
 interface PI_SearchTable {
   prRows: Array<[string, TYP_ListViewRow]>;
@@ -86,10 +87,13 @@ export default function COM_SearchResults({
   prHasLoadedResults = false,
 }: PI_SearchTable) {
   const paywallConfig = useMemo(
-    () => ({
-      columns: PAYWALL_COLUMNS,
-      rows: prRedactedSymbols ?? undefined,
-    }),
+    () =>
+      PAYWALL_ENABLED
+        ? {
+            columns: PAYWALL_COLUMNS,
+            rows: prRedactedSymbols ?? undefined,
+          }
+        : null,
     [prRedactedSymbols]
   );
 

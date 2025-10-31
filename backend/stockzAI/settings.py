@@ -16,6 +16,14 @@ from datetime import timedelta
 from celery.schedules import crontab
 
 
+def env_flag(var_name: str, default: bool = True) -> bool:
+    """Return a boolean feature flag parsed from environment variables."""
+    raw_value = os.getenv(var_name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() not in {"0", "false", "no", "off"}
+
+
 def env_list(var_name: str) -> list:
     """Return a list of comma separated values from an environment variable, skipping blanks."""
     return [item for item in os.getenv(var_name, "").split(",") if item]
@@ -31,6 +39,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
+PAYWALL_ENABLED = env_flag("PAYWALL_ENABLED", default=True)
 
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS")
 

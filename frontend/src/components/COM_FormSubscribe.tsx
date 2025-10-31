@@ -68,7 +68,7 @@ export default function COM_FormSubscribe() {
   return (
     <>
       <h1 className="look-text-x4">Subscribe</h1>
-      <div className="area-flex-col look-div-container mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <p className="look-text-subtle look-text-x0">
             We will send a one-time code to confirm your subscription to{' '}

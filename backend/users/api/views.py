@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from users.models import (
     User,
     TokenVerification,
@@ -9,6 +10,8 @@ from users.models import (
     UserConsents,
     TrackingEvent,
     Subscription,
+    Product,
+    PermissionCode,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
@@ -455,9 +458,16 @@ def view_access(request):
         product_names.append(product.name)
         permission_names.update(product_permissions)
 
+    if not settings.PAYWALL_ENABLED:
+        product_names = sorted(
+            Product.objects.filter(is_active=True).values_list("name", flat=True)
+        )
+        permission_names = {code.value for code in PermissionCode}
+
     msg = {
         "products": product_names,
         "permissions": sorted(permission_names),
+        "paywallEnabled": settings.PAYWALL_ENABLED,
     }
 
     return api_json_response(msg=msg)

@@ -67,7 +67,7 @@ export default function COM_FormPasswordReset() {
       {valid === true && (
         <>
           <h1 className="look-text-x4">Set New Password</h1>
-          <div className="area-flex-col look-div-container mod-padding-xl">
+          <div className="area-flex-col look-div-subtle mod-padding-xl">
             <form onSubmit={handleSubmit} className="look-form-auth">
               <input
                 type="password"

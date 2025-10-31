@@ -98,7 +98,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   return (
     <>
       <h1 className="look-text-x4">Sign Up</h1>
-      <div className="area-flex-col look-div-container mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="password"
