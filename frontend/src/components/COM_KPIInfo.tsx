@@ -44,8 +44,8 @@ export default function COM_KPIInfo({
           {utText}
         </p>
         <div className="area-flex-row mod-gap-s mod-padding-none">
-          <p className="look-text-x1 look-text-normal">{formatLargeNumber(prValue)}</p>
           <COM_IndicatorChange prKPI={prKPI} />
+          <p className="look-text-x1 look-text-normal">{formatLargeNumber(prValue)}</p>{' '}
         </div>
       </div>
     );

@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import COM_IconColor from './COM_IconColor';
 
 const INFO_COLOR = 'rgba(255, 255, 255, 0.4)';
@@ -136,7 +144,12 @@ export default function COM_Tooltip({
         }}
         {...eventHandlers}
       >
-        <COM_IconColor prColor={INFO_COLOR} prPath="ICON_Info" prWidth="1.25rem" prHeight="1.25rem" />
+        <COM_IconColor
+          prColor={INFO_COLOR}
+          prPath="ICON_Info"
+          prWidth="1.25rem"
+          prHeight="1.25rem"
+        />
       </button>
       {isOpen && (
         <div
@@ -144,6 +157,7 @@ export default function COM_Tooltip({
           role="tooltip"
           className="look-div-solid mod-padding-s"
           style={{
+            backgroundColor: 'var(--color-primary)',
             position: 'fixed',
             zIndex: 1,
             maxWidth: '18rem',
