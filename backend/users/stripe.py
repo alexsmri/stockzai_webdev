@@ -278,6 +278,7 @@ def _decimal_from_amount(price: dict[str, Any]) -> Decimal:
 
 def _ensure_product(price: dict[str, Any]) -> Product:
     product = None
+    remote_product = {}
     stripe_product_id = price.get("product")
     product = Product.objects.filter(stripe_product_id=stripe_product_id).first()
 
@@ -287,16 +288,15 @@ def _ensure_product(price: dict[str, Any]) -> Product:
     if not product and stripe_product_id and STRIPE_API_KEY:
         try:
             remote_product = stripe.Product.retrieve(stripe_product_id)
+            product_metadata = remote_product.get("metadata") or {}
+            name = product_metadata.get("name")
+            verbose_name = remote_product.get("name") or name
+            product_description = remote_product.get("description")
+            product_active = remote_product.get("active")
+            product = Product.objects.filter(name=name).first()
         except stripe.StripeError as exc:
             logger.debug("Could not fetch Stripe product %s: %s", stripe_product_id, exc)
-
-        product_metadata = (remote_product.get("metadata") or {}) | product_metadata
-        name = product_metadata.get("name")
-        verbose_name = remote_product.get("name") or name
-        product_description = remote_product.get("description") or product_description
-        product_active = remote_product.get("active", product_active)
-        product = Product.objects.filter(name=name).first()
-
+    
     if not product:
         product = Product(name=name)
 
@@ -337,6 +337,7 @@ def _ensure_pricing(price: dict[str, Any], product: Product) -> Pricing:
         pricing.product = product
         pricing.name = name
         pricing.interval = interval
+        pricing.interval_count = interval_count
         pricing.unit_amount = amount
         pricing.currency = currency
         pricing.is_active = active
@@ -350,7 +351,6 @@ def _ensure_pricing(price: dict[str, Any], product: Product) -> Pricing:
             name=name,
             interval=interval,
             interval_count=interval_count,
-            price_per_interval=amount,
             unit_amount=amount,
             currency=currency,
             is_active=active,
