@@ -12,7 +12,7 @@ import {
 } from '../../utils/formats';
 import { scale } from '../../utils/functions';
 import ICON_FirstPlace from '@/assets/media/ICON_FirstPlace.svg?react';
-import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
+import ICON_ArrowDown from '@/assets/media/ICON_ArrowDown.svg?react';
 import COM_PaywallSearchResult from '../COM_PaywallSearchResult';
 
 export interface ITF_PaywallConfig {
@@ -200,7 +200,7 @@ export default function DCOM_ListView({
               >
                 <Icon style={{ width: scale(1) }} />
                 <span>{column.title}</span>
-                <ICON_Triangle
+                <ICON_ArrowDown
                   style={{
                     width: scale(1),
                     height: 'auto',

@@ -12,6 +12,7 @@ from users.middleware import require_permission
 from users.utils.tracking import track_event
 
 from ..db.DB_Handler import DB_Handler
+from stockzAI.common.functions import build_query_meta
 
 
 db = DB_Handler("companies")
@@ -78,7 +79,9 @@ class CompanyPageView(APIView):
                 "results": len(latest_entries),
             },
         )
-        return api_json_response(msg=intel)
+        payload = dict(intel or {})
+        payload["query"] = build_query_meta("PropertyCompanyProfile", symbol=symbol)
+        return api_json_response(msg=payload)
 
 
 class CompanyFreePageView(APIView):
@@ -91,7 +94,9 @@ class CompanyFreePageView(APIView):
             raise Http404("No data found for this symbol.")
 
         intel = db.dbq_get_company_data(symbol_upper)
-        return api_json_response(msg=intel)
+        payload = dict(intel or {})
+        payload["query"] = build_query_meta("PropertyCompanyProfileFree", symbol=symbol_upper)
+        return api_json_response(msg=payload)
 
 
 class CompanyFreeTickersView(APIView):
@@ -157,7 +162,19 @@ class CompanySearchView(APIView):
                     "results_count": results_count,
                 },
             )
-        return api_json_response(msg={"query": query, "results": processed_results, "redacted": redacted_symbols})
+        query_meta = build_query_meta(
+            "PropertySearchResults",
+            query=query,
+            variant=variant,
+            unique=unique,
+        )
+        return api_json_response(
+            msg={
+                "query": query_meta,
+                "results": processed_results,
+                "redacted": redacted_symbols,
+            }
+        )
 
 
 class CompanyWinnersView(APIView):
@@ -231,6 +248,11 @@ class CompanyLeaderboardView(APIView):
             "leaderboard": ranking,
             "intel": relevant_intel,
         }
+        response_payload["query"] = build_query_meta(
+            "PropertyCompanyLeaderboard",
+            sector=sector,
+            metric=metric_key,
+        )
         return api_json_response(msg=response_payload)
 
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, SVGProps } from 'react';
-import ICON_Triangle from '@/assets/media/ICON_Triangle.svg?react';
+import ICON_ArrowDown from '@/assets/media/ICON_ArrowDown.svg?react';
 import { scale } from '../utils/functions';
 
 export type TYP_DropdownOption = {
@@ -96,7 +96,7 @@ export default function COM_DropdownSelect({
     <div className="mod-postion-relative" ref={containerRef}>
       <button type="button" className="look-button-tertiary area-flex-row" onClick={toggleDropdown}>
         <span className="look-text-x1 look-text-normal">{buttonLabel}</span>
-        <ICON_Triangle
+        <ICON_ArrowDown
           style={{
             width: scale(1),
             height: 'auto',

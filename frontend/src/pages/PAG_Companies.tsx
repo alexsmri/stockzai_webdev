@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import COM_KPIInfoCard from '../components/COM_KPIInfoCard';
 import DCOM_KPIInfoCard from '../components/dumb/DCOM_KPIInfoCard';
@@ -15,6 +15,7 @@ import COM_Loading from '../components/COM_Loading';
 import COM_PremiumRoute from '../components/COM_PremiumRoute';
 import { useUserStore } from '../context/CTX_UserStore';
 import { COMPANY_PAGE_SECTION_WIDTH } from '../constants';
+import { queryMatches } from '../utils/functions';
 
 type TYP_AccessPayload = {
   permissions?: string[] | null;
@@ -30,16 +31,37 @@ type TYP_CompanyProfileRecord = {
 
 function PAG_CompaniesContent({ symbol }: { symbol: string }) {
   const store = useCompaniesStore();
-  const [companyData, setCompanyData] = useState<TYP_CompanyProfileRecord | null>(null);
+  const normalizedSymbol = symbol.trim();
+  const [companyData, setCompanyData] = useState<TYP_CompanyProfileRecord | null>(() => {
+    const existing = store.read('PropertyCompanyProfile');
+    return (existing as TYP_CompanyProfileRecord) ?? null;
+  });
+
+  const fetchPaths = useMemo<(string | number)[]>(
+    () => (normalizedSymbol ? [normalizedSymbol] : []),
+    [normalizedSymbol]
+  );
 
   useCompaniesStoreSync<TYP_CompanyProfileRecord>(store, 'PropertyCompanyProfile', setCompanyData, {
-    autoFetch: true,
-    prUrlPaths: [symbol],
+    autoFetch: Boolean(normalizedSymbol),
+    prUrlPaths: fetchPaths,
   });
 
   useEffect(() => {
     void store.get('PropertyCompanyKPIs');
   }, [store]);
+
+  const hasMatchingData =
+    Boolean(normalizedSymbol) &&
+    queryMatches('PropertyCompanyProfile', companyData, { symbol: normalizedSymbol });
+
+  if (!hasMatchingData || !companyData) {
+    return (
+      <STR_ApplicationPage>
+        <COM_Loading />
+      </STR_ApplicationPage>
+    );
+  }
 
   const latestEntries = companyData?.latest_entries ?? {};
   const symbolValue =

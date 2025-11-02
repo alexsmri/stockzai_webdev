@@ -7,6 +7,8 @@ import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { TYP_ListViewRow } from '../types/types';
+import COM_Loading from '../components/COM_Loading';
+import { queryMatches } from '../utils/functions';
 
 const METRIC_OPTIONS: MenuSelectOptions = {
   valuation_score: 'Valuation Score',
@@ -46,13 +48,14 @@ export default function PAG_TopStocks() {
   const navigate = useNavigate();
   const store = useCompaniesStore();
 
-  const [stLeaderboards, setStLeaderboards] = useState<Record<string, LeaderboardPayload>>({});
   const [selectedSector, setSelectedSector] = useState<string>('');
   const [selectedMetric, setSelectedMetric] = useState<LeaderboardMetric>('valuation_score');
-  const [activeLeaderboard, setActiveLeaderboard] = useState<LeaderboardPayload | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [sectorValues, setSectorValues] = useState<string[] | null>(null);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardPayload | null>(() => {
+    const existing = store.read('PropertyCompanyLeaderboard');
+    return isLeaderboardPayload(existing) ? existing : null;
+  });
 
   const distinctParams = useMemo(() => ({ kpi: 'sector' as const }), []);
 
@@ -82,54 +85,36 @@ export default function PAG_TopStocks() {
     setSelectedSector((prev) => (prev && sectorValues.includes(prev) ? prev : sectorValues[0]));
   }, [sectorValues]);
 
+  useCompaniesStoreSync<LeaderboardPayload | boolean>(
+    store,
+    'PropertyCompanyLeaderboard',
+    (payload) => {
+      if (isLeaderboardPayload(payload)) {
+        setLeaderboardData(payload);
+        return;
+      }
+      setLeaderboardData(null);
+    }
+  );
+
   useEffect(() => {
     if (!selectedSector || !selectedMetric) {
       return;
     }
-
-    const cacheKey = `${selectedSector}::${selectedMetric}`;
-    const cached = stLeaderboards[cacheKey];
-    if (cached) {
-      setActiveLeaderboard(cached);
-      return;
-    }
-
-    setActiveLeaderboard(null);
-
-    let isCancelled = false;
-    setIsLoading(true);
     setLoadError(null);
-
-    store
+    void store
       .get('PropertyCompanyLeaderboard', [], { sector: selectedSector, metric: selectedMetric })
       .then((response) => {
-        if (isCancelled) {
-          return;
-        }
-        if (isLeaderboardPayload(response)) {
-          setStLeaderboards((prev) => ({ ...prev, [cacheKey]: response }));
-          setActiveLeaderboard(response);
-        } else {
-          setActiveLeaderboard(null);
+        if (response === false) {
+          setLoadError('Failed to fetch leaderboard data.');
+        } else if (!isLeaderboardPayload(response)) {
           setLoadError('No leaderboard data available.');
         }
       })
       .catch(() => {
-        if (!isCancelled) {
-          setActiveLeaderboard(null);
-          setLoadError('Failed to fetch leaderboard data.');
-        }
-      })
-      .finally(() => {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
+        setLoadError('Failed to fetch leaderboard data.');
       });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedSector, selectedMetric, stLeaderboards, store]);
+  }, [selectedSector, selectedMetric, store]);
 
   const dropdownConfig = useMemo<TYP_DropdownConfig>(() => {
     const config: TYP_DropdownConfig = {};
@@ -139,14 +124,21 @@ export default function PAG_TopStocks() {
     return config;
   }, [sectorValues]);
 
+  const hasMatchingLeaderboard =
+    Boolean(selectedSector && selectedMetric) &&
+    queryMatches('PropertyCompanyLeaderboard', leaderboardData, {
+      sector: selectedSector,
+      metric: selectedMetric,
+    });
+
   const leaderboardRows = useMemo<Array<[string, TYP_ListViewRow]>>(() => {
-    if (!activeLeaderboard) {
+    if (!hasMatchingLeaderboard || !leaderboardData) {
       return [];
     }
 
-    const intel = activeLeaderboard.intel ?? {};
+    const intel = leaderboardData.intel ?? {};
 
-    return activeLeaderboard.leaderboard.map((entry, index) => {
+    return leaderboardData.leaderboard.map((entry, index) => {
       const symbol = typeof entry.symbol === 'string' ? entry.symbol : '';
       const intelEntry = (symbol && intel[symbol] ? intel[symbol] : {}) as TYP_ListViewRow;
       const rank = typeof entry.rank === 'number' ? entry.rank : index + 1;
@@ -165,7 +157,7 @@ export default function PAG_TopStocks() {
         rank,
         score,
         name: intelEntry?.name ?? null,
-        sector: intelEntry?.sector ?? activeLeaderboard.sector,
+        sector: intelEntry?.sector ?? leaderboardData.sector,
         sectorRanking: intelEntry?.sectorRanking ?? null,
         financial_score: intelEntry?.financial_score ?? null,
         valuation_score: intelEntry?.valuation_score ?? null,
@@ -175,19 +167,21 @@ export default function PAG_TopStocks() {
       const rowId = symbol;
       return [rowId, row];
     });
-  }, [activeLeaderboard, selectedMetric]);
+  }, [hasMatchingLeaderboard, leaderboardData, selectedMetric]);
 
   const listPlaceholder = useMemo(() => {
-    if (isLoading) {
-      return (
-        <div className="mod-padding-side look-text-x0 look-priority-low">Loading leaderboard</div>
-      );
-    }
     if (loadError) {
       return <div className="mod-padding-side look-text-x0 look-priority-low">{loadError}</div>;
     }
+    if (selectedSector && !hasMatchingLeaderboard) {
+      return (
+        <div className="area-flex-row mod-justify-center mod-padding-xl">
+          <COM_Loading />
+        </div>
+      );
+    }
     return null;
-  }, [isLoading, loadError]);
+  }, [hasMatchingLeaderboard, loadError, selectedSector]);
 
   const handleMetricChange = (key: string) => {
     if (!(key in METRIC_OPTIONS) || key === selectedMetric) {

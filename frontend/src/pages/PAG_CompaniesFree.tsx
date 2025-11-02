@@ -13,6 +13,8 @@ import NotFound from './PAG_404';
 import COM_TutorialOverlay from '../components/COM_TutorialOverlay';
 import { useLightbox } from '../context/CTX_Lightbox';
 import COM_SectionRisk from '../components/COM_SectionRisk';
+import COM_Loading from '../components/COM_Loading';
+import { queryMatches } from '../utils/functions';
 
 type CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
@@ -51,7 +53,11 @@ function PAG_CompaniesFreeContent({
   shouldShowTutorial: boolean;
 }) {
   const store = useCompaniesStore();
-  const [companyDataFree, setCompanyDataFree] = useState<CompanyProfileRecord | null>(null);
+  const normalizedSymbol = symbol.trim();
+  const [companyDataFree, setCompanyDataFree] = useState<CompanyProfileRecord | null>(() => {
+    const existing = store.read('PropertyCompanyProfileFree');
+    return (existing as CompanyProfileRecord) ?? null;
+  });
   const [isTutorialActive, setIsTutorialActive] = useState(shouldShowTutorial);
   const scoreSectionRef = useRef<HTMLDivElement | null>(null);
   const riskSectionRef = useRef<HTMLDivElement | null>(null);
@@ -59,21 +65,24 @@ function PAG_CompaniesFreeContent({
   const kpiDetailsRef = useRef<HTMLDivElement | null>(null);
   const { stIsOpen: isLightboxOpen, handleLBOpen } = useLightbox();
 
+  const fetchPaths = useMemo<(string | number)[]>(
+    () => (normalizedSymbol ? [normalizedSymbol] : []),
+    [normalizedSymbol]
+  );
+
   useCompaniesStoreSync<CompanyProfileRecord>(
     store,
     'PropertyCompanyProfileFree',
     setCompanyDataFree,
     {
-      autoFetch: true,
-      prUrlPaths: [symbol],
+      autoFetch: Boolean(normalizedSymbol),
+      prUrlPaths: fetchPaths,
     }
   );
 
-  useEffect(() => {
-    if (companyDataFree) {
-      store.update('PropertyCompanyProfile', companyDataFree as Record<string, unknown>);
-    }
-  }, [companyDataFree, store]);
+  const hasMatchingData =
+    Boolean(normalizedSymbol) &&
+    queryMatches('PropertyCompanyProfileFree', companyDataFree, { symbol: normalizedSymbol });
 
   useEffect(() => {
     void store.get('PropertyCompanyKPIs');
@@ -90,6 +99,14 @@ function PAG_CompaniesFreeContent({
       kpiDetailsRef.current = null;
     }
   }, [isLightboxOpen]);
+
+  if (!hasMatchingData || !companyDataFree) {
+    return (
+      <STR_ApplicationPage>
+        <COM_Loading />
+      </STR_ApplicationPage>
+    );
+  }
 
   const latestEntries = companyDataFree?.latest_entries ?? {};
   const symbolValue =

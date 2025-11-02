@@ -7,6 +7,8 @@ import STR_ApplicationPage from '../structures/STR_ApplicationPage';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { VAI_SearchData } from '../types/interfaces';
+import COM_Loading from '../components/COM_Loading';
+import { queryMatches } from '../utils/functions';
 
 export default function PAG_Search() {
   const navigate = useNavigate();
@@ -16,7 +18,10 @@ export default function PAG_Search() {
   const [submittedQuery, setSubmittedQuery] = useState<string>('');
   const [input, setInput] = useState<string>('');
   const [showCompletions, setShowCompletions] = useState<boolean>(false);
-  const [searchData, setSearchData] = useState<VAI_SearchData | null>(null);
+  const [searchData, setSearchData] = useState<VAI_SearchData | null>(() => {
+    const existing = store.read('PropertySearchResults');
+    return (existing as VAI_SearchData) ?? null;
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -47,15 +52,26 @@ export default function PAG_Search() {
   useEffect(() => {
     if (!shouldFetchResults) {
       setSearchData(null);
+      store.set('PropertySearchResults', null);
     }
-  }, [shouldFetchResults]);
+  }, [shouldFetchResults, store]);
+
+  const hasMatchingResults =
+    shouldFetchResults &&
+    queryMatches('PropertySearchResults', searchData, {
+      search: submittedQuery,
+      variant: searchParams.variant,
+      unique: searchParams.unique,
+    });
+
+  const isLoading = shouldFetchResults && !hasMatchingResults;
 
   const resultRows = useMemo(() => {
-    if (!shouldFetchResults || !searchData?.results) {
+    if (!hasMatchingResults || !searchData?.results) {
       return [] as Array<[string, Record<string, unknown>]>;
     }
     return Object.entries(searchData.results);
-  }, [searchData, shouldFetchResults]);
+  }, [hasMatchingResults, searchData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +120,15 @@ export default function PAG_Search() {
       <COM_SearchResults
         prRows={resultRows}
         prOnRowClick={(rowId) => handleRowClick(rowId)}
-        prRedactedSymbols={searchData?.redacted ?? null}
-        prHasLoadedResults={Boolean(searchData)}
+        prRedactedSymbols={hasMatchingResults ? searchData?.redacted ?? null : null}
+        prHasLoadedResults={hasMatchingResults}
+        prEmptyPlaceholder={
+          isLoading ? (
+            <div className="area-flex-row mod-justify-center mod-padding-xl">
+              <COM_Loading />
+            </div>
+          ) : undefined
+        }
       />
     </STR_ApplicationPage>
   );

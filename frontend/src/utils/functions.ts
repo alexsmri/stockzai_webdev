@@ -1,3 +1,5 @@
+import type { ValidKeys as CompanyStoreKeys } from "../stores/STO_Companies";
+
 const KPI_SCORING_ZERO = -1;
 
 export function scale(multiplier: number): string {
@@ -276,6 +278,238 @@ export function getKPIData({prKPI, prData}: {prKPI: string, prData: Record<any, 
   let latest_entry = prData.latest_entries[prKPI] || null
   let data = prData.company_intel[prKPI] || null
   return {latest_entry: latest_entry, data: data}
+}
+
+type QueryMatchableKey = Extract<
+  CompanyStoreKeys,
+  | "PropertySearchResults"
+  | "PropertyCompanyProfile"
+  | "PropertyCompanyProfileFree"
+  | "PropertyCompanyLeaderboard"
+>;
+
+type QueryInputMap = {
+  PropertySearchResults: {
+    search?: string | null;
+    query?: string | null;
+    variant?: string | null;
+    unique?: boolean | string | null;
+  };
+  PropertyCompanyProfile: {
+    symbol?: string | null;
+  };
+  PropertyCompanyProfileFree: {
+    symbol?: string | null;
+  };
+  PropertyCompanyLeaderboard: {
+    sector?: string | null;
+    metric?: string | null;
+  };
+};
+
+type QueryMetaRecord = Record<string, string>;
+
+function normalizeString(
+  value: unknown,
+  { toUpper = false, toLower = false }: { toUpper?: boolean; toLower?: boolean } = {}
+): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (toUpper) {
+    return trimmed.toUpperCase();
+  }
+  if (toLower) {
+    return trimmed.toLowerCase();
+  }
+  return trimmed;
+}
+
+function normalizeBooleanFlag(value: unknown): string | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  if (typeof value === "boolean") {
+    return value ? "true" : "false";
+  }
+  const lowered = String(value).trim().toLowerCase();
+  if (!lowered) {
+    return null;
+  }
+  if (["1", "true", "yes", "on"].includes(lowered)) {
+    return "true";
+  }
+  if (["0", "false", "no", "off"].includes(lowered)) {
+    return "false";
+  }
+  return lowered;
+}
+
+function serializeQueryMeta(meta: QueryMetaRecord): string {
+  return Object.keys(meta)
+    .sort()
+    .map((key) => `${key}:${meta[key]}`)
+    .join("|");
+}
+
+function buildDesiredQueryMeta<K extends QueryMatchableKey>(
+  key: K,
+  desired: QueryInputMap[K] | null | undefined
+): QueryMetaRecord | null {
+  const input = desired ?? ({} as QueryInputMap[K]);
+  switch (key) {
+    case "PropertySearchResults": {
+      const searchValue =
+        normalizeString((input as QueryInputMap["PropertySearchResults"]).search, { toLower: true }) ??
+        normalizeString((input as QueryInputMap["PropertySearchResults"]).query, { toLower: true });
+      if (!searchValue) {
+        return null;
+      }
+      const meta: QueryMetaRecord = { search: searchValue };
+      const variant = normalizeString((input as QueryInputMap["PropertySearchResults"]).variant, {
+        toLower: true,
+      });
+      if (variant) {
+        meta.variant = variant;
+      }
+      const unique = normalizeBooleanFlag((input as QueryInputMap["PropertySearchResults"]).unique);
+      if (unique) {
+        meta.unique = unique;
+      }
+      return meta;
+    }
+    case "PropertyCompanyProfile":
+    case "PropertyCompanyProfileFree": {
+      const symbol = normalizeString((input as QueryInputMap["PropertyCompanyProfile"]).symbol, {
+        toUpper: true,
+      });
+      if (!symbol) {
+        return null;
+      }
+      return { symbol };
+    }
+    case "PropertyCompanyLeaderboard": {
+      const metric = normalizeString((input as QueryInputMap["PropertyCompanyLeaderboard"]).metric, {
+        toLower: true,
+      });
+      const sector = normalizeString((input as QueryInputMap["PropertyCompanyLeaderboard"]).sector, {
+        toLower: true,
+      });
+      if (!metric || !sector) {
+        return null;
+      }
+      return { metric, sector };
+    }
+    default:
+      return null;
+  }
+}
+
+function resolveRawQueryObject(key: QueryMatchableKey, raw: unknown): QueryMetaRecord | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const record = raw as Record<string, unknown>;
+  switch (key) {
+    case "PropertySearchResults":
+      return buildDesiredQueryMeta("PropertySearchResults", {
+        search: (record.search ?? record.query) as string | null | undefined,
+        variant: record.variant as string | null | undefined,
+        unique: record.unique as string | boolean | null | undefined,
+      });
+    case "PropertyCompanyProfile":
+    case "PropertyCompanyProfileFree":
+      return buildDesiredQueryMeta(key, {
+        symbol: (record.symbol ?? record.SYMBOL) as string | null | undefined,
+      });
+    case "PropertyCompanyLeaderboard":
+      return buildDesiredQueryMeta("PropertyCompanyLeaderboard", {
+        sector: record.sector as string | null | undefined,
+        metric: record.metric as string | null | undefined,
+      });
+    default:
+      return null;
+  }
+}
+
+function extractStateQueryMeta<K extends QueryMatchableKey>(
+  key: K,
+  stateValue: unknown
+): QueryMetaRecord | null {
+  if (!stateValue || typeof stateValue !== "object") {
+    return null;
+  }
+  const record = stateValue as Record<string, unknown>;
+  const rawQuery = record.query;
+
+  if (rawQuery && typeof rawQuery === "object") {
+    const meta = resolveRawQueryObject(key, rawQuery);
+    if (meta) {
+      return meta;
+    }
+  } else if (typeof rawQuery === "string") {
+    if (key === "PropertySearchResults") {
+      const meta = buildDesiredQueryMeta("PropertySearchResults", { search: rawQuery });
+      if (meta) {
+        return meta;
+      }
+    }
+  }
+
+  switch (key) {
+    case "PropertySearchResults": {
+      const meta =
+        buildDesiredQueryMeta("PropertySearchResults", { search: record.query as string | null }) ??
+        buildDesiredQueryMeta("PropertySearchResults", {
+          search: record.search as string | null,
+        });
+      return meta;
+    }
+    case "PropertyCompanyProfile":
+    case "PropertyCompanyProfileFree": {
+      const latestEntries = record.latest_entries;
+      if (latestEntries && typeof latestEntries === "object") {
+        const symbolCandidate =
+          (latestEntries as Record<string, unknown>).SYMBOL ??
+          (latestEntries as Record<string, unknown>).symbol;
+        const meta = buildDesiredQueryMeta(key, { symbol: symbolCandidate as string | null });
+        if (meta) {
+          return meta;
+        }
+      }
+      const fallback = buildDesiredQueryMeta(key, { symbol: record.symbol as string | null });
+      return fallback;
+    }
+    case "PropertyCompanyLeaderboard": {
+      const meta = buildDesiredQueryMeta("PropertyCompanyLeaderboard", {
+        sector: record.sector as string | null,
+        metric: record.metric as string | null,
+      });
+      return meta;
+    }
+    default:
+      return null;
+  }
+}
+
+export function queryMatches<K extends QueryMatchableKey>(
+  key: K,
+  stateValue: unknown,
+  desired: QueryInputMap[K]
+): boolean {
+  const desiredMeta = buildDesiredQueryMeta(key, desired);
+  if (!desiredMeta) {
+    return false;
+  }
+  const stateMeta = extractStateQueryMeta(key, stateValue);
+  if (!stateMeta) {
+    return false;
+  }
+  return serializeQueryMeta(stateMeta) === serializeQueryMeta(desiredMeta);
 }
 
 type BreadcrumbParam = {
