@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import PAG_Companies from './pages/PAG_Companies';
 import PAG_CompaniesFree from './pages/PAG_CompaniesFree';
 import PAG_Login from './pages/PAG_Login';
@@ -6,8 +7,8 @@ import PAG_Register from './pages/PAG_Register';
 import PAG_RegisterPassword from './pages/PAG_RegisterPassword';
 import COM_ProtectedRoute from './components/COM_ProtectedRoute';
 import PAG_Search from './pages/PAG_Search';
-import { PRV_UserStore } from './context/CTX_UserStore';
-import { PRV_CompaniesStore } from './context/CTX_CompanyStore';
+import { PRV_UserStore, useUserStore } from './context/CTX_UserStore';
+import { PRV_CompaniesStore, useCompaniesStore } from './context/CTX_CompanyStore';
 import PA_PasswordResetRequest from './pages/PAG_PasswordResetRequest';
 import PAG_PasswordReset from './pages/PAG_PasswordReset';
 import COM_Loading from './components/COM_Loading';
@@ -28,19 +29,83 @@ import COM_PremiumRoute from './components/COM_PremiumRoute';
 import PAG_ChooseTicker from './pages/PAG_ChooseTicker';
 import PAG_Checkout from './pages/PAG_Checkout';
 import STR_UserManagement from './structures/STR_UserManagement';
+import type { ValidKeys as UserStoreKeys } from './stores/STO_Users';
+import type { ValidKeys as CompanyStoreKeys } from './stores/STO_Companies';
+import { REGISTRATION_PASSWORD_STORAGE_KEY } from './constants';
+
+function usePerformLogout() {
+  const userStore = useUserStore();
+  const companiesStore = useCompaniesStore();
+  const [completed, setCompleted] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.clear();
+    } catch {
+      /* ignore */
+    }
+    try {
+      window.sessionStorage.removeItem(REGISTRATION_PASSWORD_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+
+    const userKeysToReset: UserStoreKeys[] = [
+      'ActionLogin',
+      'ActionRefreshToken',
+      'PropertyCredentials',
+      'PropertyAccess',
+      'PropertySubscriptions',
+      'PropertyConsents',
+    ];
+    userKeysToReset.forEach((key) => {
+      userStore.set(key, null);
+    });
+    userStore.set('StateEditing', false);
+    userStore.set('PropertyTutorialCompleted', false);
+
+    const companiesKeysToReset: CompanyStoreKeys[] = [
+      'PropertyCompanyProfile',
+      'PropertyCompanyProfileFree',
+      'PropertySearchResults',
+      'PropertyCompanyLeaderboard',
+    ];
+    companiesKeysToReset.forEach((key) => {
+      companiesStore.set(key, null);
+    });
+
+    setCompleted(true);
+  }, [companiesStore, userStore]);
+
+  return completed;
+}
 
 function Logout() {
-  localStorage.clear();
-  return <Navigate to="/users/login/" />;
+  const navigate = useNavigate();
+  const isReady = usePerformLogout();
+
+  useEffect(() => {
+    if (isReady) {
+      navigate('/users/login/', { replace: true });
+    }
+  }, [isReady, navigate]);
+
+  return <COM_Loading />;
 }
 
 function CreateAndLogout() {
-  localStorage.clear();
+  const isReady = usePerformLogout();
+  if (!isReady) {
+    return <COM_Loading />;
+  }
   return <PAG_Register />;
 }
 
 function CreatePasswordAndLogout() {
-  localStorage.clear();
+  const isReady = usePerformLogout();
+  if (!isReady) {
+    return <COM_Loading />;
+  }
   return <PAG_RegisterPassword />;
 }
 
