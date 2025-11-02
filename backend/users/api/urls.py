@@ -19,7 +19,7 @@ from .views import (
     view_verify,
     view_get_subscriptions,
 )
-from ..paddle import paddle_webhook, view_cancel_plan, view_resume_plan
+from ..stripe import stripe_webhook, view_cancel_plan, view_resume_plan
 
 app_name = "users_api"
 
@@ -56,5 +56,5 @@ urlpatterns = [
     path("subscriptions/", view_get_subscriptions, name="subscriptions"),
     path("subscriptions/cancel/", view_cancel_plan, name="subscriptions_cancel"),
     path("subscriptions/resume/", view_resume_plan, name="subscriptions_resume"),
-    path("payments/webhook/", paddle_webhook, name="paddle_webhook"),
+    path("payments/webhook/", stripe_webhook, name="stripe_webhook"),
 ]

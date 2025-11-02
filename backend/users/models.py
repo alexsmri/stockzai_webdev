@@ -29,7 +29,7 @@ def validate_permission_choices(value):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     username = models.CharField(_('username'), max_length=30, blank=True)
-    paddle_id = models.CharField(_('paddle_id'), max_length=128, blank=True)
+    stripe_customer_id = models.CharField(_('stripe_customer_id'), max_length=128, blank=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -139,7 +139,7 @@ class UserConsents(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    paddle_id = models.CharField(max_length=128, unique=True, blank=True)
+    stripe_product_id = models.CharField(max_length=128, unique=True, blank=True)
     verbose_name = models.CharField(max_length=128, blank=True)
     description = models.TextField(blank=True)
     permissions = models.JSONField(default=list, blank=True, validators=[validate_permission_choices])
@@ -165,6 +165,7 @@ class Pricing(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='pricings')
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
+    stripe_price_id = models.CharField(max_length=128, blank=True)
     interval = models.CharField(max_length=16, choices=INTERVAL_CHOICES)
     price_per_interval = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)
