@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { scale } from '../utils/functions';
+import ICON_User from '@/assets/media/ICON_User.svg?react';
+import ICON_Crown from '@/assets/media/ICON_Crown.svg?react';
 
 export type SidebarUsersTab = 'account' | 'plans';
 
@@ -31,9 +33,13 @@ function readUsername(data: Credentials): string {
   return '';
 }
 
-const NAV_ITEMS: { key: SidebarUsersTab; label: string }[] = [
-  { key: 'account', label: 'Account' },
-  { key: 'plans', label: 'Plans' },
+const NAV_ITEMS: {
+  key: SidebarUsersTab;
+  label: string;
+  icon: FunctionComponent<SVGProps<SVGSVGElement>>;
+}[] = [
+  { key: 'account', label: 'Account', icon: ICON_User },
+  { key: 'plans', label: 'Plans', icon: ICON_Crown },
 ];
 
 export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersProps) {
@@ -89,6 +95,7 @@ export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersPr
               onClick={() => onSelect(item.key)}
               aria-pressed={isActive}
             >
+              <item.icon style={{ width: scale(1.2), height: scale(1.2) }} />
               {item.label}
             </button>
           );

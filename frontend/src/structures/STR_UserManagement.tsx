@@ -79,7 +79,6 @@ export default function STR_UserManagement() {
   }, [stOpen]);
 
   const renderContent = activeTab === 'account' ? <COM_FormEditUser /> : <COM_UserPlans />;
-  // height still looks shit sometimes (changes when menu changes)
   return (
     <COM_Lightbox isOpen={stOpen} onClose={() => {}}>
       <div
@@ -87,8 +86,6 @@ export default function STR_UserManagement() {
         style={{
           position: 'relative',
           backgroundColor: 'var(--color-primary)',
-          width: 'min(72rem, 100%)',
-          height: `clamp(${scale(30)}, 80%, 80%)`,
         }}
       >
         <div
@@ -122,7 +119,13 @@ export default function STR_UserManagement() {
               }}
             />
           </button>
-          <div className="area-flex-row" style={{ width: '100%', minHeight: '24rem' }}>
+          <div
+            className="area-flex-row"
+            style={{
+              width: `min(${scale(80)}, 90vh)`,
+              height: `clamp(${scale(25)}, ${scale(30)}, 90vh)`,
+            }}
+          >
             <COM_SidebarUsers activeTab={activeTab} onSelect={handleSelect} />
             <div
               className="area-flex-col mod-padding-xl mod-gap-xl"
