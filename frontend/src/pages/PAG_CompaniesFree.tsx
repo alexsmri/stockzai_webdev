@@ -100,6 +100,19 @@ function PAG_CompaniesFreeContent({
     }
   }, [isLightboxOpen]);
 
+  const tutorialSteps = useMemo(() => {
+    return [
+      { ...TUTORIAL_STEPS[0], ref: scoreSectionRef },
+      { ...TUTORIAL_STEPS[1], ref: riskSectionRef },
+      {
+        ...TUTORIAL_STEPS[2],
+        ref: profitMarginRef,
+        onContinue: () => handleLBOpen('profitMargins'),
+      },
+      { ...TUTORIAL_STEPS[3], ref: kpiDetailsRef },
+    ];
+  }, [scoreSectionRef, riskSectionRef, profitMarginRef, kpiDetailsRef, handleLBOpen]);
+
   if (!hasMatchingData || !companyDataFree) {
     return (
       <STR_ApplicationPage>
@@ -117,19 +130,6 @@ function PAG_CompaniesFreeContent({
     (latestEntries?.name as string | number | null | undefined) ??
     (latestEntries?.NAME as string | number | null | undefined) ??
     '-';
-
-  const tutorialSteps = useMemo(() => {
-    return [
-      { ...TUTORIAL_STEPS[0], ref: scoreSectionRef },
-      { ...TUTORIAL_STEPS[1], ref: riskSectionRef },
-      {
-        ...TUTORIAL_STEPS[2],
-        ref: profitMarginRef,
-        onContinue: () => handleLBOpen('profitMargins'),
-      },
-      { ...TUTORIAL_STEPS[3], ref: kpiDetailsRef },
-    ];
-  }, [scoreSectionRef, riskSectionRef, profitMarginRef, kpiDetailsRef, handleLBOpen]);
 
   const handleTutorialFinish = () => {
     setIsTutorialActive(false);
