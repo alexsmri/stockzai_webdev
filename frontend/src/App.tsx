@@ -27,7 +27,6 @@ import PAG_TopStocks from './pages/PAG_TopStocks';
 import PAG_Alerts from './pages/PAG_Alerts';
 import COM_PremiumRoute from './components/COM_PremiumRoute';
 import PAG_ChooseTicker from './pages/PAG_ChooseTicker';
-import PAG_Checkout from './pages/PAG_Checkout';
 import STR_UserManagement from './structures/STR_UserManagement';
 import type { ValidKeys as UserStoreKeys } from './stores/STO_Users';
 import type { ValidKeys as CompanyStoreKeys } from './stores/STO_Companies';
@@ -188,14 +187,6 @@ function App() {
                     element={
                       <COM_ProtectedRoute>
                         <PAG_Unsubscribe />
-                      </COM_ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/users/payment/checkout"
-                    element={
-                      <COM_ProtectedRoute>
-                        <PAG_Checkout />
                       </COM_ProtectedRoute>
                     }
                   />

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { scale } from '../utils/functions';
+import { COM_ButtonBuy } from './COM_ButtonBuy';
 
 interface PlansProps {
   prButtonLabel?: string;
@@ -9,16 +10,8 @@ interface PlansProps {
   prFooter?: ReactNode;
 }
 
-function COM_Plans({ prButtonLabel, prOnAction, prDisabled, prIsLoading, prFooter }: PlansProps) {
+function COM_Plans({ prButtonLabel, prFooter }: PlansProps) {
   const liStyle = { marginBottom: scale(0.5) };
-  const buttonLabel = prIsLoading ? 'Please wait...' : prButtonLabel ?? 'Unlock now';
-
-  const handleClick = () => {
-    if (prDisabled || prIsLoading) {
-      return;
-    }
-    prOnAction?.();
-  };
 
   return (
     <div className="area-flex-col mod-align-left">
@@ -38,14 +31,7 @@ function COM_Plans({ prButtonLabel, prOnAction, prDisabled, prIsLoading, prFoote
           Access to all KPIs
         </li>
       </ul>
-      <button
-        className="look-button-primary mod-button-auth mod-margin-t-xl"
-        type="button"
-        onClick={handleClick}
-        disabled={prDisabled || prIsLoading}
-      >
-        {buttonLabel}
-      </button>
+      <COM_ButtonBuy prPlanKey="pro_monthly" prButtonLabel={prButtonLabel} />
       {prFooter ? <div className="mod-margin-t-m">{prFooter}</div> : null}
     </div>
   );

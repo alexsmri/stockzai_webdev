@@ -37,6 +37,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
+STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 PAYWALL_ENABLED = env_flag("PAYWALL_ENABLED", default=True)
