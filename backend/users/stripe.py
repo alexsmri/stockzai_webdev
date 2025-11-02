@@ -457,7 +457,7 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
 
     return handled_item
 
-def webhook_subscription_created(subscription_obj: dict[str, Any]) -> bool:
+def webhook_subscription_created_or_updated(subscription_obj: dict[str, Any]) -> bool:
     subscription_id = subscription_obj.get("id")
     customer_id = subscription_obj.get("customer")
     if not subscription_id or not customer_id:
@@ -635,7 +635,8 @@ def stripe_webhook(request):
             "checkout.session.async_payment_failed": webhook_checkout_session_failed,
             "checkout.session.async_payment_succeeded": webhook_checkout_session_completed,
             "checkout.session.expired": webhook_checkout_session_expired,
-            "customer.subscription.created": webhook_subscription_created,
+            "customer.subscription.created": webhook_subscription_created_or_updated,
+            "customer.subscription.created": webhook_subscription_created_or_updated,
             "customer.subscription.deleted": webhook_subscription_deleted,
             "product.created": webhook_product_created_or_updated,
             "product.updated": webhook_product_created_or_updated,
