@@ -71,7 +71,7 @@ class PricingAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("verbose_name", "stripe_product_id", "paddle_id", "is_active")
+    list_display = ("verbose_name", "stripe_product_id", "is_active")
     search_fields = ("name", "verbose_name", "stripe_product_id", "paddle_id")
     list_filter = ("is_active",)
 

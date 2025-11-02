@@ -171,6 +171,7 @@ class Pricing(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
     interval = models.CharField(max_length=16, choices=INTERVAL_CHOICES)
+    interval_count = models.IntegerField(default=1, blank=False)
     unit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     currency = models.CharField(max_length=16, default='usd')
     is_active = models.BooleanField(default=True)
