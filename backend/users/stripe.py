@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Optional
 
 import stripe
@@ -12,13 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from stockzAI import settings
 from stockzAI.common.response import api_json_response
-from .models import Product, Purchase, Subscription, User
+from django.utils.dateparse import parse_datetime
+from .models import Pricing, Product, Purchase, Subscription, User
 
 STRIPE_API_KEY = settings.STRIPE_API_KEY or ""
 STRIPE_ENDPOINT_SECRET = settings.STRIPE_ENDPOINT_SECRET or ""
 
 stripe.api_key = STRIPE_API_KEY
-stripe.api_version = "2025-10-29.clover"
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,35 @@ OBJECT_DEMO_CHECKOUT_SESSION_COMPLETED = {
     "currency": "usd",
 }
 
+OBJECT_DEMO_CHECKOUT_SESSION_ASYNC_FAILED = {
+    "id": "cs_test_async_failed",
+    "object": "checkout.session",
+    "mode": "subscription",
+    "customer": "cus_123456789",
+    "status": "expired",
+    "payment_status": "unpaid",
+    "payment_intent": "pi_123456789",
+    "last_payment_error": {"message": "Customer abandoned flow"},
+}
+
+OBJECT_DEMO_CHECKOUT_SESSION_ASYNC_SUCCEEDED = {
+    "id": "cs_test_async_succeeded",
+    "object": "checkout.session",
+    "mode": "subscription",
+    "customer": "cus_123456789",
+    "status": "complete",
+    "payment_status": "paid",
+    "payment_intent": "pi_987654321",
+}
+
+OBJECT_DEMO_CHECKOUT_SESSION_EXPIRED = {
+    "id": "cs_test_expired",
+    "object": "checkout.session",
+    "mode": "subscription",
+    "customer": "cus_123456789",
+    "status": "expired",
+}
+
 OBJECT_DEMO_CUSTOMER_SUBSCRIPTION_UPDATED = {
     "id": "sub_123456789",
     "object": "subscription",
@@ -64,13 +94,24 @@ OBJECT_DEMO_CUSTOMER_SUBSCRIPTION_UPDATED = {
                     "object": "price",
                     "product": "prod_123456789",
                     "currency": "usd",
-                    "recurring": {"interval": "month"},
+                    "recurring": {"interval": "month", "interval_count": 1},
                     "nickname": "Starter Plan Monthly",
                     "metadata": {},
                 },
             }
         ],
     },
+}
+
+OBJECT_DEMO_CUSTOMER_SUBSCRIPTION_DELETED = {
+    "id": "sub_987654321",
+    "object": "subscription",
+    "customer": "cus_123456789",
+    "status": "canceled",
+    "cancel_at_period_end": False,
+    "current_period_end": 1893456000,
+    "ended_at": 1890864000,
+    "items": {"object": "list", "data": []},
 }
 
 OBJECT_DEMO_PRODUCT_CREATED = {
@@ -90,8 +131,24 @@ OBJECT_DEMO_PRICE_CREATED = {
     "unit_amount": 2000,
     "currency": "usd",
     "active": True,
-    "recurring": {"interval": "month"},
+    "recurring": {"interval": "month", "interval_count": 1},
     "metadata": {"name": "premium_plan"},
+}
+
+OBJECT_DEMO_PRODUCT_DELETED = {
+    "id": "prod_987654321",
+    "object": "product",
+    "name": "Archived Plan",
+    "active": False,
+    "deleted": True,
+}
+
+OBJECT_DEMO_PRICE_DELETED = {
+    "id": "price_987654321",
+    "object": "price",
+    "product": "prod_987654321",
+    "active": False,
+    "deleted": True,
 }
 
 
@@ -133,7 +190,7 @@ def util_verify_signature(request) -> Optional[dict[str, Any]]:
     except ValueError:
         logger.exception("Invalid payload for Stripe webhook.")
         return None
-    except stripe.error.SignatureVerificationError as exc:
+    except stripe.SignatureVerificationError as exc:
         logger.warning("Stripe webhook signature verification failed: %s", exc)
         return None
 
@@ -150,7 +207,7 @@ def util_get_user(stripe_customer_id: str) -> Optional[User]:
 
     try:
         customer = stripe.Customer.retrieve(stripe_customer_id) if STRIPE_API_KEY else None
-    except stripe.error.StripeError as exc:
+    except stripe.StripeError as exc:
         logger.warning("Failed to fetch Stripe customer %s: %s", stripe_customer_id, exc)
         return None
 
@@ -189,50 +246,123 @@ def webhook_customer_created(customer: dict[str, Any]) -> bool:
     return True
 
 
-def _resolve_product_by_price(price: dict[str, Any]) -> Optional[Product]:
-    price_id = price.get("id")
-    product_id = price.get("product")
-    nickname = price.get("nickname")
-    metadata = price.get("metadata") or {}
-    custom_name = metadata.get("name") or nickname
-
-    lookup_order = [
-        {"stripe_price_id": price_id} if price_id else None,
-        {"stripe_product_id": product_id} if product_id else None,
-        {"name": custom_name} if custom_name else None,
-    ]
-
-    for criteria in lookup_order:
-        if not criteria:
-            continue
-        product = Product.objects.filter(**criteria).first()
-        if product:
-            return product
-    return None
+def _normalise_interval(recurring: Optional[dict[str, Any]]) -> str:
+    interval = (recurring or {}).get("interval")
+    if not interval:
+        return Pricing.INTERVAL_ONETIME
+    interval = str(interval).lower()
+    mapping = {
+        "day": Pricing.INTERVAL_DAILY,
+        "week": Pricing.INTERVAL_WEEKLY,
+        "month": Pricing.INTERVAL_MONTHLY,
+        "year": Pricing.INTERVAL_YEARLY,
+    }
+    return mapping.get(interval, Pricing.INTERVAL_ONETIME)
 
 
-def _ensure_product_from_price(price: dict[str, Any]) -> Product:
-    product = _resolve_product_by_price(price)
+def _decimal_from_amount(price: dict[str, Any]) -> Decimal:
+    raw_decimal = price.get("unit_amount_decimal")
+    if raw_decimal is not None:
+        try:
+            return (Decimal(raw_decimal) / Decimal("100")).quantize(Decimal("0.01"))
+        except (InvalidOperation, ZeroDivisionError):
+            logger.warning("Invalid unit_amount_decimal on Stripe price %s", price.get("id"))
+    raw_amount = price.get("unit_amount")
+    if raw_amount is not None:
+        try:
+            return (Decimal(raw_amount) / Decimal("100")).quantize(Decimal("0.01"))
+        except (InvalidOperation, ZeroDivisionError):
+            logger.warning("Invalid unit_amount on Stripe price %s", price.get("id"))
+    return Decimal("0.00")
+
+
+def _ensure_product(price: dict[str, Any]) -> Product:
+    product = None
+    stripe_product_id = price.get("product")
+    product = Product.objects.filter(stripe_product_id=stripe_product_id).first()
+
     if product:
         return product
+    
+    if not product and stripe_product_id and STRIPE_API_KEY:
+        try:
+            remote_product = stripe.Product.retrieve(stripe_product_id)
+        except stripe.StripeError as exc:
+            logger.debug("Could not fetch Stripe product %s: %s", stripe_product_id, exc)
 
-    metadata = price.get("metadata") or {}
-    product_id = price.get("product") or ""
-    name = metadata.get("name") or price.get("nickname") or product_id or "Stripe product"
+        product_metadata = (remote_product.get("metadata") or {}) | product_metadata
+        name = product_metadata.get("name")
+        verbose_name = remote_product.get("name") or name
+        product_description = remote_product.get("description") or product_description
+        product_active = remote_product.get("active", product_active)
+        product = Product.objects.filter(name=name).first()
 
-    product = Product.objects.create(
-        name=name,
-        stripe_product_id=product_id or "",
-        stripe_price_id=price.get("id") or "",
-        verbose_name=price.get("nickname") or name,
-        description="",
-        is_active=bool(price.get("active", True)),
-    )
-    permissions = _parse_permissions(metadata)
-    if permissions:
-        product.permissions = permissions
-        product.save(update_fields=["permissions"])
+    if not product:
+        product = Product(name=name)
+
+    if stripe_product_id:
+        product.stripe_product_id = stripe_product_id
+    if verbose_name:
+        product.verbose_name = verbose_name
+    if product_description and not product.description:
+        product.description = product_description
+    product.is_active = product_active
+
+    product.save()
     return product
+
+
+def _ensure_pricing(price: dict[str, Any], product: Product) -> Pricing:
+    stripe_price_id = price.get("id")
+    name = price.get("nickname") or product.verbose_name or product.name
+    recurring = price.get("recurring") or {}
+    interval = _normalise_interval(recurring)
+    interval_count = int((recurring.get("interval_count") or 1) or 1)
+    amount = _decimal_from_amount(price)
+    currency = (price.get("currency") or "usd").lower()
+    active = bool(price.get("active", True))
+
+    pricing = None
+    if stripe_price_id:
+        pricing = Pricing.objects.filter(stripe_price_id=stripe_price_id).first()
+    if not pricing:
+        pricing = Pricing.objects.filter(
+            product=product,
+            name=name,
+            interval=interval,
+            interval_count=interval_count,
+        ).first()
+
+    if pricing:
+        pricing.product = product
+        pricing.name = name
+        pricing.interval = interval
+        pricing.unit_amount = amount
+        pricing.currency = currency
+        pricing.is_active = active
+        if stripe_price_id:
+            pricing.stripe_price_id = stripe_price_id
+        pricing.save()
+    else:
+        pricing = Pricing.objects.create(
+            product=product,
+            stripe_price_id=stripe_price_id,
+            name=name,
+            interval=interval,
+            interval_count=interval_count,
+            price_per_interval=amount,
+            unit_amount=amount,
+            currency=currency,
+            is_active=active,
+        )
+
+    return pricing
+
+
+def _ensure_product_and_pricing(price: dict[str, Any]) -> tuple[Product, Pricing]:
+    product = _ensure_product(price)
+    pricing = _ensure_pricing(price, product)
+    return product, pricing
 
 
 def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
@@ -256,37 +386,47 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
             line_items = response.data  # type: ignore[attr-defined]
         elif isinstance(response, dict):
             line_items = response.get("data", []) or []
-    except stripe.error.StripeError as exc:
+    except stripe.StripeError as exc:
         logger.exception("Failed to list Stripe Checkout line items for %s: %s", session_id, exc)
         return False
 
     for item in line_items:
-        price = item.get("price") or {}
-        if not price:
+        price_data = item.get("price")
+        if isinstance(price_data, str):
+            try:
+                price = stripe.Price.retrieve(price_data)
+            except stripe.StripeError as exc:
+                logger.exception("Failed to retrieve Stripe price %s: %s", price_data, exc)
+                continue
+        else:
+            price = price_data or {}
+        if not isinstance(price, dict) or not price:
             logger.warning("Stripe line item missing price object: %s", item)
             continue
+        product, pricing = _ensure_product_and_pricing(price)
 
-        product = _ensure_product_from_price(price)
-
-        recurring = price.get("recurring")
-        if recurring:
+        session_mode = session.get("mode")
+        if session_mode == "subscription":
             subscription_id = session.get("subscription")
             subscription_obj = None
             if subscription_id:
                 try:
                     subscription_obj = stripe.Subscription.retrieve(subscription_id)
-                except stripe.error.StripeError as exc:
+                except stripe.StripeError as exc:
                     logger.exception("Failed to retrieve Stripe subscription %s: %s", subscription_id, exc)
 
             subscription, _created = Subscription.objects.get_or_create(
                 user=user,
                 defaults={
                     "product": product,
+                    "pricing": pricing,
                     "provider": "stripe",
                     "provider_subscription_id": subscription_id or "",
                 },
             )
             subscription.product = product
+            if pricing:
+                subscription.pricing = pricing
             subscription.provider = "stripe"
             if subscription_id:
                 subscription.provider_subscription_id = subscription_id
@@ -295,14 +435,15 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
                 status = subscription_obj.get("status")
                 subscription.is_active = status in {"trialing", "active", "past_due"}
                 subscription.cancel_at_period_end = bool(subscription_obj.get("cancel_at_period_end"))
-                expires_at = _timestamp_to_datetime(subscription_obj.get("current_period_end"))
+                expires_at = _timestamp_to_datetime(subscription_obj.get("cancel_at"))
                 if expires_at:
                     subscription.expires_at = expires_at
             else:
                 subscription.is_active = True
                 subscription.cancel_at_period_end = False
-            subscription.save()
-        else:
+                subscription.save()
+
+        elif session_mode == "payment":
             payment_reference = session.get("payment_intent") or session_id
             Purchase.objects.update_or_create(
                 user=user,
@@ -316,8 +457,7 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
 
     return handled_item
 
-
-def webhook_subscription_updated(subscription_obj: dict[str, Any]) -> bool:
+def webhook_subscription_created(subscription_obj: dict[str, Any]) -> bool:
     subscription_id = subscription_obj.get("id")
     customer_id = subscription_obj.get("customer")
     if not subscription_id or not customer_id:
@@ -330,26 +470,33 @@ def webhook_subscription_updated(subscription_obj: dict[str, Any]) -> bool:
         return False
 
     items = subscription_obj.get("items", {}).get("data", [])
-    if not items:
-        logger.warning("Stripe subscription %s has no items.", subscription_id)
-        return False
 
     handled = False
     for item in items:
-        price = item.get("price") or {}
-        if not price:
+        price_data = item.get("price")
+        if isinstance(price_data, str):
+            try:
+                price = stripe.Price.retrieve(price_data)
+            except stripe.StripeError as exc:
+                logger.exception("Failed to retrieve Stripe price %s: %s", price_data, exc)
+                continue
+        else:
+            price = price_data or {}
+        if not isinstance(price, dict) or not price:
             continue
-
-        product = _ensure_product_from_price(price)
+        product, pricing = _ensure_product_and_pricing(price)
         subscription, _ = Subscription.objects.get_or_create(
             user=user,
             defaults={
                 "product": product,
+                "pricing": pricing,
                 "provider": "stripe",
                 "provider_subscription_id": subscription_id,
             },
         )
         subscription.product = product
+        if pricing:
+            subscription.pricing = pricing
         subscription.provider = "stripe"
         subscription.provider_subscription_id = subscription_id
 
@@ -357,25 +504,43 @@ def webhook_subscription_updated(subscription_obj: dict[str, Any]) -> bool:
         subscription.is_active = status in {"trialing", "active", "past_due"}
         subscription.cancel_at_period_end = bool(subscription_obj.get("cancel_at_period_end"))
 
-        expires_at = _timestamp_to_datetime(subscription_obj.get("current_period_end"))
+        expires_at = _timestamp_to_datetime(subscription_obj.get("cancel_at"))
         if expires_at:
             subscription.expires_at = expires_at
-
-        if status in {"canceled", "unpaid", "incomplete_expired"}:
-            ended_at = _timestamp_to_datetime(subscription_obj.get("ended_at"))
-            subscription.is_active = False
-            subscription.expires_at = ended_at or expires_at or timezone.now()
 
         subscription.save()
         handled = True
 
     return handled
 
+def webhook_subscription_deleted(subscription_obj: dict[str, Any]):
+    subscription_id = subscription_obj.get("id")
+    customer_id = subscription_obj.get("customer")
+    if not subscription_id or not customer_id:
+        logger.warning("Stripe subscription deletion missing id or customer.")
+        return False
+
+    user = util_get_user(customer_id)
+    if not user:
+        logger.warning("User %s not resolved for subscription %s", customer_id, subscription_id)
+        return False
+    
+    subscription = Subscription.objects.filter(
+        user=user, provider="stripe", provider_subscription_id=subscription_id
+    ).first()
+    if subscription:
+        subscription.is_active = False
+        subscription.cancel_at_period_end = True
+        subscription.expires_at = _timestamp_to_datetime(subscription_obj.get("ended_at")) or timezone.now()
+        subscription.save(update_fields=["is_active", "cancel_at_period_end", "expires_at"])
+        return True
+
+
 
 def webhook_product_created_or_updated(product_obj: dict[str, Any]) -> bool:
     stripe_product_id = product_obj.get("id")
     metadata = product_obj.get("metadata") or {}
-    name = metadata.get("name") or product_obj.get("name")
+    name = metadata.get("name")
     if not name:
         logger.warning("Stripe product event missing name metadata.")
         return False
@@ -393,45 +558,58 @@ def webhook_product_created_or_updated(product_obj: dict[str, Any]) -> bool:
     product.verbose_name = product_obj.get("name") or product.verbose_name
     product.description = product_obj.get("description") or product.description
     product.is_active = bool(product_obj.get("active", True))
-
-    permissions = _parse_permissions(metadata)
-    if permissions:
-        product.permissions = permissions
-
     product.save()
     return True
 
 
 def webhook_price_created_or_updated(price_obj: dict[str, Any]) -> bool:
     price_id = price_obj.get("id")
-    product_id = price_obj.get("product")
     if not price_id:
         logger.warning("Stripe price event missing id.")
         return False
 
+    product = _ensure_product(price_obj)
+    _ensure_pricing(price_obj, product)
+    return True
+
+
+def webhook_product_deleted(product_obj: dict[str, Any]) -> bool:
+    stripe_product_id = product_obj.get("id")
+    metadata = product_obj.get("metadata") or {}
+    name = metadata.get("name")
+
     product = None
-    if product_id:
-        product = Product.objects.filter(stripe_product_id=product_id).first()
+    if stripe_product_id:
+        product = Product.objects.filter(stripe_product_id=stripe_product_id).first()
+    if not product and name:
+        product = Product.objects.filter(name=name).first()
     if not product:
-        metadata = price_obj.get("metadata") or {}
-        name = metadata.get("name") or price_obj.get("nickname")
-        if name:
-            product = Product.objects.filter(name=name).first()
-        if not product:
-            product = Product(name=name or price_id)
+        return False
+    product.is_active = False
+    product.save(update_fields=["is_active"])
+    product.pricings.update(is_active=False) # DOES THIS WORK?
+    return True
 
-    product.stripe_product_id = product_id or product.stripe_product_id
-    product.stripe_price_id = price_id
-    nickname = price_obj.get("nickname")
-    if nickname and not product.verbose_name:
-        product.verbose_name = nickname
-    product.is_active = bool(price_obj.get("active", True))
 
-    permissions = _parse_permissions(price_obj.get("metadata") or {})
-    if permissions:
-        product.permissions = permissions
+def webhook_price_deleted(price_obj: dict[str, Any]) -> bool:
+    price_id = price_obj.get("id")
+    if not price_id:
+        return False
+    pricing = Pricing.objects.filter(stripe_price_id=price_id).first()
+    if not pricing:
+        return False
+    pricing.is_active = False
+    pricing.save(update_fields=["is_active"])
+    return True
 
-    product.save()
+
+def webhook_checkout_session_failed(session: dict[str, Any]) -> bool:
+    logger.info("Stripe checkout session %s failed asynchronously.", session.get("id"))
+    return True
+
+
+def webhook_checkout_session_expired(session: dict[str, Any]) -> bool:
+    logger.info("Stripe checkout session %s expired without completion.", session.get("id"))
     return True
 
 
@@ -451,16 +629,25 @@ def stripe_webhook(request):
         logger.info("Stripe event: %s", event_type)
 
         out = False
-        if event_type == "customer.created":
-            out = webhook_customer_created(data)
-        elif event_type == "checkout.session.completed":
-            out = webhook_checkout_session_completed(data)
-        elif event_type in {"customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"}:
-            out = webhook_subscription_updated(data)
-        elif event_type in {"product.created", "product.updated"}:
-            out = webhook_product_created_or_updated(data)
-        elif event_type in {"price.created", "price.updated"}:
-            out = webhook_price_created_or_updated(data)
+        event_handlers = {
+            "customer.created": webhook_customer_created,
+            "checkout.session.completed": webhook_checkout_session_completed,
+            "checkout.session.async_payment_failed": webhook_checkout_session_failed,
+            "checkout.session.async_payment_succeeded": webhook_checkout_session_completed,
+            "checkout.session.expired": webhook_checkout_session_expired,
+            "customer.subscription.created": webhook_subscription_created,
+            "customer.subscription.deleted": webhook_subscription_deleted,
+            "product.created": webhook_product_created_or_updated,
+            "product.updated": webhook_product_created_or_updated,
+            "product.deleted": webhook_product_deleted,
+            "price.created": webhook_price_created_or_updated,
+            "price.updated": webhook_price_created_or_updated,
+            "price.deleted": webhook_price_deleted,
+        }
+
+        handler = event_handlers.get(event_type)
+        if handler:
+            out = handler(data)
 
         return HttpResponse("OK" if out else "Ignored", status=200)
 
@@ -515,7 +702,7 @@ def view_cancel_plan(request):
     if subscription.provider.lower() == "stripe" and subscription.provider_subscription_id:
         try:
             stripe.Subscription.modify(subscription.provider_subscription_id, cancel_at_period_end=True)
-        except stripe.error.StripeError as exc:
+        except stripe.StripeError as exc:
             logger.exception(
                 "Failed to cancel Stripe subscription %s", subscription.provider_subscription_id
             )
@@ -563,7 +750,7 @@ def view_resume_plan(request):
                 cancel_at_period_end=False,
                 prorate=False,
             )
-        except stripe.error.StripeError as exc:
+        except stripe.StripeError as exc:
             logger.exception(
                 "Failed to resume Stripe subscription %s", subscription.provider_subscription_id
             )

@@ -8,6 +8,21 @@ import { useAlert } from '../context/CTX_Alert';
 import COM_Loading from './COM_Loading';
 import { PAYWALL_ENABLED } from '../constants';
 
+const environment_raw = import.meta.env.VITE_STRIPE_ENVIRONMENT;
+
+const ENVIRONMENT = environment_raw === 'production' ? 'production' : 'dev';
+
+export const STRIPE_PLANS = {
+  pro: {
+    pro_monthly: {
+      link: ENVIRONMENT === 'dev' ? 'https://buy.stripe.com/test_cNifZgez4bHna5zaCZgbm00' : '',
+      priceId: ENVIRONMENT === 'dev' ? 'price_1SOyiaBnrUSa2i9JrzxSZxzB' : '',
+      price: 10,
+      interval: '/month',
+    },
+  },
+};
+
 type SubscriptionSummary = {
   product: string;
   expires_at?: string | null;
@@ -56,8 +71,12 @@ export default function COM_UserPlans() {
   const [subscriptions, setSubscriptions] = useState<SubscriptionSummary[]>(
     normalizeSubscriptions(userStore.read('PropertySubscriptions'))
   );
+  const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
+    userStore.read('PropertyCredentials') as Record<string, any>
+  );
   const [isActionLoading, setIsActionLoading] = useState(false);
 
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   useUserStoreSync(
     userStore,
     'PropertySubscriptions',
@@ -113,7 +132,9 @@ export default function COM_UserPlans() {
 
   const handleAction = useCallback(async () => {
     if (!hasActiveSubscription) {
-      navigate('/users/payment/checkout');
+      const link = STRIPE_PLANS.pro.pro_monthly.link;
+      const email = stCredentials?.email;
+      window.location.href = `${link}?prefilled_email=${email}`;
       return;
     }
 
@@ -143,11 +164,7 @@ export default function COM_UserPlans() {
             'Failed to schedule cancellation.';
           handleAlertOpen('An error occurred', errorMessage, 'f');
         } else {
-          handleAlertOpen(
-            'Cancellation scheduled',
-            'Cancellation scheduled at period end.',
-            'i'
-          );
+          handleAlertOpen('Cancellation scheduled', 'Cancellation scheduled at period end.', 'i');
           await refreshSubscriptionData();
         }
       }

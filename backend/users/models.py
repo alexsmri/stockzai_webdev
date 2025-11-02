@@ -29,7 +29,7 @@ def validate_permission_choices(value):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     username = models.CharField(_('username'), max_length=30, blank=True)
-    stripe_customer_id = models.CharField(_('stripe_customer_id'), max_length=128, blank=True)
+    stripe_customer_id = models.CharField(_('stripe_customer_id'), max_length=128, blank=True, null=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -139,47 +139,64 @@ class UserConsents(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)
-    stripe_product_id = models.CharField(max_length=128, unique=True, blank=True)
+    stripe_product_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
     verbose_name = models.CharField(max_length=128, blank=True)
     description = models.TextField(blank=True)
     permissions = models.JSONField(default=list, blank=True, validators=[validate_permission_choices])
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.verbose_name
+        return self.verbose_name or self.name
 
 
 class Pricing(models.Model):
-    INTERVAL_MONTHLY = 'monthly'
-    INTERVAL_QUARTERLY = 'quarterly'
-    INTERVAL_YEARLY = 'yearly'
-    INTERVAL_ONETIME = 'onetime'
+    INTERVAL_ONETIME = 'one_time'
+    INTERVAL_DAILY = 'day'
+    INTERVAL_WEEKLY = 'week'
+    INTERVAL_MONTHLY = 'month'
+    INTERVAL_QUARTERLY = 'quarter'
+    INTERVAL_YEARLY = 'year'
 
     INTERVAL_CHOICES = [
+        (INTERVAL_ONETIME, 'One-time'),
+        (INTERVAL_DAILY, 'Daily'),
+        (INTERVAL_WEEKLY, 'Weekly'),
         (INTERVAL_MONTHLY, 'Monthly'),
         (INTERVAL_QUARTERLY, 'Quarterly'),
         (INTERVAL_YEARLY, 'Yearly'),
-        (INTERVAL_ONETIME, 'One-time'),
     ]
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='pricings')
+    stripe_price_id = models.CharField(max_length=128, unique=True, blank=True, null=True)
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
-    stripe_price_id = models.CharField(max_length=128, blank=True)
     interval = models.CharField(max_length=16, choices=INTERVAL_CHOICES)
-    price_per_interval = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    currency = models.CharField(max_length=16, default='usd')
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        unique_together = ('product', 'name', 'interval')
+        unique_together = ('product', 'name', 'interval', 'interval_count')
 
     def __str__(self):
-        return f"{self.product.verbose_name} - {self.name} ({self.interval})"
+        human_labels = {
+            self.INTERVAL_ONETIME: "one-time",
+            self.INTERVAL_DAILY: "day",
+            self.INTERVAL_WEEKLY: "week",
+            self.INTERVAL_MONTHLY: "month",
+            self.INTERVAL_QUARTERLY: "quarter",
+            self.INTERVAL_YEARLY: "year",
+        }
+        interval_label = human_labels.get(self.interval, self.interval)
+        if self.interval_count and self.interval_count != 1 and interval_label != "one-time":
+            interval_label = f"{self.interval_count} x {interval_label}"
+        return f"{self.product.verbose_name or self.product.name} - {self.name} ({interval_label})"
 
 
 class Subscription(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='subscription')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='subscriptions')
+    pricing = models.ForeignKey(Pricing, on_delete=models.PROTECT, related_name='subscriptions', null=True, blank=True)
     is_active = models.BooleanField(default=True)
     started_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
@@ -199,6 +216,19 @@ class Subscription(models.Model):
         if self.expires_at and self.expires_at <= timezone.now():
             return False
         return True
+
+    def clean(self):
+        super().clean()
+        if self.pricing:
+            if not self.product:
+                self.product = self.pricing.product
+            elif self.pricing.product_id != self.product_id:
+                raise ValidationError({'pricing': 'Selected pricing must belong to the chosen product.'})
+
+    def save(self, *args, **kwargs):
+        if self.pricing and not self.product:
+            self.product = self.pricing.product
+        super().save(*args, **kwargs)
 
 
 class Purchase(models.Model):
