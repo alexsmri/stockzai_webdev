@@ -119,7 +119,7 @@ export default function COM_UserPlans() {
     if (!hasActiveSubscription) {
       const link = STRIPE_PLANS.pro.pro_monthly.link;
       const email = stCredentials?.email;
-      window.location.href = `${link}?prefilled_email=${email}`;
+      window.location.href = `${link}?locked_prefilled_email=${email}`;
       return;
     }
 

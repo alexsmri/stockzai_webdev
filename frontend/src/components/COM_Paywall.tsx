@@ -24,7 +24,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
   const handleAction = useCallback(async () => {
     const link = STRIPE_PLANS.pro.pro_monthly.link;
     const email = stCredentials?.email;
-    window.location.href = `${link}?prefilled_email=${email}`;
+    window.location.href = `${link}?locked_prefilled_email=${email}`;
     return;
   }, [userStore]);
 
