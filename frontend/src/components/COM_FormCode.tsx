@@ -271,7 +271,10 @@ export default function COM_FormCode({
           </div>
 
           <div className="area-flex-col mod-gap-s mod-padding-none mod-align-stretch">
-            <button className="look-button-auth" disabled={!isComplete || isSubmitting}>
+            <button
+              className="look-button-secondary look-button-auth"
+              disabled={!isComplete || isSubmitting}
+            >
               {isSubmitting ? 'Verifying...' : 'Verify'}
             </button>
             <button

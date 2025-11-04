@@ -51,11 +51,7 @@ export default function COM_FormUnsubscribe() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!stReason.trim()) {
-      handleAlertOpen(
-        'Missing reason',
-        'Please let us know why you are unsubscribing.',
-        'f'
-      );
+      handleAlertOpen('Missing reason', 'Please let us know why you are unsubscribing.', 'f');
       return;
     }
 
@@ -126,7 +122,7 @@ export default function COM_FormUnsubscribe() {
               formatReason(reason, idx === DEFAULT_REASONS.length - 1)
             )}
           </div>
-          <button className="look-button-auth">Confirm</button>
+          <button className="look-button-secondary look-button-auth">Confirm</button>
         </form>
       </div>
     </>

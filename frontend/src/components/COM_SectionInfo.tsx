@@ -1,7 +1,6 @@
 import { Children, useEffect, useMemo, useState, type ReactNode } from 'react';
 import COM_IndicatorChange from './COM_IndicatorChange';
 import COM_MenuSelect from './COM_MenuSelect';
-import { COMPANY_PAGE_SECTION_WIDTH } from '../constants';
 
 const ROLE_CHANGE_KPIS: Record<string, string> = {
   'Scores.': 'totalScore',
@@ -89,10 +88,7 @@ function COM_SectionInfo({
   const showControlArea = Boolean((menuEntries && prMenuOptions) || (shouldShowChange && title));
 
   return (
-    <div
-      className="area-flex-col mod-align-stretch look-div-subtle"
-      style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
-    >
+    <div className="area-flex-col mod-align-stretch look-div-subtle">
       <div className="area-flex-row mod-space-between">
         {title && (
           <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>

@@ -74,7 +74,7 @@ export default function COM_FormSubscribe() {
             We will send a one-time code to confirm your subscription to{' '}
             {stEmail || 'your account email'}.
           </p>
-          <button className="look-button-auth" disabled={stLoading}>
+          <button className="look-button-secondary look-button-auth" disabled={stLoading}>
             {stLoading ? 'Sending code...' : 'Send confirmation code'}
           </button>
         </form>

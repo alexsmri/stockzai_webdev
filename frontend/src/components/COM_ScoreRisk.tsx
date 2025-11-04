@@ -79,7 +79,7 @@ export default function COM_ScoreRisk() {
           textAnchor="middle"
           opacity="60%"
           className="look-text-x0"
-          style={{ fill: `${withAlpha(color, 0.6)}` }}
+          style={{ fill: `var(--color-secondary)`, fontSize: '90%' }}
         >
           Risk
         </text>
@@ -88,7 +88,7 @@ export default function COM_ScoreRisk() {
           y="60%"
           textAnchor="middle"
           className="look-text-x0"
-          style={{ fill: `${withAlpha(color, 0.8)}` }}
+          style={{ fill: `${withAlpha(color, 0.8)}`, fontSize: '90%' }}
         >
           {label}
         </text>

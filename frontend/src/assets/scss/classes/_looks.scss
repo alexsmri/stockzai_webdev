@@ -253,7 +253,7 @@
 .look-text-x1 {
   font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(0);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.4;
   @include u.remove-margin();
 }
@@ -261,7 +261,7 @@
 .look-text-x0 {
   font-family: 'Geist', 'Inter', sans-serif;
   font-size: u.scale_font(-1);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.4;
   @include u.remove-margin();
 }

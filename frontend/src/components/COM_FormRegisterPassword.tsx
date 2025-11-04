@@ -137,7 +137,10 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
             Get stockz.ai newsletter for product updates & special offers (can be canceled at any
             time)
           </label>
-          <button className="look-button-auth" disabled={stLoading || !stConsentsTos}>
+          <button
+            className="look-button-secondary look-button-auth"
+            disabled={stLoading || !stConsentsTos}
+          >
             {stLoading ? 'Creating Account...' : CONTINUE_LABEL}
           </button>
         </form>

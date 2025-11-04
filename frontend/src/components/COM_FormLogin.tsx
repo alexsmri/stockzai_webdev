@@ -64,16 +64,18 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             placeholder="Password"
             className="look-input-auth"
           />
-          <button className="look-button-auth">{stLoading ? 'Logging In...' : 'Continue'}</button>
+          <button className="look-button-secondary look-button-auth">
+            {stLoading ? 'Logging In...' : 'Continue'}
+          </button>
         </form>
-        <div className="area-form-auth-links">
-          <a href="/users/password-reset/token/request" className="look-button-subtle">
-            Forgot Password?
-          </a>
-          <a href="/users/register" className="look-button-subtle">
-            Don't have an account yet? Sign Up
-          </a>
-        </div>
+      </div>
+      <div className="area-form-auth-links">
+        <a href="/users/password-reset/token/request" className="look-button-subtle">
+          Forgot Password?
+        </a>
+        <a href="/users/register" className="look-button-subtle">
+          Don't have an account yet? Sign Up
+        </a>
       </div>
     </>
   );

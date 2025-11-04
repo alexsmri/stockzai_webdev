@@ -61,13 +61,13 @@ function COM_FormRegister() {
             placeholder="Username"
             className="look-input-auth"
           />
-          <button className="look-button-auth">{CONTINUE_LABEL}</button>
+          <button className="look-button-secondary look-button-auth">{CONTINUE_LABEL}</button>
         </form>
-        <div className="area-form-auth-links">
-          <a href="/users/login" className="look-button-subtle">
-            Log In Instead
-          </a>
-        </div>
+      </div>
+      <div className="area-form-auth-links">
+        <a href="/users/login" className="look-button-subtle">
+          Log In Instead
+        </a>
       </div>
     </>
   );

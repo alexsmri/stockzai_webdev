@@ -127,7 +127,7 @@
 
   &:hover {
     background-color: color-mix(in srgb, #{$color} 85%, white 15%);
-    box-shadow: 0 0 calc(#{$shadow-size} * 1.5) color-mix(in srgb, #{$color} 45%, transparent);
+    color: color-mix(in srgb, #{$text-color} 80%, white 20%);
   }
 
   &:focus-visible {
@@ -137,7 +137,6 @@
 
   &:active {
     background-color: color-mix(in srgb, #{$color} 80%, black 20%);
-    box-shadow: 0 0 calc(#{$shadow-size} * 0.5) color-mix(in srgb, #{$color} 40%, transparent);
     transform: translateY($active-offset);
   }
 

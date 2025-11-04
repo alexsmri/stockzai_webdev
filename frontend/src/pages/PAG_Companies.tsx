@@ -82,10 +82,7 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
             className="area-flex-col mod-align-stretch mod-padding-none"
             style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
           >
-            <div
-              className="area-flex-row mod-padding-none mod-flex-grow-children mod-gap-s"
-              style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
-            >
+            <div className="area-flex-row mod-padding-none mod-flex-grow-children mod-gap-s">
               <DCOM_KPIInfoCard prLabel="Symbol" prValue={symbolValue} />
               <COM_KPIInfoCard prTableRole="basics" prKPI="name" prValue={nameValue} />
             </div>
