@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import { withAlpha, getRiskLevelMeta } from '../utils/risk';
-import { toNumber } from '../utils/functions';
+import { scale, toNumber } from '../utils/functions';
 
 type CompanyProfileRecord = {
   latest_entries?: Record<string, unknown>;
@@ -77,9 +77,12 @@ export default function COM_ScoreRisk() {
           x="50%"
           y="48%"
           textAnchor="middle"
-          opacity="60%"
-          className="look-text-x0"
-          style={{ fill: `var(--color-secondary)`, fontSize: '90%' }}
+          className="look-text-x1"
+          style={{
+            fontSize: `${scale(0.7)}`,
+            fill: 'var(--color-secondary)',
+            opacity: 0.6,
+          }}
         >
           Risk
         </text>
@@ -87,8 +90,11 @@ export default function COM_ScoreRisk() {
           x="50%"
           y="60%"
           textAnchor="middle"
-          className="look-text-x0"
-          style={{ fill: `${withAlpha(color, 0.8)}`, fontSize: '90%' }}
+          className="look-text-x1"
+          style={{
+            fontSize: `${scale(0.7)}`,
+            fill: `${withAlpha(color, 0.8)}`,
+          }}
         >
           {label}
         </text>

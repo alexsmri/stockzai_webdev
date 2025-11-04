@@ -1,4 +1,4 @@
-import { getScoreColor, getDashOffset } from '../utils/functions';
+import { getScoreColor, getDashOffset, scale } from '../utils/functions';
 import { useCompaniesStoreSync } from '../hooks/hooks';
 import { useCompaniesStore } from '../context/CTX_CompanyStore';
 import { useState } from 'react';
@@ -63,10 +63,14 @@ function COM_ScoreRadial({ KPI }: PI_ScoreRadial) {
           ></circle>
 
           <text
-            className="look-text-x0 mod-cursor-pointer"
+            className="look-text-x1 mod-cursor-pointer"
             x="50%"
             y="53%"
             textAnchor="middle"
+            style={{
+              fontSize: `${scale(0.7)}`,
+              fill: 'var(--color-secondary)',
+            }}
             onClick={() => handleLBOpen(KPI)}
           >
             {text}
