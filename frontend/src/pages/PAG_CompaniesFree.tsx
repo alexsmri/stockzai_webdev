@@ -25,23 +25,23 @@ type CompanyProfileRecord = {
 const TUTORIAL_STEPS = [
   {
     key: 'scores',
-    title: 'Start with the Scores',
-    body: 'Review the aggregate financial and valuation scores here.',
+    title: 'Begin with the Scores',
+    body: "Get a quick overview of each company's financial and valuation strength.",
   },
   {
     key: 'risk',
-    title: 'Review Risk Scores',
-    body: 'This panel highlights upcoming risk indicators alongside the basics.',
+    title: 'Assess the Risk Profile',
+    body: 'Identify potential red flags and see how risk balances against fundamentals.',
   },
   {
     key: 'profit-margin',
-    title: 'Open Profit Margin Details',
-    body: 'Click Profit Margin to launch the KPI lightbox.',
+    title: 'Dive into any KPI',
+    body: 'Click on any KPI to open an interactive breakdown of performance.',
   },
   {
     key: 'kpi-details',
-    title: 'Explore KPI Details',
-    body: 'Use the lightbox table to compare history and percentile performance.',
+    title: 'Analyze KPI Insights',
+    body: 'Use the KPI lightbox to explore historical data and sector percentile ranks.',
   },
 ];
 

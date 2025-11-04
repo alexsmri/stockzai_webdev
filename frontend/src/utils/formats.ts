@@ -133,11 +133,11 @@ export function formatText(value: unknown, fallback: string): ReactNode {
 
 const RISK_LEVEL_CONTEXT = [
   'very low',
-  'low',
-  'balanced',
-  'elevated',
-  'high',
-  'critical',
+  'slight',        
+  'moderate',      
+  'balanced',      
+  'heightened',    
+  'severe',        
 ] as const;
 
 const RISK_LEVEL_ACTION = [
@@ -158,17 +158,17 @@ type RiskTextGenerator = (context: {
 
 const RISK_TEXT_GENERATORS: Record<RiskFactorKey, RiskTextGenerator> = {
   countriesAML: ({ descriptor, action, label }) =>
-    `Operating jurisdictions show ${descriptor} anti-money laundering enforcement (${label} risk). ${action}`,
+    `Operating jurisdictions show ${descriptor} lack of anti-money laundering enforcement (${label} risk). ${action}`,
   countriesFSI: ({ descriptor, action, label }) =>
-    `Cross-border exposure to financial secrecy hubs is ${descriptor} (${label} risk). ${action}`,
+    `Exposure to fragile states is ${descriptor}, indicating a ${label.toLowerCase()} geopolitical risk. ${action}`,
   marketCap: ({ descriptor, action, label }) =>
     `Market capitalization resilience appears ${descriptor}, shaping downside protection at a ${label.toLowerCase()} level. ${action}`,
   volume: ({ descriptor, action, label }) =>
     `Trading volume signals ${descriptor} liquidity support with a ${label.toLowerCase()} risk flag. ${action}`,
   price: ({ descriptor, action, label }) =>
-    `Recent price action reflects ${descriptor} volatility, pointing to a ${label.toLowerCase()} drawdown risk. ${action}`,
+    `Share price level indicates ${descriptor} listing instability, reflecting a ${label.toLowerCase()} delisting risk. ${action}`,
   freeFloat: ({ descriptor, action, label }) =>
-    `Free float availability is ${descriptor}, keeping ownership concentration at a ${label.toLowerCase()} risk. ${action}`,
+    `Free float is limited, leading to ${descriptor} ownership concentration and a ${label.toLowerCase()} liquidity risk. ${action}`,
   altmanZScore: ({ descriptor, action, label }) =>
     `The Altman Z-Score indicates a ${descriptor} probability of financial distress (${label} risk). ${action}`,
 };
