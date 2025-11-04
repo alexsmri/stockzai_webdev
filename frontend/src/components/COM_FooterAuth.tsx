@@ -5,24 +5,28 @@ export default function COM_FooterAuth() {
     { href: 'https://stockz.ai/terms-conditions', label: 'Terms & Conditions' },
     { href: 'https://stockz.ai/payment-dispatch', label: 'Payment & Dispatch' },
     { href: 'https://stockz.ai/data-protection', label: 'Data Protection' },
+    { href: 'https://stockz.ai/disclaimer', label: 'Disclaimer' },
   ];
 
   return (
-    <div className="area-flex-wrap mod-bottom mod-gap-l" style={{ justifyContent: 'center' }}>
-      <a href="/companies/search" className="look-button-subtle">
-        Search
-      </a>
-      {legalLinks.map(({ href, label }) => (
-        <a
-          key={href}
-          href={href}
-          className="look-button-subtle"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {label}
+    <div className="area-flex-col mod-center mod-gap-s">
+      <p className="look-text-x0 look-text-subtle">No investment advice - see disclaimer.</p>
+      <div className="area-flex-wrap mod-bottom mod-gap-l" style={{ justifyContent: 'center' }}>
+        <a href="/companies/search" className="look-button-subtle">
+          Search
         </a>
-      ))}
+        {legalLinks.map(({ href, label }) => (
+          <a
+            key={href}
+            href={href}
+            className="look-button-subtle"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {label}
+          </a>
+        ))}
+      </div>
     </div>
   );
 }

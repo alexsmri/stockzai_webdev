@@ -15,6 +15,7 @@ interface InfoSectionProps {
   children: ReactNode;
   prShowChange?: boolean;
   prMenuOptions?: Record<string, string>;
+  prHeaderAddon?: ReactNode;
 }
 
 function COM_SectionInfo({
@@ -23,6 +24,7 @@ function COM_SectionInfo({
   children,
   prShowChange,
   prMenuOptions,
+  prHeaderAddon,
 }: InfoSectionProps) {
   const shouldShowChange = prShowChange ? true : false;
 
@@ -86,6 +88,8 @@ function COM_SectionInfo({
   };
 
   const showControlArea = Boolean((menuEntries && prMenuOptions) || (shouldShowChange && title));
+  const showHeaderAddon = Boolean(prHeaderAddon);
+  const shouldRenderControls = showControlArea || showHeaderAddon;
 
   return (
     <div className="area-flex-col mod-align-stretch look-div-subtle">
@@ -93,7 +97,7 @@ function COM_SectionInfo({
         {title && (
           <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>
         )}
-        {showControlArea && (
+        {shouldRenderControls && (
           <div className="area-flex-row mod-gap-s mod-padding-none">
             {menuEntries && prMenuOptions && (
               <COM_MenuSelect prOptions={prMenuOptions} prHandleChange={handleMenuChange} />
@@ -101,6 +105,7 @@ function COM_SectionInfo({
             {shouldShowChange && title && (
               <COM_IndicatorChange prKPI={ROLE_CHANGE_KPIS[title]} prShowDiv={true} />
             )}
+            {prHeaderAddon}
           </div>
         )}
       </div>

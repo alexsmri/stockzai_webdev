@@ -14,6 +14,7 @@ import COM_TutorialOverlay from '../components/COM_TutorialOverlay';
 import { useLightbox } from '../context/CTX_Lightbox';
 import COM_SectionRisk from '../components/COM_SectionRisk';
 import COM_Loading from '../components/COM_Loading';
+import COM_Tooltip from '../components/COM_Tooltip';
 import { queryMatches } from '../utils/functions';
 
 type CompanyProfileRecord = {
@@ -137,6 +138,24 @@ function PAG_CompaniesFreeContent({
     (latestEntries?.NAME as string | number | null | undefined) ??
     '-';
 
+  const scoresTooltipContent = (
+    <div className="area-flex-col mod-gap-xs">
+      <p className="look-text-x1 look-text-normal">
+        The displayed scores and analytics are for informational purposes only and do not constitute
+        financial advice or investment recommendations. View our{' '}
+        <a
+          className="look-text-clickable mod-padding-none"
+          href="https://stockz.ai/scores"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          documentation
+        </a>
+        .
+      </p>
+    </div>
+  );
+
   const handleTutorialFinish = () => {
     setIsTutorialActive(false);
   };
@@ -155,7 +174,13 @@ function PAG_CompaniesFreeContent({
               <COM_KPIInfoCard prTableRole="basics" prKPI="name" prValue={nameValue} />
             </div>
             <div ref={scoreSectionRef}>
-              <COM_SectionInfo title="Scores." prShowChange={true}>
+              <COM_SectionInfo
+                title="Scores."
+                prShowChange={true}
+                prHeaderAddon={
+                  <COM_Tooltip prContent={scoresTooltipContent} prLabel="How we calculate scores" />
+                }
+              >
                 <div className="area-flex-row mod-padding-none mod-gap-s">
                   <COM_ScoreRadial KPI="financial_score" />
                   <COM_ScoreRadial KPI="valuation_score" />
