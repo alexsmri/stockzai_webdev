@@ -40,7 +40,11 @@ class RegisterUserView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         consents_data = self.request.data.get("consents") or {}
-        allowed_fields = {"consents_newsletter", "consents_tos"}
+        allowed_fields = {"consents_newsletter", "consents_tos", "consents_information_only"}
+        if not bool(consents_data.get("consents_information_only")) or not bool(consents_data.get("consents_tos")):
+            raise ValidationError(
+                {"consents_information_only": ["Informational consent is required."]}
+            )
         sanitized = {
             field: bool(consents_data.get(field))
             for field in allowed_fields
@@ -310,6 +314,7 @@ def view_credentials(request):
         {
             "consents_newsletter": consents.consents_newsletter,
             "consents_tos": consents.consents_tos,
+            "consents_information_only": consents.consents_information_only,
         }
         if consents
         else {}
@@ -415,6 +420,7 @@ def view_consents(request):
         {
             "consents_newsletter": consents.consents_newsletter,
             "consents_tos": consents.consents_tos,
+            "consents_information_only": consents.consents_information_only,
         }
         if consents
         else {}

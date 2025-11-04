@@ -279,7 +279,7 @@ export default function COM_FormCode({
             </button>
             <button
               type="button"
-              className="look-button-ghost"
+              className="look-button-ghost mod-centersides"
               onClick={handleResend}
               disabled={cooldown > 0 || isResending}
             >

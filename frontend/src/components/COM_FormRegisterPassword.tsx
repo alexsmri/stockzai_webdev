@@ -16,6 +16,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   const [stPasswordConfirm, setPasswordConfirm] = useState('');
   const [stConsentsNewsletter, setStConsentsNewsletter] = useState(false);
   const [stConsentsTos, setStConsentsTos] = useState(false);
+  const [stConsentsInformationOnly, setStConsentsInformationOnly] = useState(false);
   const [stLoading, setStLoading] = useState(false);
 
   const utStore = useUserStore();
@@ -34,10 +35,10 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
       return;
     }
 
-    if (!stConsentsTos) {
+    if (!stConsentsTos || !stConsentsInformationOnly) {
       handleAlertOpen(
         'Action required',
-        'Please accept our privacy policy & terms to continue.',
+        'Please accept our privacy policy, terms and informational disclaimer to continue.',
         'f'
       );
       return;
@@ -49,7 +50,11 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
         email: prEmail,
         username: prUsername,
         password: stPassword,
-        consents: { consents_newsletter: stConsentsNewsletter, consents_tos: stConsentsTos },
+        consents: {
+          consents_newsletter: stConsentsNewsletter,
+          consents_tos: stConsentsTos,
+          consents_information_only: stConsentsInformationOnly,
+        },
       });
 
       if (!utRes) {
@@ -116,7 +121,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
           />
           <label
             className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
-            style={{ maxWidth: '15rem' }}
+            style={{ maxWidth: '20rem' }}
           >
             <input
               type="checkbox"
@@ -139,6 +144,18 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
           </label>
           <label
             className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
+            style={{ maxWidth: '20rem' }}
+          >
+            <input
+              type="checkbox"
+              checked={stConsentsInformationOnly}
+              onChange={(e) => setStConsentsInformationOnly(e.target.checked)}
+            />
+            I confirm that I understand Stockz.ai provides informational scores only and no
+            investment advice.
+          </label>
+          <label
+            className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"
             style={{ maxWidth: '15rem' }}
           >
             <input
@@ -151,7 +168,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
           </label>
           <button
             className="look-button-secondary look-button-auth"
-            disabled={stLoading || !stConsentsTos}
+            disabled={stLoading || !stConsentsTos || !stConsentsInformationOnly}
           >
             {stLoading ? 'Creating Account...' : CONTINUE_LABEL}
           </button>

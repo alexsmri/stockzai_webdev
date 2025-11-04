@@ -135,6 +135,7 @@ class UserConsents(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='consents')
     consents_newsletter = models.BooleanField(default=False)
     consents_tos = models.BooleanField(default=True)
+    consents_information_only = models.BooleanField(default=False)
     given_at = models.DateTimeField(auto_now_add=True)
 
 class Product(models.Model):
