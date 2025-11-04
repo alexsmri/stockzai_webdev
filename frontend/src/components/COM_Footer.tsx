@@ -9,7 +9,7 @@ export default function COM_Footer() {
   ];
 
   return (
-    <div className="area-flex-col mod-bottom mod-gap-s">
+    <div className="area-flex-col mod-bottom mod-centersides mod-gap-s">
       <p className="look-text-x0 look-text-subtle">No investment advice - see disclaimer.</p>
       <div className="area-flex-wrap mod-center mod-gap-l">
         <a href="/companies/search" className="look-button-subtle">

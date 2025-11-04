@@ -9,7 +9,7 @@ export default function COM_FooterAuth() {
   ];
 
   return (
-    <div className="area-flex-col mod-bottom mod-gap-s">
+    <div className="area-flex-col mod-bottom mod-centersides mod-gap-s">
       <p className="look-text-x0 look-text-subtle">No investment advice - see disclaimer.</p>
       <div className="area-flex-wrap mod-bottom mod-gap-l" style={{ justifyContent: 'center' }}>
         <a href="/companies/search" className="look-button-subtle">
