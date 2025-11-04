@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react';
 import COM_IconColor from './COM_IconColor';
@@ -34,6 +35,7 @@ export default function COM_Tooltip({
 }: PRI_Tooltip) {
   const anchorRef = useRef<HTMLButtonElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [style, setStyle] = useState<CSSProperties>({});
@@ -112,22 +114,67 @@ export default function COM_Tooltip({
     };
   }, [isOpen, isTouchDevice]);
 
-  const eventHandlers = useMemo(() => {
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    clearCloseTimer();
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsOpen(false);
+      closeTimerRef.current = null;
+    }, 120);
+  }, [clearCloseTimer]);
+
+  useEffect(() => clearCloseTimer, [clearCloseTimer]);
+
+  const buttonEventHandlers = useMemo(() => {
     if (isTouchDevice) {
       return {
         onClick: () => setIsOpen((previous) => !previous),
       };
     }
     return {
-      onMouseEnter: () => setIsOpen(true),
-      onMouseLeave: () => setIsOpen(false),
-      onFocus: () => setIsOpen(true),
-      onBlur: () => setIsOpen(false),
+      onFocus: () => {
+        clearCloseTimer();
+        setIsOpen(true);
+      },
+      onBlur: () => {
+        clearCloseTimer();
+        setIsOpen(false);
+      },
+      onMouseEnter: () => {
+        clearCloseTimer();
+        setIsOpen(true);
+      },
+      onMouseLeave: () => {
+        scheduleClose();
+      },
     };
-  }, [isTouchDevice]);
+  }, [clearCloseTimer, isTouchDevice, scheduleClose]);
+
+  const tooltipHoverHandlers = useMemo<
+    Pick<HTMLAttributes<HTMLDivElement>, 'onMouseEnter' | 'onMouseLeave'>
+  >(() => {
+    if (isTouchDevice) {
+      return {};
+    }
+    return {
+      onMouseEnter: () => {
+        clearCloseTimer();
+        setIsOpen(true);
+      },
+      onMouseLeave: () => {
+        scheduleClose();
+      },
+    };
+  }, [clearCloseTimer, isTouchDevice, scheduleClose]);
 
   return (
-    <>
+    <div style={{ display: 'inline-flex', alignItems: 'center', position: 'relative' }}>
       <button
         type="button"
         aria-label={prLabel}
@@ -142,7 +189,7 @@ export default function COM_Tooltip({
           alignItems: 'center',
           justifyContent: 'center',
         }}
-        {...eventHandlers}
+        {...buttonEventHandlers}
       >
         <COM_IconColor
           prColor={INFO_COLOR}
@@ -163,10 +210,11 @@ export default function COM_Tooltip({
             maxWidth: '18rem',
             ...style,
           }}
+          {...tooltipHoverHandlers}
         >
           {prContent}
         </div>
       )}
-    </>
+    </div>
   );
 }
