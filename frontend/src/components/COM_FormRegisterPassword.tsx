@@ -123,7 +123,19 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
               checked={stConsentsTos}
               onChange={(e) => setStConsentsTos(e.target.checked)}
             />
-            I accept the privacy policy and terms of service.
+            <span>
+              I accept the privacy policy and{' '}
+              <a
+                href="https://stockz.ai/terms-conditions"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => event.stopPropagation()}
+                onMouseDown={(event) => event.preventDefault()}
+              >
+                Terms of Service
+              </a>
+              .
+            </span>
           </label>
           <label
             className="area-flex-row look-text-subtle look-text-x0 mod-gap-s mod-padding-none"

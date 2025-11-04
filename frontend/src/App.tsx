@@ -13,7 +13,6 @@ import PA_PasswordResetRequest from './pages/PAG_PasswordResetRequest';
 import PAG_PasswordReset from './pages/PAG_PasswordReset';
 import COM_Loading from './components/COM_Loading';
 import { PRV_Alert } from './context/CTX_Alert';
-import PAG_Legal from './pages/PAG_Legal';
 import COM_HandleTokens from './components/COM_HandleTokens';
 import PAG_FormFeedback from './pages/PAG_FormFeedback';
 import { PRV_Lightbox } from './context/CTX_Lightbox';
@@ -119,7 +118,6 @@ function App() {
                 <STR_UserManagement />
                 <Routes>
                   <Route path="/" element={<Navigate to="/companies/search" replace />} />
-                  <Route path="/legal/:page" element={<PAG_Legal />} />
                   <Route path="/users/login" element={<PAG_Login />} />
                   <Route path="/users/logout" element={<Logout />} />
                   <Route path="/users/register" element={<CreateAndLogout />} />
