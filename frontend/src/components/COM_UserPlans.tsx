@@ -6,22 +6,7 @@ import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useAlert } from '../context/CTX_Alert';
 import COM_Loading from './COM_Loading';
-import { PAYWALL_ENABLED } from '../constants';
-
-const environment_raw = import.meta.env.VITE_STRIPE_ENVIRONMENT;
-
-const ENVIRONMENT = environment_raw === 'production' ? 'production' : 'dev';
-
-export const STRIPE_PLANS = {
-  pro: {
-    pro_monthly: {
-      link: ENVIRONMENT === 'dev' ? 'https://buy.stripe.com/test_cNifZgez4bHna5zaCZgbm00' : '',
-      priceId: ENVIRONMENT === 'dev' ? 'price_1SOyiaBnrUSa2i9JrzxSZxzB' : '',
-      price: 10,
-      interval: '/month',
-    },
-  },
-};
+import { PAYWALL_ENABLED, STRIPE_PLANS } from '../constants';
 
 type SubscriptionSummary = {
   product: string;

@@ -1,8 +1,10 @@
-import { type JSX } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import ICON_ArrowLeft from '@/assets/media/ICON_ArrowLeft.svg?react';
 import COM_Plans from './COM_Plans';
 import { scale } from '../utils/functions';
-import { PAYWALL_ENABLED } from '../constants';
+import { PAYWALL_ENABLED, STRIPE_PLANS } from '../constants';
+import { useUserStore } from '../context/CTX_UserStore';
+import { useUserStoreSync } from '../hooks/hooks';
 
 interface PI_Paywall {
   prIsOpen: boolean;
@@ -10,9 +12,21 @@ interface PI_Paywall {
 }
 
 export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
+  const userStore = useUserStore();
+  const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
+    userStore.read('PropertyCredentials') as Record<string, any>
+  );
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   const handleBack = () => {
     window.history.back();
   };
+
+  const handleAction = useCallback(async () => {
+    const link = STRIPE_PLANS.pro.pro_monthly.link;
+    const email = stCredentials?.email;
+    window.location.href = `${link}?prefilled_email=${email}`;
+    return;
+  }, [userStore]);
 
   if (!PAYWALL_ENABLED || !prIsOpen) {
     return null;
@@ -54,7 +68,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
             overflow: 'hidden',
           }}
         >
-          {prChildren ?? <COM_Plans />}
+          {prChildren ?? <COM_Plans prOnAction={handleAction} />}
         </div>
       </div>
     </div>

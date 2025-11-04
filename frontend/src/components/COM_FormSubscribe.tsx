@@ -20,7 +20,7 @@ export default function COM_FormSubscribe() {
       ])) as Record<string, any>[];
 
       if (consents?.consents_newsletter) {
-        navigate('/users/edit', { replace: true });
+        navigate('/', { replace: true });
         return;
       }
 

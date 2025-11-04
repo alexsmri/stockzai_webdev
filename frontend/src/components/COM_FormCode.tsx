@@ -7,6 +7,7 @@ import {
   REGISTRATION_RESEND_COOLDOWN_SECONDS,
 } from '../constants';
 import { censorEmail } from '../utils/formats';
+import { scale } from '../utils/functions';
 
 const CODE_LENGTH = 6;
 
@@ -209,12 +210,9 @@ export default function COM_FormCode({
       });
       if (!loginRes) {
         clearTemporaryPassword();
-        handleAlertOpen(
-          'Manual login required',
-          'Account verified. Please log in manually.',
-          'w',
-          { timeout: 5000 }
-        );
+        handleAlertOpen('Manual login required', 'Account verified. Please log in manually.', 'w', {
+          timeout: 5000,
+        });
         navigate('/users/login');
         return;
       }
@@ -262,7 +260,12 @@ export default function COM_FormCode({
                 onChange={(e) => handleChange(e, i)}
                 onKeyDown={(e) => handleKeyDown(e, i)}
                 onPaste={(e) => handlePaste(e, i)}
-                style={{ width: '2.5rem', textAlign: 'center' }}
+                style={{
+                  minWidth: 'unset',
+                  maxWidth: `${scale(2.5)}`,
+                  textAlign: 'center',
+                  padding: `${scale(0.5)}`,
+                }}
               />
             ))}
           </div>

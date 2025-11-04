@@ -264,21 +264,19 @@ export default function COM_Sidebar() {
             style={{
               width: '100%',
               marginTop: 'auto',
+              marginBottom: 0,
               justifyContent: showLabels ? 'center' : 'center',
             }}
             onClick={handleSignUpNavigate}
             aria-label="Sign Up"
           >
-            {showLabels ? (
-              <span style={{ width: '100%', textAlign: 'center' }}>Sign Up</span>
-            ) : (
-              <ICON_User
-                style={{
-                  width: scale(1.3),
-                  height: scale(1.3),
-                }}
-              />
-            )}
+            <ICON_User
+              style={{
+                width: scale(1.2),
+                height: scale(1.2),
+              }}
+            />
+            {showLabels && <span style={{ width: '100%', textAlign: 'center' }}>Sign Up</span>}
           </button>
         )}
       </aside>

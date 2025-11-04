@@ -122,8 +122,8 @@ export default function STR_UserManagement() {
           <div
             className="area-flex-row"
             style={{
-              width: `min(${scale(80)}, 90vh)`,
-              height: `clamp(${scale(25)}, ${scale(30)}, 90vh)`,
+              width: `min(${scale(80)}, 90vw)`,
+              height: `clamp(${scale(35)}, ${scale(40)}, 95vh)`,
             }}
           >
             <COM_SidebarUsers activeTab={activeTab} onSelect={handleSelect} />

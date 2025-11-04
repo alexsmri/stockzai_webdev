@@ -1,5 +1,20 @@
 import { scale } from "./utils/functions";
 
+const environment_raw = import.meta.env.VITE_STRIPE_ENVIRONMENT;
+
+const ENVIRONMENT = environment_raw === 'production' ? 'production' : 'dev';
+
+export const STRIPE_PLANS = {
+  pro: {
+    pro_monthly: {
+      link: ENVIRONMENT === 'dev' ? 'https://buy.stripe.com/test_cNifZgez4bHna5zaCZgbm00' : '',
+      priceId: ENVIRONMENT === 'dev' ? 'price_1SOyiaBnrUSa2i9JrzxSZxzB' : '',
+      price: 10,
+      interval: '/month',
+    },
+  },
+};
+
 const PAYWALL_FLAG =
   typeof import.meta.env.VITE_PAYWALL_ENABLED === 'string'
     ? import.meta.env.VITE_PAYWALL_ENABLED

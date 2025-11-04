@@ -25,7 +25,7 @@ function COM_Plans({ prButtonLabel, prOnAction, prDisabled, prIsLoading, prFoote
       <h2 className="look-text-x3 mod-left look-priority-medium">Pro</h2>
       <h2 className="look-text-x3 mod-align-left look-priority-low">
         Unlock everything for just <br />
-        <span className="look-priority-high">$10</span>/one-time
+        <span className="look-priority-high">$10</span>/month
       </h2>
       <ul className="mod-padding-s">
         <li className="look-text-x1 look-priority-normal" style={liStyle}>

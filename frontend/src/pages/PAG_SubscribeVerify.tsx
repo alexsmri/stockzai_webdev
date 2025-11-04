@@ -54,7 +54,7 @@ export default function PAG_SubscribeVerify() {
           prEmail={resolvedEmail}
           prUsername={resolvedUsername}
           prMode="newsletter"
-          prRedirect="/users/edit"
+          prRedirect="/"
         />
       </COM_Hero>
       <COM_FooterAuth />

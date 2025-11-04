@@ -636,7 +636,7 @@ def stripe_webhook(request):
             "checkout.session.async_payment_succeeded": webhook_checkout_session_completed,
             "checkout.session.expired": webhook_checkout_session_expired,
             "customer.subscription.created": webhook_subscription_created_or_updated,
-            "customer.subscription.created": webhook_subscription_created_or_updated,
+            "customer.subscription.updated": webhook_subscription_created_or_updated,
             "customer.subscription.deleted": webhook_subscription_deleted,
             "product.created": webhook_product_created_or_updated,
             "product.updated": webhook_product_created_or_updated,
@@ -722,6 +722,7 @@ def view_cancel_plan(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+# Needs work, fails rn
 def view_resume_plan(request):
     try:
         payload = json.loads(request.body or "{}")
@@ -749,7 +750,6 @@ def view_resume_plan(request):
             stripe.Subscription.modify(
                 subscription.provider_subscription_id,
                 cancel_at_period_end=False,
-                prorate=False,
             )
         except stripe.StripeError as exc:
             logger.exception(
