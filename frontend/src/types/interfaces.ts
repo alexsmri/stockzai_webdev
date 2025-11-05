@@ -2,7 +2,7 @@ import type { TYP_IconType, TYP_ListViewRow } from "./types";
 import type { ReactNode } from "react";
 
 export interface VAI_SearchData {
-  query: string,
+  query: Record<string, string>,
   results: Record<string, Record<string, any>>;
   redacted: string[];
 }

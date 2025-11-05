@@ -49,9 +49,9 @@ export default function COM_SectionRisk() {
       className="look-div-subtle area-flex-col mod-gap-m mod-padding-m"
       style={{ width: COMPANY_PAGE_SECTION_WIDTH }}
     >
-      <div className="area-flex-row mod-space-between mod-align-center">
-        <h3 className="look-text-x0 look-text-subtle">Risk Factors.</h3>
-      </div>
+      <h3 className="look-text-x0 look-text-subtle" style={{ marginRight: 'auto' }}>
+        Risk Factors.
+      </h3>
       <COM_ScoreRisk />
       <div className="area-flex-row mod-gap-s mod-padding-none">
         <p className="look-text-x1 look-priority-low">{label}</p>

@@ -32,7 +32,10 @@ function COM_SearchCompletion({ prQuery, prUnique, onSelect }: PRI_SearchComplet
   }
 
   const safeData = data;
-  const shouldShow = safeData.results && data.query === prQuery;
+  console.log(safeData);
+  const normalizedQuery = prQuery.trim().toLowerCase();
+  const dataQuery = data.query['search'];
+  const shouldShow = Boolean(safeData.results) && dataQuery === normalizedQuery;
 
   if (!shouldShow) {
     return null;

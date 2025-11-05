@@ -95,7 +95,9 @@ function COM_SectionInfo({
     <div className="area-flex-col mod-align-stretch look-div-subtle">
       <div className="area-flex-row mod-space-between">
         {title && (
-          <h3 className="look-text-x0 look-text-subtle mod-align-left mod-center">{title}</h3>
+          <h3 className="look-text-x0 look-text-subtle" style={{ marginRight: 'auto' }}>
+            {title}
+          </h3>
         )}
         {shouldRenderControls && (
           <div className="area-flex-row mod-gap-s mod-padding-none">

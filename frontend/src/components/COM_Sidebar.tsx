@@ -64,6 +64,28 @@ function readUsername(data: any | null): string {
   return '';
 }
 
+type SubscriptionRecord = {
+  product?: string | null;
+};
+
+function normalizeSubscriptions(value: unknown): SubscriptionRecord[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.filter(
+    (item): item is SubscriptionRecord => typeof item === 'object' && item !== null
+  );
+}
+
+function hasProSubscription(subscriptions: SubscriptionRecord[]): boolean {
+  return subscriptions.some((subscription) => {
+    if (typeof subscription?.product !== 'string') {
+      return false;
+    }
+    return subscription.product.toLowerCase().includes('pro');
+  });
+}
+
 export default function COM_Sidebar() {
   const { width } = useWindowDimensions();
   const location = useLocation();
@@ -110,12 +132,23 @@ export default function COM_Sidebar() {
   useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
   const [stLoginTokens, setStLoginTokens] = useState<any | null>(userStore.read('ActionLogin'));
   useUserStoreSync(userStore, 'ActionLogin', setStLoginTokens);
+  const [stSubscriptionsRaw, setStSubscriptionsRaw] = useState<any | null>(
+    userStore.read('PropertySubscriptions')
+  );
+  useUserStoreSync(userStore, 'PropertySubscriptions', setStSubscriptionsRaw);
   const isAuthenticated = Boolean(
     (stLoginTokens && typeof stLoginTokens === 'object' && stLoginTokens?.access) ||
       (stCredentials && typeof stCredentials === 'object')
   );
+  const subscriptions = useMemo(
+    () => normalizeSubscriptions(stSubscriptionsRaw),
+    [stSubscriptionsRaw]
+  );
+  const isProUser = useMemo(() => hasProSubscription(subscriptions), [subscriptions]);
   const username = readUsername(stCredentials);
   const displayName = username || 'Profile';
+  const planLabel = isProUser ? 'Pro' : 'Free Plan';
+  const planLabelStyle = isProUser ? { color: 'var(--color-tertiary)' } : undefined;
 
   const handleProfileNavigate = () => {
     userStore.set('StateEditing', true);
@@ -218,29 +251,23 @@ export default function COM_Sidebar() {
         {isAuthenticated ? (
           <button
             type="button"
-            className="area-flex-row mod-gap-s mod-align-left"
+            className="area-flex-row look-button-ghost mod-gap-s mod-align-left"
             onClick={handleProfileNavigate}
             aria-label="Edit profile"
             style={{
               width: '100%',
               marginTop: 'auto',
-              justifyContent: showLabels ? 'flex-start' : 'center',
+              marginBottom: 0,
               background: 'none',
-              border: 'none',
               padding: 0,
-              color: 'inherit',
+              justifyContent: showLabels ? 'flex-start' : 'center',
               cursor: 'pointer',
             }}
           >
-            <span
-              aria-hidden
+            <ICON_User
               style={{
-                width: scale(2.5),
-                height: scale(2.5),
-                borderRadius: '50%',
-                backgroundColor: 'color-mix(in srgb, var(--color-secondary) 12%, transparent)',
-                flexShrink: 0,
-                display: 'inline-block',
+                width: scale(showLabels ? 2 : 1.2),
+                height: 'auto',
               }}
             />
             {showLabels && (
@@ -251,7 +278,9 @@ export default function COM_Sidebar() {
                 >
                   {displayName}
                 </span>
-                <span className="look-text-x0 look-text-subtle">Free Plan</span>
+                <span className="look-text-x0 look-text-subtle" style={planLabelStyle}>
+                  {planLabel}
+                </span>
               </div>
             )}
           </button>
@@ -276,7 +305,14 @@ export default function COM_Sidebar() {
                 height: scale(1.2),
               }}
             />
-            {showLabels && <span style={{ width: '100%', textAlign: 'center' }}>Sign Up</span>}
+            {showLabels && (
+              <span
+                className="look-text-x1 look-priority-normal"
+                style={{ width: '100%', textAlign: 'center' }}
+              >
+                Sign Up
+              </span>
+            )}
           </button>
         )}
       </aside>
