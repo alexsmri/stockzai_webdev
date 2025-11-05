@@ -31,9 +31,8 @@ export default function PAG_SubscribeConfirmation() {
                   width: scale(5),
                   height: 'auto',
                   flexShrink: 0,
+                  color: 'var(--color-tertiary)',
                 }}
-                fill="var(--color-tertiary)"
-                stroke="transparent"
                 aria-hidden="true"
               />
               <h1 className="look-text-x3 mod-text-align-center look-priority-high mod-padding-none">
@@ -63,8 +62,15 @@ export default function PAG_SubscribeConfirmation() {
               onClick={handleBack}
               aria-label="Back to search"
             >
-              <ICON_ArrowLeft style={{ width: scale(1.3), height: 'auto', flexShrink: 0 }} />
-              <span>Back to search</span>
+              <span>Start Exploring</span>
+              <ICON_ArrowLeft
+                style={{
+                  width: scale(1.3),
+                  height: 'auto',
+                  flexShrink: 0,
+                  transform: 'rotateZ(180deg)',
+                }}
+              />
             </button>
           </div>
         </div>
