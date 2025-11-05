@@ -9,6 +9,9 @@
 .mod-padding-none {
     padding: 0;
 }
+.mod-padding-s {
+    padding: u.scale-padding(0.5);
+}
 .mod-padding-side {
     padding: 0 u.scale-padding(1)
 }

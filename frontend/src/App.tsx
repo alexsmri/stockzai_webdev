@@ -19,6 +19,7 @@ import { PRV_Lightbox } from './context/CTX_Lightbox';
 import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
 import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
+import PAG_SubscribeConfirmation from './pages/PAG_SubscribeConfirmation';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
 import PAG_404 from './pages/PAG_404';
 import PAG_Debug from './pages/PAG_Debug';
@@ -177,6 +178,16 @@ function App() {
                     element={
                       <COM_ProtectedRoute>
                         <PAG_SubscribeVerify />
+                      </COM_ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/users/subscribe/pro/confirmation"
+                    element={
+                      <COM_ProtectedRoute>
+                        <COM_PremiumRoute prAccessConfig={{ permissions: ['company_page:all'] }}>
+                          <PAG_SubscribeConfirmation />
+                        </COM_PremiumRoute>
                       </COM_ProtectedRoute>
                     }
                   />

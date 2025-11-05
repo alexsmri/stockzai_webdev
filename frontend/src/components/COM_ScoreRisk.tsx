@@ -11,7 +11,6 @@ type CompanyProfileRecord = {
 const RADIUS = 42;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const BASE_STROKE = 'rgba(255, 255, 255, 0.1)';
-// Tachymeter styling: leave a gap at the bottom and sweep clockwise from left to right.
 const GAUGE_GAP_ANGLE = 90;
 const GAUGE_GAP_RATIO = GAUGE_GAP_ANGLE / 360;
 const GAUGE_GAP_LENGTH = CIRCUMFERENCE * GAUGE_GAP_RATIO;
