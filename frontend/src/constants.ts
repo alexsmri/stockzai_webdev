@@ -1,14 +1,13 @@
 import { scale } from "./utils/functions";
 
-const environment_raw = import.meta.env.VITE_STRIPE_ENVIRONMENT;
-
-const ENVIRONMENT = environment_raw === 'production' ? 'production' : 'dev';
+const PRO_MONTHLY_LINK = import.meta.env.VITE_STRIPE_PAYMENT_LINK_PRO_MONTHLY
+const PRO_MONTHLY_LINK_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_LOOKUP_KEY
 
 export const STRIPE_PLANS = {
   pro: {
     pro_monthly: {
-      link: ENVIRONMENT === 'dev' ? 'https://buy.stripe.com/test_cNifZgez4bHna5zaCZgbm00' : '',
-      priceId: ENVIRONMENT === 'dev' ? 'price_1SOyiaBnrUSa2i9JrzxSZxzB' : '',
+      link: PRO_MONTHLY_LINK,
+      priceId: PRO_MONTHLY_LINK_PRICE_ID,
       price: 10,
       interval: '/month',
     },
