@@ -293,7 +293,7 @@ export default function COM_Sidebar() {
             style={{
               width: '100%',
               marginTop: 'auto',
-              marginBottom: 0,
+              marginBottom: scale(2),
               justifyContent: showLabels ? 'center' : 'center',
             }}
             onClick={handleSignUpNavigate}

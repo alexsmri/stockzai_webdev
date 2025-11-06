@@ -304,6 +304,7 @@ type QueryInputMap = {
   PropertyCompanyLeaderboard: {
     sector?: string | null;
     metric?: string | null;
+    riskTolerance?: string | null;
   };
 };
 
@@ -399,10 +400,14 @@ function buildDesiredQueryMeta<K extends QueryMatchableKey>(
       const sector = normalizeString((input as QueryInputMap["PropertyCompanyLeaderboard"]).sector, {
         toLower: true,
       });
-      if (!metric || !sector) {
+      const riskTolerance = normalizeString(
+        (input as QueryInputMap["PropertyCompanyLeaderboard"]).riskTolerance,
+        { toLower: true },
+      );
+      if (!metric || !sector || !riskTolerance) {
         return null;
       }
-      return { metric, sector };
+      return { metric, sector, risktolerance: riskTolerance };
     }
     default:
       return null;
@@ -430,6 +435,7 @@ function resolveRawQueryObject(key: QueryMatchableKey, raw: unknown): QueryMetaR
       return buildDesiredQueryMeta("PropertyCompanyLeaderboard", {
         sector: record.sector as string | null | undefined,
         metric: record.metric as string | null | undefined,
+        riskTolerance: (record.risktolerance ?? record.riskTolerance) as string | null | undefined,
       });
     default:
       return null;
@@ -488,6 +494,9 @@ function extractStateQueryMeta<K extends QueryMatchableKey>(
       const meta = buildDesiredQueryMeta("PropertyCompanyLeaderboard", {
         sector: record.sector as string | null,
         metric: record.metric as string | null,
+        riskTolerance: (record.riskTolerance ?? (record as Record<string, unknown>).risktolerance) as
+          | string
+          | null,
       });
       return meta;
     }

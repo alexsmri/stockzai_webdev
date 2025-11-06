@@ -5,6 +5,7 @@ from celery import shared_task
 
 from .db.DB_Handler import DB_Handler
 from .models import DBSnapshots
+from .constants import RISK_TOLERANCE_BUCKETS
 
 logger = logging.getLogger(__name__)
 
@@ -45,27 +46,39 @@ def refresh_sector_leaderboard():
         logger.exception("Failed to fetch sectors for leaderboard refresh")
         return
 
-    leaderboard: Dict[str, Dict[str, list]] = {}
+    leaderboard: Dict[str, Dict[str, Dict[str, list]]] = {}
     intel: Dict[str, Dict[str, object]] = {}
 
     for sector in sectors:
-        sector_leaderboard: Dict[str, list] = {}
+        sector_leaderboard: Dict[str, Dict[str, list]] = {}
         leaderboard[sector] = sector_leaderboard
         sector_symbols: set[str] = set()
 
         for metric in LEADERBOARD_METRICS:
-            try:
-                ranking = db.dbq_get_sector_ranking(sector, metric)
-            except Exception:
-                logger.exception("Failed to fetch ranking for sector %s and metric %s", sector, metric)
-                ranking = []
+            metric_risk_rankings: Dict[str, list] = {}
+            sector_leaderboard[metric] = metric_risk_rankings
 
-            sector_leaderboard[metric] = ranking
+            for bucket in RISK_TOLERANCE_BUCKETS:
+                try:
+                    ranking = db.dbq_get_sector_ranking(sector, metric, risk_filter=bucket)
+                except Exception:
+                    logger.exception(
+                        "Failed to fetch ranking for sector %s, metric %s, risk bucket %s",
+                        sector,
+                        metric,
+                        bucket.get("key"),
+                    )
+                    ranking = []
 
-            for entry in ranking:
-                symbol = entry.get("symbol") if isinstance(entry, dict) else None
-                if symbol:
-                    sector_symbols.add(symbol)
+                bucket_key = bucket.get("key")
+                if not isinstance(bucket_key, str):
+                    continue
+                metric_risk_rankings[bucket_key] = ranking
+
+                for entry in ranking:
+                    symbol = entry.get("symbol") if isinstance(entry, dict) else None
+                    if symbol:
+                        sector_symbols.add(symbol)
 
         if not sector_symbols:
             continue
@@ -83,7 +96,11 @@ def refresh_sector_leaderboard():
         for symbol, payload in sector_intel.items():
             intel[symbol] = payload
 
-    snapshot_value = {"leaderboard": leaderboard, "intel": intel}
+    snapshot_value = {
+        "leaderboard": leaderboard,
+        "intel": intel,
+        "risk_filters": RISK_TOLERANCE_BUCKETS,
+    }
 
     DBSnapshots.objects.update_or_create(
         type=DBSnapshots.SnapshotType.SECTOR_LEADERBOARD,

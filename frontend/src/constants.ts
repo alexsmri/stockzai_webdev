@@ -36,3 +36,14 @@ export const PAYWALL_ENABLED =
   PAYWALL_FLAG.trim().toLowerCase() !== '0' &&
   PAYWALL_FLAG.trim().toLowerCase() !== 'no' &&
   PAYWALL_FLAG.trim().toLowerCase() !== 'off';
+
+export const RISK_TOLERANCE_OPTIONS = {
+  risk_zero: { label: 'Risk-Free (0)' },
+  risk_ultra_conservative: { label: 'Ultra Conservative (0-1)' },
+  risk_conservative: { label: 'Conservative (0-2)' },
+  risk_balanced: { label: 'Balanced (0-3)' },
+  risk_growth: { label: 'Growth (0-4)' },
+  risk_aggressive: { label: 'Aggressive (0-5)' },
+} as const;
+
+export type RiskToleranceKey = keyof typeof RISK_TOLERANCE_OPTIONS;

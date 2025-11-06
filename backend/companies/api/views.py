@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
-from companies.constants import FREE_TICKERS
+from companies.constants import FREE_TICKERS, RISK_TOLERANCE_LOOKUP
 from companies.models import DBSnapshots
 from stockzAI.common.response import api_json_response
 from users.models import TrackingEvent, User, PermissionCode
@@ -214,12 +214,22 @@ class CompanyLeaderboardView(APIView):
     def get(self, request):
         sector = request.GET.get("sector")
         metric_param = request.GET.get("metric")
+        risk_param = request.GET.get("riskTolerance")
 
-        if not sector or not metric_param:
+        if not sector or not metric_param or not risk_param:
             return api_json_response(msg=False)
 
         metric_key = LEADERBOARD_METRIC_PARAMS.get(metric_param.lower())
         if not metric_key:
+            return api_json_response(msg=False)
+
+        normalized_risk_param = (risk_param or "").strip().lower()
+        risk_key = None
+        for candidate_key in RISK_TOLERANCE_LOOKUP:
+            if candidate_key.lower() == normalized_risk_param:
+                risk_key = candidate_key
+                break
+        if not risk_key:
             return api_json_response(msg=False)
 
         try:
@@ -230,12 +240,18 @@ class CompanyLeaderboardView(APIView):
         payload = snapshot.value or {}
         leaderboard = payload.get("leaderboard", {})
         intel = payload.get("intel", {})
+        risk_filters = payload.get("risk_filters")
 
         sector_data = leaderboard.get(sector)
         if not isinstance(sector_data, dict):
             return api_json_response(msg=False)
 
-        ranking = sector_data.get(metric_key)
+        metric_payload = sector_data.get(metric_key)
+        ranking = None
+        if isinstance(metric_payload, dict):
+            ranking = metric_payload.get(risk_key)
+        elif isinstance(metric_payload, list):
+            ranking = metric_payload
         if ranking is None:
             return api_json_response(msg=False)
 
@@ -245,13 +261,17 @@ class CompanyLeaderboardView(APIView):
         response_payload = {
             "sector": sector,
             "metric": metric_key,
+            "riskTolerance": risk_key,
             "leaderboard": ranking,
             "intel": relevant_intel,
         }
+        if isinstance(risk_filters, list):
+            response_payload["riskFilters"] = risk_filters
         response_payload["query"] = build_query_meta(
             "PropertyCompanyLeaderboard",
             sector=sector,
             metric=metric_key,
+            riskTolerance=risk_key,
         )
         return api_json_response(msg=response_payload)
 

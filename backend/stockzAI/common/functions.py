@@ -46,11 +46,17 @@ def build_query_meta(key: QueryKey, **kwargs: Any) -> Dict[str, str]:
     if normalized_key == "PropertyCompanyLeaderboard":
         metric = _normalize_string(kwargs.get("metric"), to_lower=True)
         sector = _normalize_string(kwargs.get("sector"), to_lower=True)
+        risk_tolerance = _normalize_string(
+            kwargs.get("riskTolerance") or kwargs.get("risk_tolerance"),
+            to_lower=True,
+        )
         meta = {}
         if metric:
             meta["metric"] = metric
         if sector:
             meta["sector"] = sector
+        if risk_tolerance:
+            meta["risktolerance"] = risk_tolerance
         return meta
 
     return {}

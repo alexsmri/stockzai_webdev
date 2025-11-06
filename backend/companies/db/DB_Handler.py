@@ -7,6 +7,7 @@ import os
 from .formats import parse_json
 from typing import Any, Dict
 import logging
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -347,12 +348,39 @@ class DB_Handler:
         rows = self.dbu_read_execute(query, params={"sector_kpi_id": sector_info["id"]})
         return [row[0] for row in rows if isinstance(row[0], str) and row[0].strip()]
 
-    def dbq_get_sector_ranking(self, sector: str, metric: str, limit: int = 100, risk_levels: list[str] | None = None) -> list[dict[str, Any]]:
+    def dbq_get_sector_ranking(self, sector: str, metric: str, limit: int = 100, risk_filter: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Fetch the top companies for a sector ranked by the provided KPI."""
         metric_info = self.dbq_get_kpi_info(self._resolve_kpi_name(metric))
         sector_info = self.dbq_get_kpi_info(self._resolve_kpi_name("sector"))
+        risk_info = self.dbq_get_kpi_info(self._resolve_kpi_name("risk_score"))
 
         metric_table = metric_info["role"]
+        risk_table = risk_info["role"]
+
+        risk_conditions: list[str] = []
+        params: dict[str, Any] = {
+            "metric_kpi_id": int(metric_info["id"]),
+            "sector_kpi_id": int(sector_info["id"]),
+            "risk_kpi_id": int(risk_info["id"]),
+            "sector": sector,
+            "limit": limit,
+        }
+
+        if risk_filter:
+            minimum = risk_filter.get("min")
+            maximum = risk_filter.get("max")
+            if minimum is not None:
+                params["risk_min"] = float(minimum)
+                operator = ">=" if risk_filter.get("min_inclusive", True) else ">"
+                risk_conditions.append(f"lr.risk_value {operator} :risk_min")
+            if maximum is not None:
+                params["risk_max"] = float(maximum)
+                operator = "<=" if risk_filter.get("max_inclusive", True) else "<"
+                risk_conditions.append(f"lr.risk_value {operator} :risk_max")
+        logger.info(params)
+        risk_filter_sql = ""
+        if risk_conditions:
+            risk_filter_sql = " AND " + " AND ".join(risk_conditions)
 
         query = f"""
             WITH latest_metric AS (
@@ -368,34 +396,35 @@ class DB_Handler:
                        ROW_NUMBER() OVER (PARTITION BY b.SYMBOL ORDER BY b.date DESC) AS sector_row
                 FROM `basics` b
                 WHERE b.KPI = :sector_kpi_id
+            ),
+            latest_risk AS (
+                SELECT s.SYMBOL,
+                       CAST(s.value AS DECIMAL(32, 8)) AS risk_value,
+                       ROW_NUMBER() OVER (PARTITION BY s.SYMBOL ORDER BY s.date DESC) AS risk_row
+                FROM `{risk_table}` s
+                WHERE s.KPI = :risk_kpi_id
             )
             SELECT lm.SYMBOL,
-                   lm.metric_value
+                   lm.metric_value,
+                   lr.risk_value
             FROM latest_metric lm
             JOIN latest_sector ls ON ls.SYMBOL = lm.SYMBOL
+            JOIN latest_risk lr ON lr.SYMBOL = lm.SYMBOL
             WHERE lm.metric_row = 1
               AND ls.sector_row = 1
+              AND lr.risk_row = 1
               AND ls.sector_value = :sector
               AND lm.metric_value IS NOT NULL
               AND lm.metric_value != 0
+              AND lr.risk_value IS NOT NULL
+              {risk_filter_sql}
             ORDER BY lm.metric_value DESC
             LIMIT :limit
         """
-
-        params: dict[str, Any] = {
-            "metric_kpi_id": metric_info["id"],
-            "sector_kpi_id": sector_info["id"],
-            "sector": sector,
-            "limit": limit,
-        }
-
         rows = self.dbu_read_execute(query, params=params)
 
-        if risk_levels:
-            logger.debug("Risk level filtering not yet implemented. Provided levels: %s", risk_levels)
-
         ranking: list[dict[str, Any]] = []
-        for index, (symbol, metric_value) in enumerate(rows, start=1):
+        for index, (symbol, metric_value, risk_value) in enumerate(rows, start=1):
             if not symbol:
                 continue
             ranking.append(
@@ -403,6 +432,7 @@ class DB_Handler:
                     "symbol": symbol,
                     "rank": index,
                     "score": float(metric_value) if metric_value is not None else None,
+                    "risk_score": float(risk_value) if risk_value is not None else None,
                 }
             )
         return ranking

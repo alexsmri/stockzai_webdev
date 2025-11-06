@@ -9,6 +9,7 @@ import { useCompaniesStoreSync } from '../hooks/hooks';
 import type { TYP_ListViewRow } from '../types/types';
 import COM_Loading from '../components/COM_Loading';
 import { queryMatches } from '../utils/functions';
+import { RISK_TOLERANCE_OPTIONS } from '../constants';
 
 const METRIC_OPTIONS: MenuSelectOptions = {
   valuation_score: 'Valuation Score',
@@ -17,6 +18,7 @@ const METRIC_OPTIONS: MenuSelectOptions = {
 };
 
 type LeaderboardMetric = keyof typeof METRIC_OPTIONS;
+const DEFAULT_RISK_TOLERANCE = 'risk_balanced';
 
 type LeaderboardEntry = {
   symbol?: string;
@@ -30,6 +32,8 @@ type LeaderboardPayload = {
   metric: string;
   leaderboard: LeaderboardEntry[];
   intel?: Record<string, TYP_ListViewRow>;
+  riskTolerance?: string;
+  riskFilters?: Array<{ key?: string; label?: string }>;
 };
 
 function isLeaderboardPayload(value: unknown): value is LeaderboardPayload {
@@ -55,6 +59,13 @@ export default function PAG_TopStocks() {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardPayload | null>(() => {
     const existing = store.read('PropertyCompanyLeaderboard');
     return isLeaderboardPayload(existing) ? existing : null;
+  });
+  const [selectedRiskTolerance, setSelectedRiskTolerance] = useState<string>(() => {
+    const existing = store.read('PropertyCompanyLeaderboard');
+    if (isLeaderboardPayload(existing) && typeof existing.riskTolerance === 'string') {
+      return existing.riskTolerance;
+    }
+    return DEFAULT_RISK_TOLERANCE;
   });
 
   const distinctParams = useMemo(() => ({ kpi: 'sector' as const }), []);
@@ -91,19 +102,68 @@ export default function PAG_TopStocks() {
     (payload) => {
       if (isLeaderboardPayload(payload)) {
         setLeaderboardData(payload);
+        if (typeof payload.riskTolerance === 'string') {
+          setSelectedRiskTolerance((prev) =>
+            prev === payload.riskTolerance ? prev : (payload.riskTolerance as string)
+          );
+        }
         return;
       }
       setLeaderboardData(null);
     }
   );
 
+  const riskDropdownConfig = useMemo<TYP_DropdownConfig>(() => {
+    const config: TYP_DropdownConfig = {};
+    Object.entries(RISK_TOLERANCE_OPTIONS).forEach(([key, option]) => {
+      config[key] = { label: option.label };
+    });
+    if (leaderboardData?.riskFilters && Array.isArray(leaderboardData.riskFilters)) {
+      leaderboardData.riskFilters.forEach((filter) => {
+        if (!filter || typeof filter !== 'object') {
+          return;
+        }
+        const key = typeof filter.key === 'string' ? filter.key : null;
+        if (!key) {
+          return;
+        }
+        const label =
+          typeof filter.label === 'string'
+            ? filter.label
+            : config[key]?.label || (filter.key as string);
+        config[key] = { label };
+      });
+    }
+    return config;
+  }, [leaderboardData?.riskFilters]);
+
   useEffect(() => {
-    if (!selectedSector || !selectedMetric) {
+    const available = Object.keys(riskDropdownConfig);
+    if (!available.length) {
+      return;
+    }
+    setSelectedRiskTolerance((prev) => {
+      if (prev && available.includes(prev)) {
+        return prev;
+      }
+      if (available.includes(DEFAULT_RISK_TOLERANCE)) {
+        return DEFAULT_RISK_TOLERANCE;
+      }
+      return available[0];
+    });
+  }, [riskDropdownConfig]);
+
+  useEffect(() => {
+    if (!selectedSector || !selectedMetric || !selectedRiskTolerance) {
       return;
     }
     setLoadError(null);
     void store
-      .get('PropertyCompanyLeaderboard', [], { sector: selectedSector, metric: selectedMetric })
+      .get('PropertyCompanyLeaderboard', [], {
+        sector: selectedSector,
+        metric: selectedMetric,
+        riskTolerance: selectedRiskTolerance,
+      })
       .then((response) => {
         if (response === false) {
           setLoadError('Failed to fetch leaderboard data.');
@@ -114,7 +174,7 @@ export default function PAG_TopStocks() {
       .catch(() => {
         setLoadError('Failed to fetch leaderboard data.');
       });
-  }, [selectedSector, selectedMetric, store]);
+  }, [selectedSector, selectedMetric, selectedRiskTolerance, store]);
 
   const dropdownConfig = useMemo<TYP_DropdownConfig>(() => {
     const config: TYP_DropdownConfig = {};
@@ -125,10 +185,11 @@ export default function PAG_TopStocks() {
   }, [sectorValues]);
 
   const hasMatchingLeaderboard =
-    Boolean(selectedSector && selectedMetric) &&
+    Boolean(selectedSector && selectedMetric && selectedRiskTolerance) &&
     queryMatches('PropertyCompanyLeaderboard', leaderboardData, {
       sector: selectedSector,
       metric: selectedMetric,
+      riskTolerance: selectedRiskTolerance,
     });
 
   const leaderboardRows = useMemo<Array<[string, TYP_ListViewRow]>>(() => {
@@ -173,7 +234,7 @@ export default function PAG_TopStocks() {
     if (loadError) {
       return <div className="mod-padding-side look-text-x0 look-priority-low">{loadError}</div>;
     }
-    if (selectedSector && !hasMatchingLeaderboard) {
+    if (selectedSector && selectedRiskTolerance && !hasMatchingLeaderboard) {
       return (
         <div className="area-flex-row mod-justify-center mod-padding-xl">
           <COM_Loading />
@@ -181,7 +242,7 @@ export default function PAG_TopStocks() {
       );
     }
     return null;
-  }, [hasMatchingLeaderboard, loadError, selectedSector]);
+  }, [hasMatchingLeaderboard, loadError, selectedRiskTolerance, selectedSector]);
 
   const handleMetricChange = (key: string) => {
     if (!(key in METRIC_OPTIONS) || key === selectedMetric) {
@@ -197,6 +258,13 @@ export default function PAG_TopStocks() {
     setSelectedSector(key);
   };
 
+  const handleRiskChange = (key: string) => {
+    if (!key || key === selectedRiskTolerance) {
+      return;
+    }
+    setSelectedRiskTolerance(key);
+  };
+
   const handleRowClick = (symbol: string) => {
     if (!symbol) {
       return;
@@ -206,13 +274,21 @@ export default function PAG_TopStocks() {
 
   return (
     <STR_ApplicationPage>
-      <div className="area-flex-wrap mod-space-between mod-w-full">
-        <COM_DropdownSelect
-          prDropdownConfig={dropdownConfig}
-          prSelectedKey={selectedSector}
-          handleSelect={handleSectorChange}
-          prPlaceholder="Select sector"
-        />
+      <div className="area-flex-wrap mod-space-between mod-w-full" style={{ alignItems: 'center' }}>
+        <div className="area-flex-row mod-gap" style={{ alignItems: 'center' }}>
+          <COM_DropdownSelect
+            prDropdownConfig={dropdownConfig}
+            prSelectedKey={selectedSector}
+            handleSelect={handleSectorChange}
+            prPlaceholder="Select sector"
+          />
+          <COM_DropdownSelect
+            prDropdownConfig={riskDropdownConfig}
+            prSelectedKey={selectedRiskTolerance}
+            handleSelect={handleRiskChange}
+            prPlaceholder="Select risk tolerance"
+          />
+        </div>
         <COM_MenuSelect prOptions={METRIC_OPTIONS} prHandleChange={handleMetricChange} />
       </div>
       {selectedSector && (
