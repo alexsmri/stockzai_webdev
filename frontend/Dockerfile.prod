@@ -8,6 +8,6 @@ RUN npm ci
 
 COPY . .
 
-RUN bash -c "source ./load-env.sh .env.staging && npm run build"
+RUN bash -c "source ./load-env.sh .env.prod && npm run build"
 
 
