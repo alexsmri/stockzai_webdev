@@ -5,6 +5,7 @@ import COM_Loading from './COM_Loading';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import PAG_Login from '../pages/PAG_Login';
+import PAG_Register from '../pages/PAG_Register';
 
 interface DecodedToken {
   exp?: number;
@@ -19,6 +20,8 @@ function COM_ProtectedRoute({ children }: { children: JSX.Element }) {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [tokens, setTokens] = useState<any>(utStore.read('ActionLogin'));
   useUserStoreSync(utStore, 'ActionLogin', setTokens);
+  const [isNewUser, setIsNewUser] = useState<boolean>(Boolean(utStore.read('PropertyNewUser')));
+  useUserStoreSync(utStore, 'PropertyNewUser', (value) => setIsNewUser(Boolean(value)));
 
   useEffect(() => {
     (async () => {
@@ -81,11 +84,21 @@ function COM_ProtectedRoute({ children }: { children: JSX.Element }) {
     }
   };
 
+  useEffect(() => {
+    if (isAuthorized) {
+      utStore.set('PropertyNewUser', false);
+    }
+  }, [isAuthorized, utStore]);
+
   if (isAuthorized === null) {
     return <COM_Loading />;
   }
 
-  return isAuthorized ? children : <PAG_Login prRedirect={utRedirect} />;
+  if (isAuthorized) {
+    return children;
+  }
+
+  return isNewUser ? <PAG_Register /> : <PAG_Login prRedirect={utRedirect} />;
 }
 
 export default COM_ProtectedRoute;

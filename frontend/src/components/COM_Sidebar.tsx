@@ -111,6 +111,12 @@ export default function COM_Sidebar() {
       setStExpanded((prev) => !prev);
     }
   };
+  const handleLogoNavigate = () => {
+    navigate('/companies/search');
+    if (isMobile) {
+      setStExpanded(false);
+    }
+  };
 
   const showLabels = !isMobile || stExpanded;
 
@@ -200,14 +206,26 @@ export default function COM_Sidebar() {
               />
             </button>
           )}
-          <LOGO_schwarzquer
+          <button
+            type="button"
+            aria-label="Go to company search"
+            onClick={handleLogoNavigate}
             style={{
-              width: 'auto',
-              height: scale(2.8),
-              alignSelf: showLabels ? 'flex-start' : 'center',
+              background: 'transparent',
+              border: 'none',
               padding: showLabels ? LOGO_PADDING_EXPANDED : LOGO_PADDING,
+              alignSelf: showLabels ? 'flex-start' : 'center',
+              cursor: 'pointer',
             }}
-          />
+          >
+            <LOGO_schwarzquer
+              style={{
+                width: 'auto',
+                height: scale(2.8),
+                display: 'block',
+              }}
+            />
+          </button>
         </div>
         <nav className="area-flex-col mod-padding-none" style={{ width: '100%' }}>
           {NAV_ITEMS.map((item) => (

@@ -66,7 +66,8 @@ function COM_FormRegister() {
       </div>
       <div className="area-form-auth-links">
         <a href="/users/login" className="look-button-subtle">
-          Log In Instead
+          {'Already have an account? '}
+          <span className="look-priority-high">Log In</span>
         </a>
       </div>
     </>

@@ -62,6 +62,7 @@ function usePerformLogout() {
     });
     userStore.set('StateEditing', false);
     userStore.set('PropertyTutorialCompleted', false);
+    userStore.set('PropertyNewUser', false);
 
     const companiesKeysToReset: CompanyStoreKeys[] = [
       'PropertyCompanyProfile',

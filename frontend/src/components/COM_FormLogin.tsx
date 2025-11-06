@@ -74,7 +74,8 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
           Forgot Password?
         </a>
         <a href="/users/register" className="look-button-subtle">
-          Don't have an account yet? Sign Up
+          {"Don't have an account yet? "}
+          <span className="look-priority-high">Sign Up</span>
         </a>
       </div>
     </>
