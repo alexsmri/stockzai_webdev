@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from statistics import pstdev
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
+
 import numpy as np
 import yfinance as yf
 
@@ -65,10 +67,14 @@ class BacktestReport:
         return self.cycles[-1].capital_out
 
     @property
-    def cumulative_return_pct(self) -> float:
+    def starting_capital(self) -> float:
         if not self.cycles:
             return 0.0
-        starting_capital = self.cycles[0].capital_in
+        return self.cycles[0].capital_in
+
+    @property
+    def cumulative_return_pct(self) -> float:
+        starting_capital = self.starting_capital
         if not starting_capital:
             return 0.0
         return (self.ending_capital / starting_capital - 1.0) * 100
@@ -96,6 +102,91 @@ class BacktestReport:
             return 0.0
         return pstdev(returns)
 
+    @property
+    def average_monthly_return(self) -> float:
+        returns = self.monthly_returns
+        if not returns:
+            return 0.0
+        return sum(returns) / len(returns)
+
+    @property
+    def duration_years(self) -> float:
+        periods = len(self.monthly_returns)
+        return periods / 12 if periods else 0.0
+
+    @property
+    def sharpe_ratio(self) -> float:
+        returns = self.monthly_returns
+        if len(returns) < 2:
+            return 0.0
+        avg = self.average_monthly_return
+        volatility = self.strategy_volatility
+        if volatility == 0:
+            return 0.0
+        return (avg / volatility) * math.sqrt(12)
+
+    @property
+    def sortino_ratio(self) -> float:
+        returns = self.monthly_returns
+        if not returns:
+            return 0.0
+        downside = [min(0.0, r) for r in returns if r < 0]
+        if not downside:
+            return math.inf
+        downside_dev = math.sqrt(sum(d ** 2 for d in downside) / len(downside))
+        if downside_dev == 0:
+            return math.inf
+        return (self.average_monthly_return / downside_dev) * math.sqrt(12)
+
+    @property
+    def equity_curve(self) -> List[float]:
+        if not self.cycles:
+            return []
+        equity = [self.cycles[0].capital_in]
+        for cycle in self.cycles:
+            equity.append(cycle.capital_out)
+        return equity
+
+    @property
+    def max_drawdown(self) -> float:
+        equity = self.equity_curve
+        if not equity:
+            return 0.0
+        peak = equity[0]
+        max_dd = 0.0
+        for value in equity:
+            if value > peak:
+                peak = value
+            if peak:
+                drawdown = (peak - value) / peak
+                max_dd = max(max_dd, drawdown)
+        return max_dd
+
+    @property
+    def cagr(self) -> float:
+        starting_capital = self.starting_capital
+        if not starting_capital or starting_capital <= 0:
+            return 0.0
+        total_return = self.ending_capital / starting_capital
+        years = self.duration_years
+        if years == 0:
+            return 0.0
+        if total_return <= 0:
+            return -1.0
+        return total_return ** (1 / years) - 1
+
+    @property
+    def calmar_ratio(self) -> float:
+        max_dd = self.max_drawdown
+        cagr = self.cagr
+        if max_dd == 0:
+            return math.inf if cagr > 0 else 0.0
+        return cagr / max_dd
+
+    @property
+    def absolute_return(self) -> float:
+        return self.ending_capital - self.starting_capital
+
     def top_trades(self, limit: int = 10, descending: bool = True) -> List[TradeLeg]:
         trades = self.all_trades()
         if not trades:
@@ -104,6 +195,8 @@ class BacktestReport:
 
     def sample_randomness(self, simulation_nr: int = 10000):
         returns = self.monthly_returns
+        if not returns:
+            return np.array([0.0, 0.0, 0.0])
         simulations = []
         for _ in range(simulation_nr):
             sample = np.random.choice(returns, size=len(returns), replace=True)
@@ -334,13 +427,80 @@ def run_monthly_top_score_backtest(
     return BacktestReport(cycles=cycles)
 
 
-def print_backtest_summary(report: BacktestReport, top_n: int = 10) -> None:
+def run_backtest_with_rolling_windows(
+    start: date = DEFAULT_START_DATE,
+    end: date = DEFAULT_END_DATE,
+    initial_capital: float = DEFAULT_INITIAL_CAPITAL,
+    symbols_per_cycle: int = SYMBOLS_PER_CYCLE,
+    db: Optional[DB_Handler] = None,
+    window_months: int = 6,
+    window_step_months: int = 3,
+) -> Tuple[BacktestReport, List[Tuple[Tuple[date, date], BacktestReport]]]:
+    """
+    Run the full-period backtest and a series of rolling 6-month windows starting each quarter.
+    """
+    if window_months <= 0 or window_step_months <= 0:
+        raise ValueError("window_months and window_step_months must be positive.")
+
+    db_handler = db or DB_Handler("companies")
+    primary_report = run_monthly_top_score_backtest(
+        start=start,
+        end=end,
+        initial_capital=initial_capital,
+        symbols_per_cycle=symbols_per_cycle,
+        db=db_handler,
+    )
+
+    rolling_reports: List[Tuple[Tuple[date, date], BacktestReport]] = []
+    window_start = start
+    while window_start < end:
+        window_end = _month_delta(window_start, window_months)
+        if window_end > end:
+            break
+        window_report = run_monthly_top_score_backtest(
+            start=window_start,
+            end=window_end,
+            initial_capital=initial_capital,
+            symbols_per_cycle=symbols_per_cycle,
+            db=db_handler,
+        )
+        rolling_reports.append(((window_start, window_end), window_report))
+        window_start = _month_delta(window_start, window_step_months)
+
+    return primary_report, rolling_reports
+
+
+def _format_ratio(value: float) -> str:
+    if math.isinf(value):
+        return "inf"
+    return f"{value:.2f}"
+
+
+def print_backtest_summary(
+    report: BacktestReport,
+    rolling_reports: Optional[List[Tuple[Tuple[date, date], BacktestReport]]] = None,
+    top_n: int = 10,
+) -> None:
     print("=== Backtest Summary ===")
     print(f"Ending capital: ${report.ending_capital:,.2f}")
     print(f"Cumulative return: {report.cumulative_return_pct:.2f}%")
+    print(f"Absolute return: ${report.absolute_return:,.2f}")
     print(f"Profitable trades: {report.profitable_trade_percentage:.2f}%")
     volatility_pct = report.strategy_volatility * 100
     print(f"Strategy volatility (monthly return stdev): {volatility_pct:.2f}%")
+    print(f"Average monthly return: {report.average_monthly_return * 100:.2f}%")
+    print(f"Sharpe Ratio (annualized): {report.sharpe_ratio:.2f}")
+    print(f"Sortino Ratio (annualized): {_format_ratio(report.sortino_ratio)}")
+    print(f"Max Drawdown: {report.max_drawdown * 100:.2f}%")
+    print(f"CAGR: {report.cagr * 100:.2f}%")
+    print(f"Calmar Ratio: {_format_ratio(report.calmar_ratio)}")
+
+    randomness = report.sample_randomness()
+    if randomness is not None:
+        print(
+            "Randomness percentiles (5/50/95): "
+            f"{randomness[0] * 100:.2f}% | {randomness[1] * 100:.2f}% | {randomness[2] * 100:.2f}%"
+        )
 
     best_trades = report.top_trades(limit=top_n, descending=True)
     worst_trades = report.top_trades(limit=top_n, descending=False)
@@ -353,14 +513,74 @@ def print_backtest_summary(report: BacktestReport, top_n: int = 10) -> None:
         for idx, trade in enumerate(trades, start=1):
             entry = trade.entry_date.isoformat() if trade.entry_date else "n/a"
             exit_date = trade.exit_date.isoformat() if trade.exit_date else "n/a"
+            entry_price = trade.entry_price if trade.entry_price is not None else 0.0
+            exit_price = trade.exit_price if trade.exit_price is not None else 0.0
             print(
                 f"  {idx:02d}. {trade.symbol} | PnL: ${trade.pnl:,.2f} | "
-                f"{entry} -> {exit_date} | Entry: {trade.entry_price or 0:.2f} "
-                f"| Exit: {trade.exit_price or 0:.2f}"
+                f"{entry} -> {exit_date} | Entry: {entry_price:.2f} | Exit: {exit_price:.2f}"
             )
 
     _print_trades("Top Trades", best_trades)
     _print_trades("Worst Trades", worst_trades)
+
+    if rolling_reports:
+        print("\n=== Rolling Window Backtests ===")
+        for idx, ((window_start, window_end), window_report) in enumerate(rolling_reports, start=1):
+            avg_return_pct = window_report.average_monthly_return * 100
+            abs_return = window_report.absolute_return
+            print(f"Window {idx}: {window_start.isoformat()} -> {window_end.isoformat()}")
+            print(f"  Avg monthly return: {avg_return_pct:.2f}%")
+            print(f"  Absolute return: ${abs_return:,.2f} ({window_report.cumulative_return_pct:.2f}%)")
+            print(f"  Profitable trades: {window_report.profitable_trade_percentage:.2f}%")
+            print(f"  Sharpe: {window_report.sharpe_ratio:.2f}")
+            print(f"  Sortino: {_format_ratio(window_report.sortino_ratio)}")
+            print(f"  Max Drawdown: {window_report.max_drawdown * 100:.2f}%")
+            print(f"  Calmar: {_format_ratio(window_report.calmar_ratio)}")
+
+    print_backtest_report(report)
+
+
+def print_backtest_report(report: BacktestReport) -> None:
+    print("\n=== Monthly Breakdown ===")
+    if not report.cycles:
+        print("No data available.")
+        return
+    for cycle in report.cycles:
+        if cycle.capital_in:
+            cycle_return = (cycle.capital_out - cycle.capital_in) / cycle.capital_in * 100
+        else:
+            cycle_return = 0.0
+        print(
+            f"{cycle.cycle_start:%Y-%m} | Capital {cycle.capital_in:,.2f} -> "
+            f"{cycle.capital_out:,.2f} ({cycle_return:+.2f}%)"
+        )
+        if not cycle.picks:
+            print("  No trades executed.")
+            continue
+        for trade in cycle.picks:
+            entry_date = trade.entry_date.isoformat() if trade.entry_date else "n/a"
+            exit_date = trade.exit_date.isoformat() if trade.exit_date else "n/a"
+            entry_price = trade.entry_price if trade.entry_price is not None else 0.0
+            exit_price = trade.exit_price if trade.exit_price is not None else 0.0
+            if trade.allocation:
+                allocation_return = trade.pnl / trade.allocation * 100
+            else:
+                allocation_return = 0.0
+            if trade.entry_price and trade.exit_price:
+                price_return = ((trade.exit_price - trade.entry_price) / trade.entry_price) * 100
+            else:
+                price_return = 0.0
+            status = ""
+            if trade.shares == 0:
+                status = "CASH"
+            elif trade.exit_price is None:
+                status = "OPEN"
+            print(
+                f"  - {trade.symbol}: {entry_date} -> {exit_date} | "
+                f"{entry_price:.2f} -> {exit_price:.2f} | "
+                f"Price {price_return:+.2f}% | Alloc {allocation_return:+.2f}% | "
+                f"PnL ${trade.pnl:,.2f} {status}".rstrip()
+            )
 
 
 __all__ = [
@@ -368,5 +588,7 @@ __all__ = [
     "MonthlyCycle",
     "TradeLeg",
     "run_monthly_top_score_backtest",
+    "run_backtest_with_rolling_windows",
     "print_backtest_summary",
+    "print_backtest_report",
 ]
