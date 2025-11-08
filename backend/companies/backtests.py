@@ -3,8 +3,9 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
+from statistics import pstdev
 from typing import Dict, Iterable, List, Optional
-
+import numpy as np
 import yfinance as yf
 
 from .db.DB_Handler import DB_Handler, KPI_NAME_ALIASES
@@ -49,6 +50,14 @@ class MonthlyCycle:
 class BacktestReport:
     cycles: List[MonthlyCycle]
 
+    def all_trades(self, include_cash_legs: bool = False) -> List[TradeLeg]:
+        trades: List[TradeLeg] = []
+        for cycle in self.cycles:
+            for trade in cycle.picks:
+                if include_cash_legs or (trade.shares > 0 and trade.entry_price is not None):
+                    trades.append(trade)
+        return trades
+
     @property
     def ending_capital(self) -> float:
         if not self.cycles:
@@ -63,6 +72,45 @@ class BacktestReport:
         if not starting_capital:
             return 0.0
         return (self.ending_capital / starting_capital - 1.0) * 100
+
+    @property
+    def profitable_trade_percentage(self) -> float:
+        trades = self.all_trades()
+        if not trades:
+            return 0.0
+        winners = sum(1 for trade in trades if trade.pnl > 0)
+        return (winners / len(trades)) * 100
+
+    @property
+    def monthly_returns(self) -> List[float]:
+        returns: List[float] = []
+        for cycle in self.cycles:
+            if cycle.capital_in:
+                returns.append((cycle.capital_out - cycle.capital_in) / cycle.capital_in)
+        return returns
+
+    @property
+    def strategy_volatility(self) -> float:
+        returns = self.monthly_returns
+        if len(returns) < 2:
+            return 0.0
+        return pstdev(returns)
+
+    def top_trades(self, limit: int = 10, descending: bool = True) -> List[TradeLeg]:
+        trades = self.all_trades()
+        if not trades:
+            return []
+        return sorted(trades, key=lambda trade: trade.pnl, reverse=descending)[:limit]
+
+    def sample_randomness(self, simulation_nr: int = 10000):
+        returns = self.monthly_returns
+        simulations = []
+        for _ in range(simulation_nr):
+            sample = np.random.choice(returns, size=len(returns), replace=True)
+            total = np.prod(1 + sample) - 1
+            simulations.append(total)
+            
+        return np.percentile(simulations, [5, 50, 95])
 
 
 def _resolve_kpi_name(friendly: str) -> str:
@@ -186,6 +234,7 @@ def run_monthly_top_score_backtest(
     start: date = DEFAULT_START_DATE,
     end: date = DEFAULT_END_DATE,
     initial_capital: float = DEFAULT_INITIAL_CAPITAL,
+    symbols_per_cycle: int = SYMBOLS_PER_CYCLE,
     db: Optional[DB_Handler] = None,
 ) -> BacktestReport:
     db_handler = db or DB_Handler("companies")
@@ -195,15 +244,15 @@ def run_monthly_top_score_backtest(
     for cycle_start in _iter_cycle_dates(start, end):
         cycle_end = _month_delta(cycle_start, 1)
         logger.info(f"Current Cycle start:{cycle_start}")
-        selection = _fetch_top_symbols(db_handler, cycle_start)
+        selection = _fetch_top_symbols(db_handler, cycle_start, symbols_per_cycle)
         logger.info(f"Current Cycle selection:{selection}")
         notes: List[str] = []
-        if len(selection) < SYMBOLS_PER_CYCLE:
+        if len(selection) < symbols_per_cycle:
             notes.append(
                 f"Only found {len(selection)} eligible stocks on {cycle_start.isoformat()}."
             )
 
-        allocation_per_symbol = capital / SYMBOLS_PER_CYCLE if selection else 0.0
+        allocation_per_symbol = capital / symbols_per_cycle if selection else 0.0
         picks: List[TradeLeg] = []
         realized_value = 0.0
 
@@ -285,9 +334,39 @@ def run_monthly_top_score_backtest(
     return BacktestReport(cycles=cycles)
 
 
+def print_backtest_summary(report: BacktestReport, top_n: int = 10) -> None:
+    print("=== Backtest Summary ===")
+    print(f"Ending capital: ${report.ending_capital:,.2f}")
+    print(f"Cumulative return: {report.cumulative_return_pct:.2f}%")
+    print(f"Profitable trades: {report.profitable_trade_percentage:.2f}%")
+    volatility_pct = report.strategy_volatility * 100
+    print(f"Strategy volatility (monthly return stdev): {volatility_pct:.2f}%")
+
+    best_trades = report.top_trades(limit=top_n, descending=True)
+    worst_trades = report.top_trades(limit=top_n, descending=False)
+
+    def _print_trades(title: str, trades: List[TradeLeg]) -> None:
+        print(f"\n{title}")
+        if not trades:
+            print("  No trades to display.")
+            return
+        for idx, trade in enumerate(trades, start=1):
+            entry = trade.entry_date.isoformat() if trade.entry_date else "n/a"
+            exit_date = trade.exit_date.isoformat() if trade.exit_date else "n/a"
+            print(
+                f"  {idx:02d}. {trade.symbol} | PnL: ${trade.pnl:,.2f} | "
+                f"{entry} -> {exit_date} | Entry: {trade.entry_price or 0:.2f} "
+                f"| Exit: {trade.exit_price or 0:.2f}"
+            )
+
+    _print_trades("Top Trades", best_trades)
+    _print_trades("Worst Trades", worst_trades)
+
+
 __all__ = [
     "BacktestReport",
     "MonthlyCycle",
     "TradeLeg",
     "run_monthly_top_score_backtest",
+    "print_backtest_summary",
 ]
