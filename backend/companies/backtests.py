@@ -202,8 +202,32 @@ class BacktestReport:
             sample = np.random.choice(returns, size=len(returns), replace=True)
             total = np.prod(1 + sample) - 1
             simulations.append(total)
-            
+
         return np.percentile(simulations, [5, 50, 95])
+
+    def benchmark_monthly_returns(self, symbol: str = "^GSPC") -> List[float]:
+        returns: List[float] = []
+        for cycle in self.cycles:
+            entry_price, _ = _fetch_price(symbol, cycle.cycle_start)
+            exit_price, _ = _fetch_price(symbol, cycle.cycle_end)
+            if entry_price is None or exit_price is None or entry_price == 0:
+                logger.warning(
+                    "Skipping benchmark calculation for %s cycle %s due to missing price data.",
+                    symbol,
+                    cycle.cycle_start,
+                )
+                continue
+            returns.append((exit_price - entry_price) / entry_price)
+        return returns
+
+    def benchmark_summary(self, symbol: str = "^GSPC") -> Optional[Dict[str, float]]:
+        returns = self.benchmark_monthly_returns(symbol)
+        if not returns:
+            return None
+        stats = _calculate_return_statistics(returns, self.starting_capital)
+        stats["symbol"] = symbol
+        stats["monthly_returns"] = returns
+        return stats
 
 
 def _resolve_kpi_name(friendly: str) -> str:
@@ -226,6 +250,77 @@ def _iter_cycle_dates(start: date, end: date) -> Iterable[date]:
 
 def _to_end_of_day(value: date) -> datetime:
     return datetime.combine(value, time(23, 59, 59))
+
+
+def _calculate_return_statistics(returns: List[float], starting_capital: float) -> Dict[str, float]:
+    stats: Dict[str, float] = {
+        "average_monthly_return": 0.0,
+        "volatility": 0.0,
+        "sharpe_ratio": 0.0,
+        "sortino_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "cagr": 0.0,
+        "calmar_ratio": 0.0,
+        "ending_capital": starting_capital,
+        "cumulative_return_pct": 0.0,
+        "absolute_return": 0.0,
+    }
+    if not returns:
+        return stats
+
+    avg_return = sum(returns) / len(returns)
+    volatility = pstdev(returns) if len(returns) >= 2 else 0.0
+    sharpe = (avg_return / volatility) * math.sqrt(12) if volatility else 0.0
+
+    downside = [r for r in returns if r < 0]
+    if downside:
+        downside_dev = math.sqrt(sum(d ** 2 for d in downside) / len(downside))
+        sortino = (avg_return / downside_dev) * math.sqrt(12) if downside_dev else math.inf
+    else:
+        sortino = math.inf
+
+    base_capital = starting_capital if starting_capital and starting_capital > 0 else 1.0
+    equity = [base_capital]
+    for r in returns:
+        equity.append(equity[-1] * (1 + r))
+    ending_capital = equity[-1]
+    cumulative_return = (ending_capital / base_capital) - 1
+    absolute_return = ending_capital - base_capital
+
+    peak = equity[0]
+    max_drawdown = 0.0
+    for value in equity:
+        if value > peak:
+            peak = value
+        if peak:
+            drawdown = (peak - value) / peak
+            max_drawdown = max(max_drawdown, drawdown)
+
+    years = len(returns) / 12 if returns else 0.0
+    if years > 0 and ending_capital > 0:
+        cagr = (ending_capital / base_capital) ** (1 / years) - 1
+    else:
+        cagr = 0.0
+    if max_drawdown == 0:
+        calmar = math.inf if cagr > 0 else 0.0
+    else:
+        calmar = cagr / max_drawdown
+
+    stats.update(
+        {
+            "average_monthly_return": avg_return,
+            "volatility": volatility,
+            "sharpe_ratio": sharpe,
+            "sortino_ratio": sortino,
+            "max_drawdown": max_drawdown,
+            "cagr": cagr,
+            "calmar_ratio": calmar,
+            "ending_capital": ending_capital,
+            "cumulative_return_pct": cumulative_return * 100,
+            "absolute_return": absolute_return,
+        }
+    )
+    return stats
 
 
 def _fetch_top_symbols(
@@ -480,6 +575,7 @@ def print_backtest_summary(
     report: BacktestReport,
     rolling_reports: Optional[List[Tuple[Tuple[date, date], BacktestReport]]] = None,
     top_n: int = 10,
+    benchmark_symbol: str = "^GSPC",
 ) -> None:
     print("=== Backtest Summary ===")
     print(f"Ending capital: ${report.ending_capital:,.2f}")
@@ -501,6 +597,19 @@ def print_backtest_summary(
             "Randomness percentiles (5/50/95): "
             f"{randomness[0] * 100:.2f}% | {randomness[1] * 100:.2f}% | {randomness[2] * 100:.2f}%"
         )
+
+    benchmark_stats = report.benchmark_summary(benchmark_symbol)
+    if benchmark_stats:
+        print(f"\nBenchmark ({benchmark_symbol})")
+        print(f"  Cumulative return: {benchmark_stats['cumulative_return_pct']:.2f}%")
+        print(f"  Absolute return: ${benchmark_stats['absolute_return']:,.2f}")
+        print(f"  Average monthly return: {benchmark_stats['average_monthly_return'] * 100:.2f}%")
+        print(f"  Volatility: {benchmark_stats['volatility'] * 100:.2f}%")
+        print(f"  Sharpe: {benchmark_stats['sharpe_ratio']:.2f}")
+        print(f"  Sortino: {_format_ratio(benchmark_stats['sortino_ratio'])}")
+        print(f"  Max Drawdown: {benchmark_stats['max_drawdown'] * 100:.2f}%")
+        print(f"  CAGR: {benchmark_stats['cagr'] * 100:.2f}%")
+        print(f"  Calmar: {_format_ratio(benchmark_stats['calmar_ratio'])}")
 
     best_trades = report.top_trades(limit=top_n, descending=True)
     worst_trades = report.top_trades(limit=top_n, descending=False)
@@ -536,6 +645,14 @@ def print_backtest_summary(
             print(f"  Sortino: {_format_ratio(window_report.sortino_ratio)}")
             print(f"  Max Drawdown: {window_report.max_drawdown * 100:.2f}%")
             print(f"  Calmar: {_format_ratio(window_report.calmar_ratio)}")
+            window_benchmark = window_report.benchmark_summary(benchmark_symbol)
+            if window_benchmark:
+                print(f"  Benchmark ({benchmark_symbol}) cumulative: {window_benchmark['cumulative_return_pct']:.2f}%")
+                print(f"    Avg monthly return: {window_benchmark['average_monthly_return'] * 100:.2f}%")
+                print(f"    Sharpe: {window_benchmark['sharpe_ratio']:.2f}")
+                print(f"    Sortino: {_format_ratio(window_benchmark['sortino_ratio'])}")
+                print(f"    Max Drawdown: {window_benchmark['max_drawdown'] * 100:.2f}%")
+                print(f"    Calmar: {_format_ratio(window_benchmark['calmar_ratio'])}")
 
     print_backtest_report(report)
 
