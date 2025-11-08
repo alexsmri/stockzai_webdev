@@ -107,43 +107,39 @@ def _fetch_top_symbols(
     query = f"""
         WITH financial_ranked AS (
             SELECT t.SYMBOL AS symbol,
-                   CAST(t.value AS DECIMAL(32, 8)) AS financial_value,
-                   ROW_NUMBER() OVER (PARTITION BY t.SYMBOL ORDER BY t.date DESC) AS rn
+                t.value AS financial_value,
+                ROW_NUMBER() OVER (PARTITION BY t.SYMBOL ORDER BY t.date DESC) AS rn
             FROM `{financial_table}` t
             WHERE t.KPI = :financial_kpi_id
-              AND t.date <= :as_of
-              AND t.value IS NOT NULL
-              AND t.value != 'NULL'
+            AND t.date <= :as_of
+            AND t.value IS NOT NULL
         ),
         valuation_ranked AS (
             SELECT v.SYMBOL AS symbol,
-                   CAST(v.value AS DECIMAL(32, 8)) AS valuation_value,
-                   ROW_NUMBER() OVER (PARTITION BY v.SYMBOL ORDER BY v.date DESC) AS rn
+                v.value AS valuation_value,
+                ROW_NUMBER() OVER (PARTITION BY v.SYMBOL ORDER BY v.date DESC) AS rn
             FROM `{valuation_table}` v
             WHERE v.KPI = :valuation_kpi_id
-              AND v.date <= :as_of
-              AND v.value IS NOT NULL
-              AND v.value != 'NULL'
+            AND v.date <= :as_of
+            AND v.value IS NOT NULL
         ),
         risk_ranked AS (
             SELECT r.SYMBOL AS symbol,
-                   CAST(r.value AS DECIMAL(32, 8)) AS risk_value,
-                   ROW_NUMBER() OVER (PARTITION BY r.SYMBOL ORDER BY r.date DESC) AS rn
+                r.value AS risk_value,
+                ROW_NUMBER() OVER (PARTITION BY r.SYMBOL ORDER BY r.date DESC) AS rn
             FROM `{risk_table}` r
             WHERE r.KPI = :risk_kpi_id
-              AND r.date <= :as_of
-              AND r.value IS NOT NULL
-              AND r.value != 'NULL'
+            AND r.value IS NOT NULL
         )
         SELECT fr.symbol,
-               (fr.financial_value + vr.valuation_value) / 2 AS aggregated_score
+            (fr.financial_value + vr.valuation_value) / 2 AS aggregated_score
         FROM financial_ranked fr
         JOIN valuation_ranked vr ON vr.symbol = fr.symbol
         JOIN risk_ranked rr ON rr.symbol = fr.symbol
         WHERE fr.rn = 1
-          AND vr.rn = 1
-          AND rr.rn = 1
-          AND rr.risk_value = :risk_target
+        AND vr.rn = 1
+        AND rr.rn = 1
+        AND rr.risk_value = :risk_target
         ORDER BY aggregated_score DESC
         LIMIT :limit
     """
@@ -198,7 +194,9 @@ def run_monthly_top_score_backtest(
 
     for cycle_start in _iter_cycle_dates(start, end):
         cycle_end = _month_delta(cycle_start, 1)
+        logger.info(f"Current Cycle start:{cycle_start}")
         selection = _fetch_top_symbols(db_handler, cycle_start)
+        logger.info(f"Current Cycle selection:{selection}")
         notes: List[str] = []
         if len(selection) < SYMBOLS_PER_CYCLE:
             notes.append(
