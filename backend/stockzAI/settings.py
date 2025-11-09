@@ -39,6 +39,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+X_API_KEY = os.getenv("X_API_KEY")
+X_API_KEY_SECRET = os.getenv("X_API_KEY_SECRET")
+X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN")
+X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET")
+X_API_POST_URL = os.getenv("X_API_POST_URL", "https://api.x.com/2/tweets")
+X_DEFAULT_COMMUNITY_ID = os.getenv("X_DEFAULT_COMMUNITY_ID")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 PAYWALL_ENABLED = env_flag("PAYWALL_ENABLED", default=True)
@@ -80,7 +88,8 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'companies', 
-    'users'
+    'users',
+    'social_media',
 ]
 
 MIDDLEWARE = [
@@ -214,6 +223,14 @@ CELERY_BEAT_SCHEDULE = {
     "refresh_sector_leaderboard_every_30_min": {
         "task": "refresh_sector_leaderboard",
         "schedule": crontab(minute="*/30"),
+    },
+    "write_pending_x_posts_every_5_min": {
+        "task": "social_media.write_pending_x_posts",
+        "schedule": crontab(minute="*/5"),
+    },
+    "publish_ready_x_posts_every_5_min": {
+        "task": "social_media.publish_ready_x_posts",
+        "schedule": crontab(minute="*/5"),
     },
 }
 

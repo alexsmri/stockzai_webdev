@@ -15,3 +15,6 @@ redis
 django-celery-beat
 stripe
 yfinance
+openai
+requests
+requests_oauthlib
