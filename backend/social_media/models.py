@@ -4,6 +4,29 @@ from django.db import models
 from django.utils import timezone
 
 
+class Prompt(models.Model):
+    class PromptType(models.TextChoices):
+        X_POST_MASTER = ("x_post_master", "X Post Master")
+
+    prompt_type = models.CharField(
+        max_length=64,
+        choices=PromptType.choices,
+        unique=True,
+        help_text="Identifier for this prompt’s usage.",
+    )
+    text = models.TextField(help_text="Full prompt content used for generation.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Prompt"
+        verbose_name_plural = "Prompts"
+        ordering = ["prompt_type"]
+
+    def __str__(self):
+        return self.get_prompt_type_display()
+
+
 class XCommunity(models.Model):
     name = models.CharField(max_length=64, blank=True, null=True)
     community_id = models.CharField(

@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import XCommunity, XPost
+from .models import Prompt, XCommunity, XPost
+
+
+@admin.register(Prompt)
+class PromptAdmin(admin.ModelAdmin):
+    list_display = ("id", "prompt_type", "updated_at")
+    list_filter = ("prompt_type",)
+    search_fields = ("text",)
 
 
 @admin.register(XCommunity)

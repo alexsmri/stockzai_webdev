@@ -1,34 +1,30 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 
 from celery import shared_task
 from django.utils import timezone
 
-from .models import XPost
+from .models import Prompt, XPost
 from .openai import OpenAIClientUnavailable, generate_x_post
 from .x import XAPIError, publish_post_to_x
 
 logger = logging.getLogger(__name__)
 
-MASTER_PROMPT_PATH = Path(__file__).resolve().parent / "material" / "X_writer_prompt.txt"
 
-
-def _load_master_prompt() -> str:
-    try:
-        return MASTER_PROMPT_PATH.read_text(encoding="utf-8").strip()
-    except FileNotFoundError:
-        logger.error("Master prompt file missing at %s", MASTER_PROMPT_PATH)
-        return ""
+def _get_master_prompt() -> str | None:
+    prompt_obj = Prompt.objects.filter(prompt_type=Prompt.PromptType.X_POST_MASTER).first()
+    if not prompt_obj:
+        logger.warning("No master prompt configured; skipping generation.")
+        return None
+    return prompt_obj.text
 
 
 @shared_task(name="social_media.write_pending_x_posts")
 def write_pending_x_posts() -> int:
     """Generate copy for X posts that still need to be written."""
-    master_prompt = _load_master_prompt()
+    master_prompt = _get_master_prompt()
     if not master_prompt:
-        logger.warning("Skipping X post generation because no master prompt is available.")
         return 0
 
     written_count = 0

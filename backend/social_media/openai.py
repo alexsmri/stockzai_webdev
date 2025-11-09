@@ -29,7 +29,7 @@ def generate_x_post(prompt: str, master_prompt: str) -> str:
     if not model:
         raise OpenAIClientUnavailable("OPENAI_MODEL is not configured.")
 
-    composed_prompt = f"{master_prompt.strip()}\n\nWrite a post for this idea:\n{prompt.strip()}"
+    composed_prompt = f"{master_prompt}\n\n{prompt}"
     logger.debug("Sending composed prompt to OpenAI model=%s", model)
 
     response = client.responses.create(
