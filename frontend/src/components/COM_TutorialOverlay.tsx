@@ -208,27 +208,26 @@ export default function COM_TutorialOverlay({
         };
 
   const needsExternalClick = Boolean(activeStep?.continueClickObject && !activeStep?.onContinue);
-  const nextLabel =
-    needsExternalClick
-      ? 'Click highlighted area'
-      : stepIndex === prSteps.length - 1
-      ? 'Finish'
-      : 'Next';
+  const nextLabel = needsExternalClick
+    ? 'Click highlighted area'
+    : stepIndex === prSteps.length - 1
+    ? 'Finish'
+    : 'Next';
 
   return (
     <>
       <svg
-        width="100vw"
-        height="100vh"
-        style={{ position: 'fixed', zIndex: 5, pointerEvents: 'none' }}
+        width={document.documentElement.scrollWidth}
+        height={document.documentElement.scrollHeight}
+        style={{ position: 'fixed', zIndex: 5, pointerEvents: 'none', top: 0, left: 0 }}
       >
         <mask id="hole-mask">
           <rect width="100%" height="100%" fill="white" />
           <rect x={x} y={y} width={w} height={h} fill="black" />
         </mask>
+        <rect width="100%" height="100%" fill="rgba(0, 0, 0, 0.6)" mask="url(#hole-mask)" />
       </svg>
       <div className="area-tutorial-overlay mod-z-5">
-        <div className="overlay" />
         <div className="tooltip" style={tooltipStyle}>
           {!showCompletion && activeStep ? (
             <div className="look-div-solid area-flex-col mod-align-stretch">

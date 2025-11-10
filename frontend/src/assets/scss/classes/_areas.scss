@@ -315,17 +315,6 @@
     z-index: 4;
     pointer-events: none;
 
-    .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      pointer-events: all; 
-      transition: clip-path 0.3s ease;
-      mask: url(#hole-mask);
-      -webkit-mask: url(#hole-mask);
-      z-index: 0;
-    }
-
     .tooltip {
       position: absolute;
       z-index: 1;
