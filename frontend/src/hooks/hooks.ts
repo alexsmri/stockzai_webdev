@@ -20,7 +20,7 @@ export function useCompaniesStoreSync<TData = Record<string, unknown>>(
   setData: Dispatch<SetStateAction<TData | null>>,
   options: ITF_CompaniesSyncOptions = {}
 ) {
-  const { autoFetch = false, prUrlPaths = [], prUrlParams = {} } = options;
+  const { autoFetch = true, prUrlPaths = [], prUrlParams = {} } = options;
   const serializedPaths = useMemo(() => JSON.stringify(prUrlPaths), [prUrlPaths]);
   const serializedParams = useMemo(() => JSON.stringify(prUrlParams), [prUrlParams]);
 
@@ -47,7 +47,7 @@ export function useUserStoreSync<TData = Record<string, unknown>>(
   setData: Dispatch<SetStateAction<any | null>>,
   options: ITF_UserSyncOptions = {}
 ) {
-  const { autoFetch = false, } = options;
+  const { autoFetch = true, } = options;
   useEffect(() => {
     const subscriber = () => {
       const nextValue = store.read(key) as TData | null | undefined;
