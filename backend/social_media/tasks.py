@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from .models import Prompt, XPost
 from .openai import OpenAIClientUnavailable, generate_x_post
-from .x import XAPIError, publish_post_to_x
+from .x import XAPIError, publish_post_to_x, publish_thread_segments, segment_post_body
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,7 @@ def publish_ready_x_posts() -> int:
         XPost.objects.filter(
             is_written=True,
             is_posted=False,
+            is_in_review=False,
             scheduled_for__lte=timezone.now(),
         ).order_by("scheduled_for", "id")
     )
@@ -78,12 +79,37 @@ def publish_ready_x_posts() -> int:
         if x_post.community:
             community_identifier = x_post.community.community_id
 
+        segments, needs_review = segment_post_body(x_post.post)
+
+        if needs_review:
+            logger.warning(
+                "Placing XPost(id=%s) into review because a paragraph exceeded tweet limits.",
+                x_post.pk,
+            )
+            x_post.is_in_review = True
+            x_post.save(update_fields=["is_in_review", "updated_at"])
+            continue
+
+        if not segments:
+            logger.warning(
+                "Skipping XPost(id=%s) because it produced no thread segments.",
+                x_post.pk,
+            )
+            continue
+
         try:
-            publish_post_to_x(x_post.post, community_identifier)
+            if len(segments) == 1:
+                publish_post_to_x(segments[0], community_identifier)
+            else:
+                publish_thread_segments(segments, community_identifier)
         except XAPIError as exc:
+            x_post.is_in_review = True
+            x_post.save(update_fields=["is_in_review", "updated_at"])
             logger.exception("X API rejected XPost(id=%s): %s", x_post.pk, exc)
             continue
         except Exception as exc:  # noqa: BLE001
+            x_post.is_in_review = True
+            x_post.save(update_fields=["is_in_review", "updated_at"])
             logger.exception("Unexpected failure while posting XPost(id=%s): %s", x_post.pk, exc)
             continue
 

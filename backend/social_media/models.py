@@ -62,6 +62,7 @@ class XPost(models.Model):
     post = models.TextField(blank=True, help_text="Final copy that will be sent to X.")
     is_written = models.BooleanField(default=False)
     is_posted = models.BooleanField(default=False)
+    is_in_review = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
