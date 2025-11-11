@@ -39,7 +39,9 @@ export default function PAG_ChooseTicker() {
         ? `${window.location.pathname}${window.location.search}`
         : '/onboarding/choose-ticker';
 
-    userStore.post('ActionTrackOnboardingChooseTicker', { path });
+    if (path !== '/companies/search') {
+      userStore.post('ActionTrackOnboardingChooseTicker', { path });
+    }
   }, [userStore]);
 
   const handleClick = (symbol: string) => {
