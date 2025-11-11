@@ -250,11 +250,15 @@ class TrackingEvent(models.Model):
     EVENT_NEWSLETTER_UNSUB = 'newsletter_unsubscribe'
     EVENT_SEARCH_QUERY = 'search_query'
     EVENT_TICKER_VIEW = 'ticker_view'
+    EVENT_ONBOARDING_CHOOSE_TICKER = 'onboarding_choose_ticker'
+    EVENT_TUTORIAL_PAGE_VIEW = 'tutorial_page_view'
 
     EVENT_CHOICES = [
         (EVENT_NEWSLETTER_UNSUB, 'Newsletter unsubscribe'),
         (EVENT_SEARCH_QUERY, 'Search query'),
         (EVENT_TICKER_VIEW, 'Ticker view'),
+        (EVENT_ONBOARDING_CHOOSE_TICKER, 'Onboarding choose ticker'),
+        (EVENT_TUTORIAL_PAGE_VIEW, 'Tutorial page view'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='tracking_events')

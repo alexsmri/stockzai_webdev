@@ -22,6 +22,7 @@ const ROUTE_CONFIG = {
   ActionSubscribeNewsletterVerify: "/api/users/subscribe-newsletter/verify/",
   ActionCancelSubscription: "/api/users/subscriptions/cancel/",
   ActionResumeSubscription: "/api/users/subscriptions/resume/",
+  ActionTrackOnboardingChooseTicker: "/api/users/tracking/onboarding/choose-ticker/",
   StateEditing: "",
   PropertyNewUser: ""
 } as const;

@@ -78,6 +78,7 @@ function PAG_CompaniesFreeContent({
     {
       autoFetch: Boolean(normalizedSymbol),
       prUrlPaths: fetchPaths,
+      prUrlParams: shouldShowTutorial ? { t: true } : {},
     }
   );
 

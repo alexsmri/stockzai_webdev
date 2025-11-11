@@ -18,6 +18,7 @@ from .views import (
     view_verification_token,
     view_verify,
     view_get_subscriptions,
+    view_track_onboarding_choose_ticker,
 )
 from ..stripe import stripe_webhook, view_cancel_plan, view_resume_plan
 
@@ -56,5 +57,10 @@ urlpatterns = [
     path("subscriptions/", view_get_subscriptions, name="subscriptions"),
     path("subscriptions/cancel/", view_cancel_plan, name="subscriptions_cancel"),
     path("subscriptions/resume/", view_resume_plan, name="subscriptions_resume"),
+    path(
+        "tracking/onboarding/choose-ticker/",
+        view_track_onboarding_choose_ticker,
+        name="tracking_onboarding_choose_ticker",
+    ),
     path("payments/webhook/", stripe_webhook, name="stripe_webhook"),
 ]

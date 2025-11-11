@@ -124,7 +124,7 @@ def _split_paragraph_on_sentence(paragraph: str, limit: int) -> Optional[List[st
 
 
 def _thread_prefix(total_segments: int, index: int) -> str:
-    return f"({total_segments}/{index}): "
+    return f"({index}/{total_segments}): "
 
 
 def _thread_prefix_length(total_segments: int, index: int) -> int:

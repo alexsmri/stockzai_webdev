@@ -479,6 +479,42 @@ def view_access(request):
     return api_json_response(msg=msg)
 
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_track_onboarding_choose_ticker(request):
+    body = request.data if isinstance(request.data, dict) else {}
+
+    def _sanitize(value: str | None, max_length: int = 128) -> str | None:
+        if not isinstance(value, str):
+            return None
+        trimmed = value.strip()
+        return trimmed[:max_length] if trimmed else None
+
+    payload = {}
+    path_value = _sanitize(body.get("path"), 256)
+    payload["path"] = path_value or "/onboarding/choose-ticker"
+
+    selection_value = _sanitize(body.get("selection"))
+    if selection_value:
+        payload["selection"] = selection_value
+
+    source_value = _sanitize(body.get("source"))
+    if source_value:
+        payload["source"] = source_value
+
+    campaign_value = _sanitize(body.get("campaign"))
+    if campaign_value:
+        payload["campaign"] = campaign_value
+
+    track_event(
+        request,
+        TrackingEvent.EVENT_ONBOARDING_CHOOSE_TICKER,
+        payload,
+    )
+
+    return api_json_response(msg=True)
+
+
 
 
 

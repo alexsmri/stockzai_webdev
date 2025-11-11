@@ -96,6 +96,17 @@ class CompanyFreePageView(APIView):
         intel = db.dbq_get_company_data(symbol_upper)
         payload = dict(intel or {})
         payload["query"] = build_query_meta("PropertyCompanyProfileFree", symbol=symbol_upper)
+
+        tutorial_flag = (request.GET.get("t") or request.GET.get("tutorial") or "").strip().lower()
+        is_tutorial = tutorial_flag in {"1", "true", "yes"}
+        if is_tutorial:
+            track_event(
+                request,
+                TrackingEvent.EVENT_TUTORIAL_PAGE_VIEW,
+                {
+                    "symbol": symbol_upper,
+                },
+            )
         return api_json_response(msg=payload)
 
 

@@ -31,6 +31,8 @@ def track_event(
     try:
         user = None
         if request and hasattr(request, 'user') and getattr(request.user, 'is_authenticated', False):
+            if getattr(request.user, 'is_staff', False) or getattr(request.user, 'is_superuser', False):
+                return
             user = request.user
         TrackingEvent.objects.create(
             user=user,

@@ -20,6 +20,7 @@ const CARD_CONFIG = [
 export default function PAG_ChooseTicker() {
   const navigate = useNavigate();
   const userStore = useUserStore();
+
   useEffect(() => {
     const tokens = userStore.read('ActionLogin') as { access?: unknown } | null;
     console.log(tokens);
@@ -31,6 +32,16 @@ export default function PAG_ChooseTicker() {
       navigate('/companies/search', { replace: true });
     }
   }, [navigate, userStore]);
+
+  useEffect(() => {
+    const path =
+      typeof window !== 'undefined'
+        ? `${window.location.pathname}${window.location.search}`
+        : '/onboarding/choose-ticker';
+
+    userStore.post('ActionTrackOnboardingChooseTicker', { path });
+  }, [userStore]);
+
   const handleClick = (symbol: string) => {
     navigate(`${REDIRECT_URL}${symbol}?t=true`);
   };
