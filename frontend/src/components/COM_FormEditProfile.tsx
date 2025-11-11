@@ -28,10 +28,9 @@ function COM_FormEditProfile() {
 
   const { handleAlertOpen, handleAlertClose } = useAlert();
 
-  useUserStoreSync(utStore, 'PropertyCredentials', setStCredentials);
+  useUserStoreSync(utStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
 
   useEffect(() => {
-    void utStore.get('PropertyCredentials');
     void utStore.get('PropertyConsents');
   }, [utStore]);
 

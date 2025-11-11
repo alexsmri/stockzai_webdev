@@ -61,7 +61,7 @@ export default function COM_UserPlans() {
   );
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
   useUserStoreSync(
     userStore,
     'PropertySubscriptions',

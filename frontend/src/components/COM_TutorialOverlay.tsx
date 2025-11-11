@@ -25,7 +25,9 @@ export default function COM_TutorialOverlay({
   onFinish,
 }: PI_TutorialOverlay) {
   const userStore = useUserStore();
-  const [tutorialState, setTutorialState] = useState<TutorialRecord>(null);
+  const [tutorialState, setTutorialState] = useState<TutorialRecord>(
+    userStore.read('PropertyTutorialCompleted') as TutorialRecord
+  );
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [showCompletion, setShowCompletion] = useState(false);

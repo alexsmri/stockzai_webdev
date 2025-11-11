@@ -21,7 +21,7 @@ export default function COM_Navbar() {
   const navRef = useRef<HTMLElement>(null);
   useStickyObserver(navRef, 'sentinel-nav');
 
-  useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn);
+  useUserStoreSync(utStore, 'PropertyCredentials', setLoggedIn, { autoFetch: true });
   const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const utMobileView = width <= MOBILE_BREAKPOINT ? true : false;

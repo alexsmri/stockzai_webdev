@@ -3,6 +3,7 @@ import type STO_Companies from "../stores/STO_Companies";
 import type { ValidKeys as CompanyStoreKeys } from "../stores/STO_Companies";
 import type STO_Users from "../stores/STO_Users";
 import type { ValidKeys as UserStoreKeys } from "../stores/STO_Users";
+import type { StoreStatus } from "../stores/STO_Base";
 
 interface ITF_CompaniesSyncOptions {
   autoFetch?: boolean;
@@ -20,7 +21,7 @@ export function useCompaniesStoreSync<TData = Record<string, unknown>>(
   setData: Dispatch<SetStateAction<TData | null>>,
   options: ITF_CompaniesSyncOptions = {}
 ) {
-  const { autoFetch = true, prUrlPaths = [], prUrlParams = {} } = options;
+  const { autoFetch = false, prUrlPaths = [], prUrlParams = {} } = options;
   const serializedPaths = useMemo(() => JSON.stringify(prUrlPaths), [prUrlPaths]);
   const serializedParams = useMemo(() => JSON.stringify(prUrlParams), [prUrlParams]);
 
@@ -47,26 +48,31 @@ export function useUserStoreSync<TData = Record<string, unknown>>(
   setData: Dispatch<SetStateAction<any | null>>,
   options: ITF_UserSyncOptions = {}
 ) {
-  const { autoFetch = true, } = options;
+  const { autoFetch = false } = options;
   useEffect(() => {
+    const readValue = () => store.read(key) as TData | null | undefined;
     const subscriber = () => {
-      const nextValue = store.read(key) as TData | null | undefined;
-      setData((nextValue ?? null));
+      const nextValue = readValue();
+      setData(nextValue ?? null);
     };
 
     const unsubscribe = store.subscribe(key, subscriber);
     subscriber();
 
     if (autoFetch) {
-      try {
-        void store.get(key);
-      } catch {
-        console.warn("autoFetch in useUserStoreSynch failed")
+      const status = store.getStatus(key) as StoreStatus | undefined;
+      const currentValue = readValue();
+      const hasValue = currentValue !== null && currentValue !== undefined;
+      const shouldFetch = status !== "loading" && (status !== "success" || !hasValue);
+      if (shouldFetch) {
+        void store.get(key).catch((error: unknown) => {
+          console.warn("autoFetch in useUserStoreSync failed", error);
+        });
       }
     }
 
     return unsubscribe;
-  }, [store, key, autoFetch]);
+  }, [store, key, autoFetch, setData]);
 }
 
 function getWindowDimensions() {

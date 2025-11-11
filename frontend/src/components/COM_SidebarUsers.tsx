@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
+import { useMemo, useState, type FunctionComponent, type SVGProps } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { scale } from '../utils/functions';
@@ -48,11 +48,7 @@ export default function COM_SidebarUsers({ activeTab, onSelect }: SidebarUsersPr
     (userStore.read('PropertyCredentials') as Credentials) ?? null
   );
 
-  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
-
-  useEffect(() => {
-    void userStore.get('PropertyCredentials');
-  }, [userStore]);
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
 
   const displayName = useMemo(() => {
     const username = readUsername(stCredentials);

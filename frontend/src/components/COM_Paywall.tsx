@@ -16,7 +16,7 @@ export default function COM_Paywall({ prIsOpen, prChildren }: PI_Paywall) {
   const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
     userStore.read('PropertyCredentials') as Record<string, any>
   );
-  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
   const handleBack = () => {
     window.history.back();
   };

@@ -135,13 +135,13 @@ export default function COM_Sidebar() {
   const [stCredentials, setStCredentials] = useState<any | null>(
     userStore.read('PropertyCredentials')
   );
-  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials);
+  useUserStoreSync(userStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
   const [stLoginTokens, setStLoginTokens] = useState<any | null>(userStore.read('ActionLogin'));
   useUserStoreSync(userStore, 'ActionLogin', setStLoginTokens);
   const [stSubscriptionsRaw, setStSubscriptionsRaw] = useState<any | null>(
     userStore.read('PropertySubscriptions')
   );
-  useUserStoreSync(userStore, 'PropertySubscriptions', setStSubscriptionsRaw);
+  useUserStoreSync(userStore, 'PropertySubscriptions', setStSubscriptionsRaw, { autoFetch: true });
   const isAuthenticated = Boolean(
     (stLoginTokens && typeof stLoginTokens === 'object' && stLoginTokens?.access) ||
       (stCredentials && typeof stCredentials === 'object')
@@ -221,7 +221,7 @@ export default function COM_Sidebar() {
             <LOGO_schwarzquer
               style={{
                 width: 'auto',
-                height: scale(2.8),
+                height: scale(1.5),
                 display: 'block',
               }}
             />
@@ -311,7 +311,7 @@ export default function COM_Sidebar() {
             style={{
               width: '100%',
               marginTop: 'auto',
-              marginBottom: scale(2),
+              marginBottom: scale(1),
               justifyContent: showLabels ? 'center' : 'center',
             }}
             onClick={handleSignUpNavigate}
