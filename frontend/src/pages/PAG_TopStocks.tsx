@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import COM_DropdownSelect, { type TYP_DropdownConfig } from '../components/COM_DropdownSelect';
 import COM_MenuSelect, { type MenuSelectOptions } from '../components/COM_MenuSelect';
 import COM_LeaderboardTable from '../components/COM_LeaderboardTable';
@@ -19,6 +19,9 @@ const METRIC_OPTIONS: MenuSelectOptions = {
 
 type LeaderboardMetric = keyof typeof METRIC_OPTIONS;
 const DEFAULT_RISK_TOLERANCE = 'risk_balanced';
+const QUERY_PARAM_SECTOR = 'sector';
+const QUERY_PARAM_METRIC = 'metric';
+const QUERY_PARAM_RISK = 'risk';
 
 type LeaderboardEntry = {
   symbol?: string;
@@ -48,12 +51,23 @@ function isLeaderboardPayload(value: unknown): value is LeaderboardPayload {
   );
 }
 
+function isLeaderboardMetric(value: string | null): value is LeaderboardMetric {
+  return Boolean(value && value in METRIC_OPTIONS);
+}
+
 export default function PAG_TopStocks() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const latestSearchParamsRef = useRef(searchParams);
   const store = useCompaniesStore();
 
-  const [selectedSector, setSelectedSector] = useState<string>('');
-  const [selectedMetric, setSelectedMetric] = useState<LeaderboardMetric>('valuation_score');
+  const [selectedSector, setSelectedSector] = useState<string>(
+    () => searchParams.get(QUERY_PARAM_SECTOR) ?? ''
+  );
+  const [selectedMetric, setSelectedMetric] = useState<LeaderboardMetric>(() => {
+    const metricParam = searchParams.get(QUERY_PARAM_METRIC);
+    return isLeaderboardMetric(metricParam) ? metricParam : 'valuation_score';
+  });
   const [loadError, setLoadError] = useState<string | null>(null);
   const [sectorValues, setSectorValues] = useState<string[] | null>(null);
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardPayload | null>(() => {
@@ -61,12 +75,20 @@ export default function PAG_TopStocks() {
     return isLeaderboardPayload(existing) ? existing : null;
   });
   const [selectedRiskTolerance, setSelectedRiskTolerance] = useState<string>(() => {
+    const paramValue = searchParams.get(QUERY_PARAM_RISK);
+    if (paramValue) {
+      return paramValue;
+    }
     const existing = store.read('PropertyCompanyLeaderboard');
     if (isLeaderboardPayload(existing) && typeof existing.riskTolerance === 'string') {
       return existing.riskTolerance;
     }
     return DEFAULT_RISK_TOLERANCE;
   });
+
+  useEffect(() => {
+    latestSearchParamsRef.current = searchParams;
+  }, [searchParams]);
 
   const distinctParams = useMemo(() => ({ kpi: 'sector' as const }), []);
 
@@ -93,8 +115,17 @@ export default function PAG_TopStocks() {
     if (!sectorValues || !sectorValues.length) {
       return;
     }
-    setSelectedSector((prev) => (prev && sectorValues.includes(prev) ? prev : sectorValues[0]));
-  }, [sectorValues]);
+    setSelectedSector((prev) => {
+      if (prev && sectorValues.includes(prev)) {
+        return prev;
+      }
+      const paramValue = searchParams.get(QUERY_PARAM_SECTOR);
+      if (paramValue && sectorValues.includes(paramValue)) {
+        return paramValue;
+      }
+      return sectorValues[0];
+    });
+  }, [searchParams, sectorValues]);
 
   useCompaniesStoreSync<LeaderboardPayload | boolean>(
     store,
@@ -176,6 +207,48 @@ export default function PAG_TopStocks() {
       });
   }, [selectedSector, selectedMetric, selectedRiskTolerance, store]);
 
+  useLayoutEffect(() => {
+    const sectorParam = searchParams.get(QUERY_PARAM_SECTOR);
+    if (sectorParam) {
+      setSelectedSector((prev) => (prev === sectorParam ? prev : sectorParam));
+    }
+    const metricParam = searchParams.get(QUERY_PARAM_METRIC);
+    if (isLeaderboardMetric(metricParam)) {
+      setSelectedMetric((prev) => (prev === metricParam ? prev : metricParam));
+    }
+    const riskParam = searchParams.get(QUERY_PARAM_RISK);
+    if (riskParam) {
+      setSelectedRiskTolerance((prev) => (prev === riskParam ? prev : riskParam));
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const next = new URLSearchParams(latestSearchParamsRef.current);
+    const currentEntries: [string, string | null][] = [
+      [QUERY_PARAM_SECTOR, selectedSector || null],
+      [QUERY_PARAM_METRIC, selectedMetric || null],
+      [QUERY_PARAM_RISK, selectedRiskTolerance || null],
+    ];
+    let changed = false;
+    currentEntries.forEach(([key, value]) => {
+      const existing = next.get(key);
+      if (value === null || value === '') {
+        if (existing !== null) {
+          next.delete(key);
+          changed = true;
+        }
+        return;
+      }
+      if (existing !== value) {
+        next.set(key, value);
+        changed = true;
+      }
+    });
+    if (changed) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [selectedMetric, selectedRiskTolerance, selectedSector, setSearchParams]);
+
   const dropdownConfig = useMemo<TYP_DropdownConfig>(() => {
     const config: TYP_DropdownConfig = {};
     (sectorValues || []).forEach((sector) => {
@@ -199,7 +272,11 @@ export default function PAG_TopStocks() {
 
     const intel = leaderboardData.intel ?? {};
 
-    return leaderboardData.leaderboard.map((entry, index) => {
+    const leaderboardList = Array.isArray(leaderboardData?.leaderboard)
+      ? leaderboardData.leaderboard
+      : [];
+
+    return leaderboardList.map((entry, index) => {
       const symbol = typeof entry.symbol === 'string' ? entry.symbol : '';
       const intelEntry = (symbol && intel[symbol] ? intel[symbol] : {}) as TYP_ListViewRow;
       const rank = typeof entry.rank === 'number' ? entry.rank : index + 1;
@@ -289,7 +366,11 @@ export default function PAG_TopStocks() {
             prPlaceholder="Select risk tolerance"
           />
         </div>
-        <COM_MenuSelect prOptions={METRIC_OPTIONS} prHandleChange={handleMetricChange} />
+        <COM_MenuSelect
+          prOptions={METRIC_OPTIONS}
+          prHandleChange={handleMetricChange}
+          prSelectedKey={selectedMetric}
+        />
       </div>
       {selectedSector && (
         <COM_LeaderboardTable

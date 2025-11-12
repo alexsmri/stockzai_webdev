@@ -6,6 +6,7 @@ export type MenuSelectOptions = Record<string, string>;
 export type MenuSelectProps = {
   prOptions: MenuSelectOptions;
   prHandleChange: (key: string) => void;
+  prSelectedKey?: string;
 };
 
 type IndicatorState = {
@@ -13,9 +14,15 @@ type IndicatorState = {
   left: number;
 };
 
-export default function COM_MenuSelect({ prOptions, prHandleChange }: MenuSelectProps) {
+export default function COM_MenuSelect({
+  prOptions,
+  prHandleChange,
+  prSelectedKey,
+}: MenuSelectProps) {
   const entries = useMemo(() => Object.entries(prOptions), [prOptions]);
-  const [selectedKey, setSelectedKey] = useState(() => entries[0]?.[0] ?? '');
+  const isControlled = prSelectedKey !== undefined;
+  const [internalKey, setInternalKey] = useState(() => prSelectedKey ?? entries[0]?.[0] ?? '');
+  const selectedKey = isControlled ? prSelectedKey ?? '' : internalKey;
   const [indicator, setIndicator] = useState<IndicatorState>({ width: 0, left: 0 });
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -30,15 +37,31 @@ export default function COM_MenuSelect({ prOptions, prHandleChange }: MenuSelect
   }, []);
 
   useEffect(() => {
-    if (!entries.length) {
-      setSelectedKey('');
+    if (isControlled) {
       return;
     }
 
-    if (!entries.some(([key]) => key === selectedKey)) {
-      setSelectedKey(entries[0][0]);
+    if (!entries.length) {
+      setInternalKey('');
+      return;
     }
-  }, [entries, selectedKey]);
+
+    if (!entries.some(([key]) => key === internalKey)) {
+      setInternalKey(entries[0][0]);
+    }
+  }, [entries, internalKey, isControlled]);
+
+  useEffect(() => {
+    if (!isControlled || prSelectedKey === undefined) {
+      return;
+    }
+
+    if (prSelectedKey && !entries.some(([key]) => key === prSelectedKey)) {
+      return;
+    }
+
+    setInternalKey((prev) => (prev === prSelectedKey ? prev : prSelectedKey));
+  }, [entries, isControlled, prSelectedKey]);
 
   const updateIndicator = useCallback(() => {
     if (!selectedKey) {
@@ -83,14 +106,25 @@ export default function COM_MenuSelect({ prOptions, prHandleChange }: MenuSelect
   }, [updateIndicator, entries.length]);
 
   useEffect(() => {
+    if (isControlled) {
+      return;
+    }
     if (selectedKey) {
       prHandleChange(selectedKey);
     }
-  }, [selectedKey, prHandleChange]);
+  }, [isControlled, selectedKey, prHandleChange]);
 
   if (!entries.length) {
     return null;
   }
+
+  const handleSelect = (key: string) => {
+    if (isControlled) {
+      prHandleChange(key);
+    } else {
+      setInternalKey(key);
+    }
+  };
 
   const indicatorStyle: CSSProperties = {
     width: indicator.width,
@@ -107,7 +141,7 @@ export default function COM_MenuSelect({ prOptions, prHandleChange }: MenuSelect
           ref={(node) => assignRef(key, node)}
           type="button"
           className={`look-text-clickable${selectedKey === key ? ' mod-selected' : ''}`}
-          onClick={() => setSelectedKey(key)}
+          onClick={() => handleSelect(key)}
         >
           <span
             className={`look-text-clickable mod-padding-none ${
