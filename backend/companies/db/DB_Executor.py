@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, MetaData, insert, text, Table
-from typing import Any, Dict, Tuple
+from sqlalchemy.exc import OperationalError
+from typing import Any, Callable, Dict, Tuple
 import os
 import logging
 import pandas as pd
@@ -8,12 +9,16 @@ logger = logging.getLogger(__name__)
 
 class DB_Executor:
 
+    _RECONNECT_ERRNOS = {2006, 2013, 2055}
+
     def __init__(self, database: str):
         self.database = database
         login_data = self._get_db_login()
         self.engine = create_engine(
             f"mysql+pymysql://{login_data['MYSQL_USERNAME']}:{login_data['MYSQL_PASSWORD']}@"
-            f"{login_data['MYSQL_HOST']}/{login_data['MYSQL_DATABASE']}"
+            f"{login_data['MYSQL_HOST']}/{login_data['MYSQL_DATABASE']}",
+            pool_pre_ping=True,
+            pool_recycle=3600,
         )
         self.metadata = MetaData()
         self.metadata.reflect(bind=self.engine)
@@ -75,8 +80,7 @@ class DB_Executor:
         query = text(base_sql + where_sql + order_sql)
 
         try:
-            with self.engine.connect() as conn:
-                results = conn.execute(query, params).fetchall()
+            results = self._execute_with_retry(lambda conn: conn.execute(query, params).fetchall())
         except Exception:
             logger.exception("Failed to read from table %s", table_name)
             raise
@@ -106,8 +110,7 @@ class DB_Executor:
         query = text(base_sql + where_sql)
 
         try:
-            with self.engine.connect() as conn:
-                result = conn.execute(query, params).scalar()
+            result = self._execute_with_retry(lambda conn: conn.execute(query, params).scalar())
         except Exception:
             logger.exception("Failed to execute COUNT on table %s", table_name)
             raise
@@ -122,8 +125,7 @@ class DB_Executor:
         query = text(base_sql + where_sql)
 
         try:
-            with self.engine.connect() as conn:
-                results = conn.execute(query, params).fetchall()
+            results = self._execute_with_retry(lambda conn: conn.execute(query, params).fetchall())
         except Exception:
             logger.exception("Failed to execute DISTINCT on table %s", table_name)
             raise
@@ -151,8 +153,9 @@ class DB_Executor:
     def dbu_read_execute(self, query: str, table_name: str | None = None, params: dict | None = None):
 
         try:
-            with self.engine.connect() as conn:
-                results = conn.execute(text(query), parameters=params).fetchall()
+            results = self._execute_with_retry(
+                lambda conn: conn.execute(text(query), parameters=params).fetchall()
+            )
         except Exception:
             logger.exception("Failed to execute raw query")
             raise
@@ -195,9 +198,7 @@ class DB_Executor:
         if not existing:
             ins = insert(table_obj).values(**cleaned_value)
 
-            with self.engine.connect() as conn:
-                conn.execute(ins)
-                conn.commit()
+            self._execute_with_retry(self._write_with_commit(ins))
 
         return True
 
@@ -231,4 +232,40 @@ class DB_Executor:
                 values_out.append(values)
         output = pd.DataFrame(values_out, columns=columns)
         return output if any(output) else None
+
+    def _execute_with_retry(self, operation: Callable):
+        try:
+            with self.engine.connect() as conn:
+                return operation(conn)
+        except OperationalError as exc:
+            if self._is_disconnect_error(exc):
+                logger.warning("Database connection dropped (%s). Retrying once.", exc)
+                self.engine.dispose()
+                with self.engine.connect() as conn:
+                    return operation(conn)
+            raise
+
+    def _write_with_commit(self, statement):
+        def _runner(conn):
+            conn.execute(statement)
+            conn.commit()
+        return _runner
+
+    def _is_disconnect_error(self, error: OperationalError) -> bool:
+        if getattr(error, "connection_invalidated", False):
+            return True
+
+        orig = getattr(error, "orig", None)
+        if not orig:
+            return False
+
+        args = getattr(orig, "args", ())
+        if not args:
+            return False
+
+        code = args[0]
+        try:
+            return int(code) in self._RECONNECT_ERRNOS
+        except (ValueError, TypeError):
+            return False
 
