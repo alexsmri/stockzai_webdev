@@ -39,7 +39,8 @@ export default function COM_FormCode({
   const utStore = useUserStore();
   const utCensoredEmail = prEmail ? censorEmail(prEmail) : 'your email';
   const redirectPath =
-    prRedirect ?? (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/companies/search');
+    prRedirect ??
+    (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/onboarding/choose-ticker');
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);
