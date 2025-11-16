@@ -3,11 +3,13 @@ from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from users.models import (
+    Email,
     User,
     TokenVerification,
     TokenPasswordReset,
     TokenNewsletter,
     UserConsents,
+    UserStatus,
     TrackingEvent,
     Subscription,
     Product,
@@ -16,7 +18,15 @@ from users.models import (
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
-from .serializers import UserSerializer, TokenLoginSerializer, TokenRefreshSerializer, TokenVerifySerializer
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
+from .serializers import (
+    UserSerializer,
+    TokenLoginSerializer,
+    TokenRefreshSerializer,
+    TokenVerifySerializer,
+    UserStatusSerializer,
+)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -479,6 +489,34 @@ def view_access(request):
     return api_json_response(msg=msg)
 
 
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def view_status(request):
+    status_obj, _ = UserStatus.objects.get_or_create(user=request.user)
+
+    if request.method == "GET":
+        serializer = UserStatusSerializer(status_obj)
+        return api_json_response(msg=serializer.data)
+
+    serializer = UserStatusSerializer(
+        status_obj,
+        data=request.data,
+        partial=True,
+    )
+    if serializer.is_valid():
+        serializer.save()
+        return api_json_response(msg=serializer.data)
+
+    error_messages = []
+    for field_errors in serializer.errors.values():
+        if isinstance(field_errors, (list, tuple)):
+            error_messages.extend(str(item) for item in field_errors)
+        else:
+            error_messages.append(str(field_errors))
+    error_message = " ".join(error_messages) or "Invalid data."
+    return api_json_response(error=error_message, status=200)
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def view_track_onboarding_choose_ticker(request):
@@ -514,6 +552,29 @@ def view_track_onboarding_choose_ticker(request):
 
     return api_json_response(msg=True)
 
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_capture_email(request):
+    body = request.data if isinstance(request.data, dict) else {}
+    raw_email = body.get("email")
+    if not isinstance(raw_email, str):
+        return api_json_response(error="Email is required.", status=200)
+
+    normalized_email = raw_email.strip().lower()
+    if not normalized_email:
+        return api_json_response(error="Email is required.", status=200)
+
+    try:
+        validate_email(normalized_email)
+    except DjangoValidationError:
+        return api_json_response(error="Invalid email address.", status=200)
+
+    if User.objects.filter(email__iexact=normalized_email).exists():
+        return api_json_response(msg=False)
+
+    _, created = Email.objects.get_or_create(email=normalized_email)
+    return api_json_response(msg=created)
 
 
 

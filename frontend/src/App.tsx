@@ -20,6 +20,7 @@ import PAG_Unsubscribe from './pages/PAG_Unsubscribe';
 import PAG_Subscribe from './pages/PAG_Subscribe';
 import PAG_SubscribeVerify from './pages/PAG_SubscribeVerify';
 import PAG_SubscribeConfirmation from './pages/PAG_SubscribeConfirmation';
+import PAG_PlanSelection from './pages/PAG_PlanSelection';
 import PAG_VericationCode from './pages/PAG_VerificationCode';
 import PAG_404 from './pages/PAG_404';
 import PAG_Debug from './pages/PAG_Debug';
@@ -61,7 +62,7 @@ function usePerformLogout() {
       userStore.set(key, null);
     });
     userStore.set('StateEditing', false);
-    userStore.set('PropertyTutorialCompleted', false);
+    userStore.set('PropertyStatus', null);
     userStore.set('PropertyNewUser', false);
 
     const companiesKeysToReset: CompanyStoreKeys[] = [
@@ -125,6 +126,14 @@ function App() {
                   <Route path="/users/register" element={<CreateAndLogout />} />
                   <Route path="/users/register/password" element={<CreatePasswordAndLogout />} />
                   <Route path="/users/verification" element={<PAG_VericationCode />} />
+                  <Route
+                    path="/users/plans/select"
+                    element={
+                      <COM_ProtectedRoute>
+                        <PAG_PlanSelection />
+                      </COM_ProtectedRoute>
+                    }
+                  />
                   <Route
                     path="/users/password-reset/token/request"
                     element={<PA_PasswordResetRequest />}

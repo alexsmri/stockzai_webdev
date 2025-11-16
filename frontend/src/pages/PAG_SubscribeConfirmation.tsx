@@ -1,10 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ICON_ArrowLeft from '@/assets/media/ICON_ArrowLeft.svg?react';
 import ICON_Checkmark from '@/assets/media/ICON_Checkmark.svg?react';
 import COM_FooterAuth from '../components/COM_FooterAuth';
 import COM_Hero from '../components/COM_Hero';
 import { scale } from '../utils/functions';
+import { useUserStore } from '../context/CTX_UserStore';
+import { useUserStoreSync } from '../hooks/hooks';
 
 const PRO_FEATURES = [
   'Full coverage of 20,000+ companies with daily updates.',
@@ -15,10 +17,19 @@ const PRO_FEATURES = [
 
 export default function PAG_SubscribeConfirmation() {
   const navigate = useNavigate();
+  const userStore = useUserStore();
+  const [status, setStatus] = useState<{ completed_onboarding?: boolean } | null>(
+    userStore.read('PropertyStatus') as { completed_onboarding?: boolean } | null
+  );
+  useUserStoreSync(userStore, 'PropertyStatus', setStatus, { autoFetch: true });
+
+  const completedOnboarding = Boolean(status?.completed_onboarding);
+  const buttonLabel = completedOnboarding ? 'Start Exploring' : 'Finish Onboarding';
 
   const handleBack = useCallback(() => {
-    navigate('/companies/search');
-  }, [navigate]);
+    const target = completedOnboarding ? '/companies/search' : '/onboarding/choose-ticker';
+    navigate(target);
+  }, [completedOnboarding, navigate]);
 
   return (
     <>
@@ -60,9 +71,9 @@ export default function PAG_SubscribeConfirmation() {
                 justifyContent: 'center',
               }}
               onClick={handleBack}
-              aria-label="Back to search"
+              aria-label={buttonLabel}
             >
-              <span>Start Exploring</span>
+              <span>{buttonLabel}</span>
               <ICON_ArrowLeft
                 style={{
                   width: scale(1.3),

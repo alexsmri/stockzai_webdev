@@ -40,7 +40,7 @@ export default function COM_FormCode({
   const utCensoredEmail = prEmail ? censorEmail(prEmail) : 'your email';
   const redirectPath =
     prRedirect ??
-    (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/onboarding/choose-ticker');
+    (prMode === 'newsletter' ? '/users/unsubscribe-newsletter' : '/users/plans/select');
   const [code, setCode] = useState<Record<number, string>>({});
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [cooldown, setCooldown] = useState(REGISTRATION_RESEND_COOLDOWN_SECONDS);

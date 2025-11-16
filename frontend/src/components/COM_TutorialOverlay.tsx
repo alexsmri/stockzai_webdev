@@ -3,7 +3,7 @@ import type { RefObject } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 
-type TutorialRecord = { completed?: boolean } | boolean | null | undefined;
+type UserStatusRecord = { completed_onboarding?: boolean } | null | undefined;
 
 interface Step {
   ref: RefObject<HTMLElement | null>;
@@ -25,22 +25,21 @@ export default function COM_TutorialOverlay({
   onFinish,
 }: PI_TutorialOverlay) {
   const userStore = useUserStore();
-  const [tutorialState, setTutorialState] = useState<TutorialRecord>(
-    userStore.read('PropertyTutorialCompleted') as TutorialRecord
+  const [statusState, setStatusState] = useState<UserStatusRecord>(
+    userStore.read('PropertyStatus') as UserStatusRecord
   );
   const [stepIndex, setStepIndex] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [showCompletion, setShowCompletion] = useState(false);
 
-  useUserStoreSync(userStore, 'PropertyTutorialCompleted', setTutorialState);
+  useUserStoreSync(userStore, 'PropertyStatus', setStatusState, { autoFetch: true });
 
   const isCompleted = useMemo(() => {
-    if (tutorialState === true) return true;
-    if (tutorialState && typeof tutorialState === 'object') {
-      return Boolean((tutorialState as { completed?: boolean }).completed);
+    if (statusState && typeof statusState === 'object') {
+      return Boolean((statusState as { completed_onboarding?: boolean }).completed_onboarding);
     }
     return false;
-  }, [tutorialState]);
+  }, [statusState]);
 
   const shouldRun = prIsActive && !isCompleted && prSteps.length > 0;
   const activeStep = shouldRun && !showCompletion ? prSteps[stepIndex] ?? null : null;
@@ -181,7 +180,9 @@ export default function COM_TutorialOverlay({
   }, [activeStep, showCompletion]);
 
   const handleClose = () => {
-    userStore.setTutorialCompleted(true);
+    const utPayload = { onboarding_completed: true };
+    userStore.set('PropertyStatus', utPayload);
+    userStore.post('PropertyStatus', utPayload);
     setShowCompletion(false);
     setRect(null);
     onFinish?.();

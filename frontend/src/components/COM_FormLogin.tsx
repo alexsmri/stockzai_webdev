@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
-import { useEffect } from 'react';
 import { useAlert } from '../context/CTX_Alert';
 
 function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const utStore = useUserStore();
+  const [searchParams] = useSearchParams();
+  const prefillEmail = useMemo(
+    () => (searchParams.get('prefill_email') ?? '').trim(),
+    [searchParams]
+  );
   const [stLoading, setStLoading] = useState(false);
   const navigate = useNavigate();
   const [tokens, setTokens] = useState<Record<string, any> | null>(
@@ -19,6 +23,12 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const name = 'Login';
 
   useUserStoreSync(utStore, 'ActionLogin', setTokens);
+
+  useEffect(() => {
+    if (prefillEmail) {
+      setEmail(prefillEmail);
+    }
+  }, [prefillEmail]);
 
   useEffect(() => {
     (async () => {

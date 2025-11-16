@@ -4,10 +4,11 @@ import IMG_Apple from '../assets/media/IMG_Apple.webp';
 import IMG_Nvidia from '../assets/media/IMG_Nvidia.webp';
 import IMG_Google from '../assets/media/IMG_Google.webp';
 import IMG_Amazon from '../assets/media/IMG_Amazon.webp';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { scale } from '../utils/functions';
 import { useUserStore } from '../context/CTX_UserStore';
+import { useUserStoreSync } from '../hooks/hooks';
 
 const REDIRECT_URL = '/companies/page/free/';
 const CARD_CONFIG = [
@@ -20,18 +21,28 @@ const CARD_CONFIG = [
 export default function PAG_ChooseTicker() {
   const navigate = useNavigate();
   const userStore = useUserStore();
+  const [status, setStatus] = useState<{ completed_onboarding?: boolean } | null>(
+    userStore.read('PropertyStatus') as { completed_onboarding?: boolean } | null
+  );
+
+  useUserStoreSync(userStore, 'PropertyStatus', setStatus);
 
   useEffect(() => {
     const tokens = userStore.read('ActionLogin') as { access?: unknown } | null;
-    console.log(tokens);
     const isLoggedIn = Boolean(tokens && typeof tokens.access === 'string');
     if (!isLoggedIn) {
       userStore.set('PropertyNewUser', true);
     } else {
       userStore.set('PropertyNewUser', false);
+      void userStore.get('PropertyStatus');
+    }
+  }, [userStore]);
+
+  useEffect(() => {
+    if (status?.completed_onboarding) {
       navigate('/companies/search', { replace: true });
     }
-  }, [navigate, userStore]);
+  }, [navigate, status]);
 
   useEffect(() => {
     const path =

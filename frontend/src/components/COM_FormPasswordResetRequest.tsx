@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
+import { useSearchParams } from 'react-router-dom';
 
 export default function COM_FormPasswordResetRequest() {
+  const [searchParams] = useSearchParams();
+  const prefillEmail = useMemo(
+    () => (searchParams.get('prefill_email') ?? '').trim(),
+    [searchParams]
+  );
   const [stEmail, setStEmail] = useState<string>('');
 
   const utStore = useUserStore();
   const { handleAlertOpen } = useAlert();
+
+  useEffect(() => {
+    if (prefillEmail) {
+      setStEmail(prefillEmail);
+    }
+  }, [prefillEmail]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

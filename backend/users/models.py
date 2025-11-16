@@ -98,6 +98,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
 
+class Email(models.Model):
+    email = models.EmailField(_('email address'), unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.email
+
+
 class TokenPasswordReset(models.Model):
     uid = models.CharField(max_length=256, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset_token')
@@ -137,6 +148,15 @@ class UserConsents(models.Model):
     consents_tos = models.BooleanField(default=True)
     consents_information_only = models.BooleanField(default=False)
     given_at = models.DateTimeField(auto_now_add=True)
+
+
+class UserStatus(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='status')
+    completed_onboarding = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Status<{self.user_id}>"
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)

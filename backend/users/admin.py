@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from .models import (
+    Email,
     Pricing,
     Product,
     Purchase,
@@ -11,6 +12,7 @@ from .models import (
     TrackingEvent,
     User,
     UserConsents,
+    UserStatus,
 )
 
 
@@ -81,6 +83,8 @@ admin.site.register(TokenPasswordReset)
 admin.site.register(TokenVerification)
 admin.site.register(TokenNewsletter)
 admin.site.register(UserConsents)
+admin.site.register(UserStatus)
+admin.site.register(Email)
 admin.site.register(TrackingEvent)
 admin.site.register(Purchase)
 

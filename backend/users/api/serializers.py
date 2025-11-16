@@ -4,6 +4,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.conf import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenVerifySerializer as JWTVerifySerializer, TokenRefreshSerializer as JWTRefreshSerializer
+from users.models import UserStatus
 
 User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
@@ -26,6 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.save()
         return user
+
+class UserStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserStatus
+        fields = ["completed_onboarding"]
 
 class TokenLoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

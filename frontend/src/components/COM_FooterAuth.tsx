@@ -9,7 +9,7 @@ export default function COM_FooterAuth() {
   ];
 
   return (
-    <div className="area-flex-col mod-bottom mod-centersides mod-gap-s">
+    <div className="area-flex-col mod-centersides mod-gap-s" style={{ marginTop: 'auto' }}>
       <p className="look-text-x0 look-text-subtle">No investment advice - see disclaimer.</p>
       <div className="area-flex-wrap mod-center mod-gap-l mod-padding-s">
         <a href="/companies/search" className="look-button-subtle">

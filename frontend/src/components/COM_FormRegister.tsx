@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAlert } from '../context/CTX_Alert';
 import { useUserStore } from '../context/CTX_UserStore';
 
@@ -7,10 +7,21 @@ const CONTINUE_LABEL = 'Continue';
 
 function COM_FormRegister() {
   const utStore = useUserStore();
+  const [searchParams] = useSearchParams();
+  const prefillEmail = useMemo(
+    () => (searchParams.get('prefill_email') ?? '').trim(),
+    [searchParams]
+  );
   const [stEmail, setStEmail] = useState('');
   const [stUsername, setStUsername] = useState('');
   const { handleAlertOpen } = useAlert();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (prefillEmail) {
+      setStEmail(prefillEmail);
+    }
+  }, [prefillEmail]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

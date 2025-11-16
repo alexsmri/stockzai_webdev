@@ -3,7 +3,7 @@ import { STO_Base } from "./STO_Base";
 const ROUTE_CONFIG = {
   PropertyCredentials: "/api/users/credentials/",
   PropertyConsents: "/api/users/consents/",
-  PropertyTutorialCompleted: "/local/users/tutorial-completed/",
+  PropertyStatus: "/api/users/status/",
   PropertyAccess: "/api/users/access/",
   PropertySubscriptions: "/api/users/subscriptions/",
   ActionVerification: "/api/users/verification/",
@@ -33,7 +33,7 @@ const PERSISTED_KEYS: ValidKeys[] = [
   "ActionLogin",
   "PropertyCredentials",
   "ActionRefreshToken",
-  "PropertyTutorialCompleted",
+  "PropertyStatus",
   "PropertyNewUser",
   "PropertyAccess",
   "PropertySubscriptions",
@@ -79,17 +79,12 @@ export default class STO_Users extends STO_Base<ValidKeys> {
     return this.data[key];
   }
 
-  setTutorialCompleted(completed: boolean): void {
-    this.update("PropertyTutorialCompleted", { completed });
-  }
-
-  getTutorialCompleted(): boolean {
-    const stored = this.read("PropertyTutorialCompleted");
-    if (typeof stored === "boolean") {
-      return stored;
-    }
+  getOnboardingCompleted(): boolean {
+    const stored = this.read("PropertyStatus");
     if (stored && typeof stored === "object") {
-      return Boolean((stored as { completed?: boolean }).completed);
+      return Boolean(
+        (stored as { completed_onboarding?: boolean }).completed_onboarding
+      );
     }
     return false;
   }
