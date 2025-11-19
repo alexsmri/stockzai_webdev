@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime, time, timedelta
 from statistics import pstdev
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -20,6 +20,81 @@ SYMBOLS_PER_CYCLE = 3
 DEFAULT_INITIAL_CAPITAL = 300.0
 
 
+def _normalize_weight(value: float) -> float:
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    if math.isnan(numeric_value):
+        return 0.0
+    return max(0.0, numeric_value)
+
+
+@dataclass
+class BacktestConfig:
+    start: date = DEFAULT_START_DATE
+    end: date = DEFAULT_END_DATE
+    initial_capital: float = DEFAULT_INITIAL_CAPITAL
+    symbols_per_cycle: int = SYMBOLS_PER_CYCLE
+    financial_weight: float = 0.5
+    valuation_weight: float = 0.5
+    risk_target: Optional[float] = 0.0
+    risk_tolerance: Optional[float] = None
+    sector_filters: Optional[Iterable[str]] = None
+    exclude_symbols: Optional[Iterable[str]] = None
+    buy_frequency_months: int = 1
+    allow_overlap: bool = False
+    holding_period_months: Optional[int] = None
+    reinvest_profits: bool = True
+    transaction_fee_pct: float = 0.0
+    benchmark_symbol: str = "^GSPC"
+
+    def __post_init__(self) -> None:
+        if self.start > self.end:
+            raise ValueError("start date must be earlier than end date.")
+        if self.initial_capital <= 0:
+            raise ValueError("initial_capital must be positive.")
+        self.symbols_per_cycle = max(3, min(int(self.symbols_per_cycle), 20))
+        if not (1 <= self.buy_frequency_months <= 12):
+            raise ValueError("buy_frequency_months must range between 1 and 12.")
+        if self.holding_period_months is None:
+            self.holding_period_months = self.buy_frequency_months
+        self.holding_period_months = max(1, int(self.holding_period_months))
+        if not self.allow_overlap and self.holding_period_months != self.buy_frequency_months:
+            raise ValueError("holding_period_months must equal buy_frequency_months when overlap is disabled.")
+        self.transaction_fee_pct = max(0.0, float(self.transaction_fee_pct))
+        if self.transaction_fee_pct > 1.0:
+            self.transaction_fee_pct /= 100.0
+        self.financial_weight = _normalize_weight(self.financial_weight)
+        self.valuation_weight = _normalize_weight(self.valuation_weight)
+        total_weight = self.financial_weight + self.valuation_weight
+        if total_weight == 0:
+            self.financial_weight = self.valuation_weight = 0.5
+        else:
+            self.financial_weight /= total_weight
+            self.valuation_weight /= total_weight
+        if self.risk_tolerance is not None:
+            self.risk_tolerance = max(1.0, min(10.0, float(self.risk_tolerance)))
+        if self.sector_filters is not None:
+            self.sector_filters = tuple(sorted({sector for sector in self.sector_filters if sector}))
+        if self.exclude_symbols is not None:
+            self.exclude_symbols = tuple(sorted({symbol.upper() for symbol in self.exclude_symbols if symbol}))
+
+    def with_window(self, start: date, end: date) -> "BacktestConfig":
+        return replace(self, start=start, end=end)
+
+    @property
+    def holding_period(self) -> int:
+        return int(self.holding_period_months or self.buy_frequency_months)
+
+
+@dataclass
+class _ActivePosition:
+    trade: TradeLeg
+    allocation: float
+    shares: float
+    planned_exit_date: date
+    entry_fee: float = 0.0
 @dataclass
 class TradeLeg:
     symbol: str
@@ -30,6 +105,7 @@ class TradeLeg:
     entry_date: Optional[date]
     exit_date: Optional[date]
     pnl: float
+    fees_paid: float = 0.0
     notes: List[str] = field(default_factory=list)
 
 
@@ -51,6 +127,7 @@ class MonthlyCycle:
 @dataclass
 class BacktestReport:
     cycles: List[MonthlyCycle]
+    config: Optional[BacktestConfig] = None
 
     def all_trades(self, include_cash_legs: bool = False) -> List[TradeLeg]:
         trades: List[TradeLeg] = []
@@ -220,12 +297,13 @@ class BacktestReport:
             returns.append((exit_price - entry_price) / entry_price)
         return returns
 
-    def benchmark_summary(self, symbol: str = "^GSPC") -> Optional[Dict[str, float]]:
-        returns = self.benchmark_monthly_returns(symbol)
+    def benchmark_summary(self, symbol: Optional[str] = None) -> Optional[Dict[str, float]]:
+        benchmark_symbol = symbol or (self.config.benchmark_symbol if self.config else "^GSPC")
+        returns = self.benchmark_monthly_returns(benchmark_symbol)
         if not returns:
             return None
         stats = _calculate_return_statistics(returns, self.starting_capital)
-        stats["symbol"] = symbol
+        stats["symbol"] = benchmark_symbol
         stats["monthly_returns"] = returns
         return stats
 
@@ -241,11 +319,11 @@ def _month_delta(current: date, months: int = 1) -> date:
     return date(year, month, current.day)
 
 
-def _iter_cycle_dates(start: date, end: date) -> Iterable[date]:
+def _iter_cycle_dates(start: date, end: date, step_months: int = 1) -> Iterable[date]:
     cursor = start
     while cursor <= end:
         yield cursor
-        cursor = _month_delta(cursor, 1)
+        cursor = _month_delta(cursor, step_months)
 
 
 def _to_end_of_day(value: date) -> datetime:
@@ -327,11 +405,25 @@ def _fetch_top_symbols(
     db: DB_Handler,
     as_of: date,
     limit: int = SYMBOLS_PER_CYCLE,
-    risk_target: float = 0.0,
+    risk_target: Optional[float] = 0.0,
+    financial_weight: float = 0.5,
+    valuation_weight: float = 0.5,
+    risk_tolerance: Optional[float] = None,
+    sectors: Optional[Iterable[str]] = None,
+    exclude_symbols: Optional[Iterable[str]] = None,
 ) -> Dict[str, float]:
     financial_info = db.dbq_get_kpi_info(_resolve_kpi_name("financial_score"))
     valuation_info = db.dbq_get_kpi_info(_resolve_kpi_name("valuation_score"))
     risk_info = db.dbq_get_kpi_info(_resolve_kpi_name("risk_score"))
+
+    sector_info = None
+    sector_filter = tuple(sectors) if sectors else tuple()
+    if sector_filter:
+        try:
+            sector_info = db.dbq_get_kpi_info(_resolve_kpi_name("sector"))
+        except Exception:
+            logger.warning("Unable to resolve sector KPI; ignoring provided sector filter.")
+            sector_filter = tuple()
 
     financial_table = financial_info["role"]
     valuation_table = valuation_info["role"]
@@ -339,6 +431,36 @@ def _fetch_top_symbols(
     financial_kpi_id = int(financial_info["id"])
     valuation_kpi_id = int(valuation_info["id"])
     risk_kpi_id = int(risk_info["id"])
+
+    sector_cte = ""
+    sector_join = ""
+    sector_condition = ""
+    if sector_info and sector_filter:
+        sector_table = sector_info["role"]
+        sector_kpi_id = int(sector_info["id"])
+        sector_cte = f""",
+        sector_ranked AS (
+            SELECT s.SYMBOL AS symbol,
+                s.value AS sector_value,
+                ROW_NUMBER() OVER (PARTITION BY s.SYMBOL ORDER BY s.date DESC) AS rn
+            FROM `{sector_table}` s
+            WHERE s.KPI = :sector_kpi_id
+            AND s.date <= :as_of
+            AND s.value IS NOT NULL
+        )"""
+        sector_join = "JOIN sector_ranked sr ON sr.symbol = fr.symbol"
+        sector_condition = "AND sr.rn = 1 AND sr.sector_value IN :sector_filters"
+
+    risk_condition = ""
+    if risk_tolerance is not None:
+        risk_condition = "AND rr.risk_value <= :risk_tolerance"
+    elif risk_target is not None:
+        risk_condition = "AND rr.risk_value = :risk_target"
+
+    exclude_condition = ""
+    excluded = tuple(exclude_symbols) if exclude_symbols else tuple()
+    if excluded:
+        exclude_condition = "AND fr.symbol NOT IN :excluded_symbols"
 
     query = f"""
         WITH financial_ranked AS (
@@ -365,17 +487,21 @@ def _fetch_top_symbols(
                 ROW_NUMBER() OVER (PARTITION BY r.SYMBOL ORDER BY r.date DESC) AS rn
             FROM `{risk_table}` r
             WHERE r.KPI = :risk_kpi_id
+            AND r.date <= :as_of
             AND r.value IS NOT NULL
-        )
+        ){sector_cte}
         SELECT fr.symbol,
-            (fr.financial_value + vr.valuation_value) / 2 AS aggregated_score
+            (fr.financial_value * :financial_weight + vr.valuation_value * :valuation_weight) AS aggregated_score
         FROM financial_ranked fr
         JOIN valuation_ranked vr ON vr.symbol = fr.symbol
         JOIN risk_ranked rr ON rr.symbol = fr.symbol
+        {sector_join}
         WHERE fr.rn = 1
         AND vr.rn = 1
         AND rr.rn = 1
-        AND rr.risk_value = :risk_target
+        {risk_condition}
+        {sector_condition}
+        {exclude_condition}
         ORDER BY aggregated_score DESC
         LIMIT :limit
     """
@@ -384,9 +510,20 @@ def _fetch_top_symbols(
         "valuation_kpi_id": valuation_kpi_id,
         "risk_kpi_id": risk_kpi_id,
         "as_of": _to_end_of_day(as_of),
-        "risk_target": risk_target,
         "limit": limit,
+        "financial_weight": financial_weight,
+        "valuation_weight": valuation_weight,
     }
+    if risk_tolerance is not None:
+        params["risk_tolerance"] = risk_tolerance
+    elif risk_target is not None:
+        params["risk_target"] = risk_target
+    if sector_info and sector_filter:
+        params["sector_kpi_id"] = int(sector_info["id"])
+        params["sector_filters"] = sector_filter
+    if excluded:
+        params["excluded_symbols"] = excluded
+
     rows = db.dbu_read_execute(query, params=params)
     return {symbol: float(score) for symbol, score in rows if symbol and score is not None}
 
@@ -424,102 +561,182 @@ def run_monthly_top_score_backtest(
     initial_capital: float = DEFAULT_INITIAL_CAPITAL,
     symbols_per_cycle: int = SYMBOLS_PER_CYCLE,
     db: Optional[DB_Handler] = None,
+    config: Optional[BacktestConfig] = None,
 ) -> BacktestReport:
+    cfg = config or BacktestConfig(
+        start=start,
+        end=end,
+        initial_capital=initial_capital,
+        symbols_per_cycle=symbols_per_cycle,
+    )
     db_handler = db or DB_Handler("companies")
     cycles: List[MonthlyCycle] = []
-    capital = initial_capital
+    cash = cfg.initial_capital
+    withdrawn_profits = 0.0
+    active_positions: List[_ActivePosition] = []
 
-    for cycle_start in _iter_cycle_dates(start, end):
-        cycle_end = _month_delta(cycle_start, 1)
-        logger.info(f"Current Cycle start:{cycle_start}")
-        selection = _fetch_top_symbols(db_handler, cycle_start, symbols_per_cycle)
-        logger.info(f"Current Cycle selection:{selection}")
+    def _portfolio_total() -> float:
+        return cash + sum(position.allocation for position in active_positions) + withdrawn_profits
+
+    def _close_positions(upto_date: date, *, force: bool = False) -> bool:
+        nonlocal cash, withdrawn_profits
+        closed_any = False
+        remaining: List[_ActivePosition] = []
+        for position in active_positions:
+            should_close = force or position.planned_exit_date <= upto_date
+            if not should_close:
+                remaining.append(position)
+                continue
+            closed_any = True
+            lookup_date = position.planned_exit_date if not force else min(position.planned_exit_date, upto_date)
+            exit_price, exit_trade_date = _fetch_price(position.trade.symbol, lookup_date)
+            if exit_price is None:
+                exit_price = position.trade.entry_price or 0.0
+                exit_trade_date = exit_trade_date or lookup_date
+                position.trade.notes.append("Missing exit price; assumed entry price.")
+            exit_value = position.shares * exit_price
+            exit_fee = exit_value * cfg.transaction_fee_pct
+            net_exit = exit_value - exit_fee
+            cash += net_exit
+            total_fees = position.entry_fee + exit_fee
+            pnl = net_exit - position.allocation - position.entry_fee
+            position.trade.exit_price = exit_price
+            position.trade.exit_date = exit_trade_date
+            position.trade.pnl = pnl
+            position.trade.fees_paid = total_fees
+            if force and position.planned_exit_date > upto_date:
+                position.trade.notes.append(f"Force-closed on {upto_date.isoformat()} before planned exit.")
+            if not cfg.reinvest_profits and pnl > 0:
+                cash -= pnl
+                withdrawn_profits += pnl
+        active_positions[:] = remaining
+        return closed_any
+
+    for cycle_start in _iter_cycle_dates(cfg.start, cfg.end, step_months=cfg.buy_frequency_months):
+        _close_positions(cycle_start)
+        capital_in = _portfolio_total()
+        cycle_end = min(_month_delta(cycle_start, cfg.buy_frequency_months), cfg.end)
+        selection = _fetch_top_symbols(
+            db_handler,
+            cycle_start,
+            limit=cfg.symbols_per_cycle,
+            risk_target=cfg.risk_target,
+            financial_weight=cfg.financial_weight,
+            valuation_weight=cfg.valuation_weight,
+            risk_tolerance=cfg.risk_tolerance,
+            sectors=cfg.sector_filters,
+            exclude_symbols=cfg.exclude_symbols,
+        )
+        logger.info("Cycle start %s selection: %s", cycle_start, selection)
         notes: List[str] = []
-        if len(selection) < symbols_per_cycle:
-            notes.append(
-                f"Only found {len(selection)} eligible stocks on {cycle_start.isoformat()}."
-            )
-
-        allocation_per_symbol = capital / symbols_per_cycle if selection else 0.0
+        if len(selection) < cfg.symbols_per_cycle:
+            notes.append(f"Only found {len(selection)} eligible stocks on {cycle_start.isoformat()}.")
         picks: List[TradeLeg] = []
-        realized_value = 0.0
 
-        for symbol in selection:
-            allocation = allocation_per_symbol
-            entry_price, actual_entry_date = _fetch_price(symbol, cycle_start)
+        target_positions = min(len(selection), cfg.symbols_per_cycle)
+        allocation_per_symbol = cash / target_positions if target_positions and cash > 0 else 0.0
+        if allocation_per_symbol <= 0 and target_positions:
+            notes.append("Insufficient available cash for new positions.")
+
+        for symbol in selection.keys():
+            if allocation_per_symbol <= 0 or cash <= 0:
+                break
             leg_notes: List[str] = []
+            entry_price, actual_entry_date = _fetch_price(symbol, cycle_start)
             if entry_price is None:
-                realized_value += allocation
-                leg_notes.append("Missing entry price, treated as holding cash.")
+                leg_notes.append("Missing entry price, capital held as cash.")
                 picks.append(
                     TradeLeg(
                         symbol=symbol,
-                        allocation=allocation,
+                        allocation=allocation_per_symbol,
                         shares=0.0,
                         entry_price=None,
                         exit_price=None,
                         entry_date=None,
                         exit_date=None,
                         pnl=0.0,
+                        fees_paid=0.0,
                         notes=leg_notes,
                     )
                 )
                 continue
 
-            shares = allocation / entry_price if entry_price else 0.0
-            exit_price, actual_exit_date = _fetch_price(symbol, cycle_end)
-            if exit_price is None:
-                realized_value += allocation
-                leg_notes.append("Missing exit price, capital rolled unchanged.")
-                picks.append(
-                    TradeLeg(
-                        symbol=symbol,
-                        allocation=allocation,
-                        shares=shares,
-                        entry_price=entry_price,
-                        exit_price=None,
-                        entry_date=actual_entry_date,
-                        exit_date=None,
-                        pnl=0.0,
-                        notes=leg_notes,
-                    )
-                )
-                continue
+            entry_fee = allocation_per_symbol * cfg.transaction_fee_pct
+            total_required = allocation_per_symbol + entry_fee
+            if cash < total_required:
+                notes.append(f"Ran out of cash before purchasing {symbol}.")
+                break
 
-            exit_value = shares * exit_price
-            realized_value += exit_value
-            pnl = exit_value - allocation
-            picks.append(
-                TradeLeg(
-                    symbol=symbol,
-                    allocation=allocation,
+            cash -= total_required
+            shares = allocation_per_symbol / entry_price if entry_price else 0.0
+            planned_exit = _month_delta(cycle_start, cfg.holding_period)
+            trade = TradeLeg(
+                symbol=symbol,
+                allocation=allocation_per_symbol,
+                shares=shares,
+                entry_price=entry_price,
+                exit_price=None,
+                entry_date=actual_entry_date,
+                exit_date=None,
+                pnl=0.0,
+                fees_paid=entry_fee,
+                notes=leg_notes,
+            )
+            picks.append(trade)
+            active_positions.append(
+                _ActivePosition(
+                    trade=trade,
+                    allocation=allocation_per_symbol,
                     shares=shares,
-                    entry_price=entry_price,
-                    exit_price=exit_price,
-                    entry_date=actual_entry_date,
-                    exit_date=actual_exit_date,
-                    pnl=pnl,
-                    notes=leg_notes,
+                    planned_exit_date=planned_exit,
+                    entry_fee=entry_fee,
                 )
             )
 
         if not selection:
-            realized_value = capital
             notes.append("No eligible stocks were found; capital carried forward unchanged.")
 
         cycle = MonthlyCycle(
             cycle_start=cycle_start,
             cycle_end=cycle_end,
-            capital_in=capital,
-            capital_out=realized_value,
+            capital_in=capital_in,
+            capital_out=_portfolio_total(),
             picks=picks,
             selection_scores=selection,
             notes=notes,
         )
         cycles.append(cycle)
-        capital = realized_value
 
-    return BacktestReport(cycles=cycles)
+    pre_settlement = _portfolio_total()
+    settled = _close_positions(cfg.end, force=True)
+    final_total = _portfolio_total()
+    if settled:
+        settlement_cycle = MonthlyCycle(
+            cycle_start=cfg.end,
+            cycle_end=cfg.end,
+            capital_in=pre_settlement,
+            capital_out=final_total,
+            picks=[],
+            selection_scores={},
+            notes=["Settled remaining open positions at the end of the backtest."],
+        )
+        cycles.append(settlement_cycle)
+    elif cycles:
+        cycles[-1].capital_out = final_total
+    else:
+        cycles.append(
+            MonthlyCycle(
+                cycle_start=cfg.start,
+                cycle_end=cfg.end,
+                capital_in=cfg.initial_capital,
+                capital_out=final_total,
+                picks=[],
+                selection_scores={},
+                notes=["No trades executed."],
+            )
+        )
+
+    return BacktestReport(cycles=cycles, config=cfg)
 
 
 def run_backtest_with_rolling_windows(
@@ -530,6 +747,7 @@ def run_backtest_with_rolling_windows(
     db: Optional[DB_Handler] = None,
     window_months: int = 6,
     window_step_months: int = 3,
+    config: Optional[BacktestConfig] = None,
 ) -> Tuple[BacktestReport, List[Tuple[Tuple[date, date], BacktestReport]]]:
     """
     Run the full-period backtest and a series of rolling 6-month windows starting each quarter.
@@ -538,26 +756,26 @@ def run_backtest_with_rolling_windows(
         raise ValueError("window_months and window_step_months must be positive.")
 
     db_handler = db or DB_Handler("companies")
-    primary_report = run_monthly_top_score_backtest(
+    base_config = config or BacktestConfig(
         start=start,
         end=end,
         initial_capital=initial_capital,
         symbols_per_cycle=symbols_per_cycle,
+    )
+    primary_report = run_monthly_top_score_backtest(
         db=db_handler,
+        config=base_config,
     )
 
     rolling_reports: List[Tuple[Tuple[date, date], BacktestReport]] = []
-    window_start = start
-    while window_start < end:
+    window_start = base_config.start
+    while window_start < base_config.end:
         window_end = _month_delta(window_start, window_months)
-        if window_end > end:
+        if window_end > base_config.end:
             break
         window_report = run_monthly_top_score_backtest(
-            start=window_start,
-            end=window_end,
-            initial_capital=initial_capital,
-            symbols_per_cycle=symbols_per_cycle,
             db=db_handler,
+            config=base_config.with_window(window_start, window_end),
         )
         rolling_reports.append(((window_start, window_end), window_report))
         window_start = _month_delta(window_start, window_step_months)
@@ -575,8 +793,9 @@ def print_backtest_summary(
     report: BacktestReport,
     rolling_reports: Optional[List[Tuple[Tuple[date, date], BacktestReport]]] = None,
     top_n: int = 10,
-    benchmark_symbol: str = "^GSPC",
+    benchmark_symbol: Optional[str] = None,
 ) -> None:
+    benchmark = benchmark_symbol or (report.config.benchmark_symbol if report.config else "^GSPC")
     print("=== Backtest Summary ===")
     print(f"Ending capital: ${report.ending_capital:,.2f}")
     print(f"Cumulative return: {report.cumulative_return_pct:.2f}%")
@@ -598,9 +817,9 @@ def print_backtest_summary(
             f"{randomness[0] * 100:.2f}% | {randomness[1] * 100:.2f}% | {randomness[2] * 100:.2f}%"
         )
 
-    benchmark_stats = report.benchmark_summary(benchmark_symbol)
+    benchmark_stats = report.benchmark_summary(benchmark)
     if benchmark_stats:
-        print(f"\nBenchmark ({benchmark_symbol})")
+        print(f"\nBenchmark ({benchmark})")
         print(f"  Cumulative return: {benchmark_stats['cumulative_return_pct']:.2f}%")
         print(f"  Absolute return: ${benchmark_stats['absolute_return']:,.2f}")
         print(f"  Average monthly return: {benchmark_stats['average_monthly_return'] * 100:.2f}%")
@@ -645,9 +864,9 @@ def print_backtest_summary(
             print(f"  Sortino: {_format_ratio(window_report.sortino_ratio)}")
             print(f"  Max Drawdown: {window_report.max_drawdown * 100:.2f}%")
             print(f"  Calmar: {_format_ratio(window_report.calmar_ratio)}")
-            window_benchmark = window_report.benchmark_summary(benchmark_symbol)
+            window_benchmark = window_report.benchmark_summary(benchmark)
             if window_benchmark:
-                print(f"  Benchmark ({benchmark_symbol}) cumulative: {window_benchmark['cumulative_return_pct']:.2f}%")
+                print(f"  Benchmark ({benchmark}) cumulative: {window_benchmark['cumulative_return_pct']:.2f}%")
                 print(f"    Avg monthly return: {window_benchmark['average_monthly_return'] * 100:.2f}%")
                 print(f"    Sharpe: {window_benchmark['sharpe_ratio']:.2f}")
                 print(f"    Sortino: {_format_ratio(window_benchmark['sortino_ratio'])}")
@@ -701,6 +920,7 @@ def print_backtest_report(report: BacktestReport) -> None:
 
 
 __all__ = [
+    "BacktestConfig",
     "BacktestReport",
     "MonthlyCycle",
     "TradeLeg",
