@@ -1,13 +1,16 @@
 import COM_FormRegister from '../components/COM_FormRegister';
-import COM_Hero from '../components/COM_Hero';
 import COM_FooterAuth from '../components/COM_FooterAuth';
+import COM_AuthShowcase from '../components/COM_AuthShowcase';
+import IMG_ApplicationDemo from '../assets/media/IMG_ApplicationDemo.png';
 
 function PAG_Register() {
   return (
     <>
-      <COM_Hero prFlex={true}>
-        <COM_FormRegister />
-      </COM_Hero>
+      <div className="area-flex-col mod-align-stretch mod-center">
+        <COM_AuthShowcase prScreenshotSrc={IMG_ApplicationDemo}>
+          <COM_FormRegister />
+        </COM_AuthShowcase>
+      </div>
       <COM_FooterAuth />
     </>
   );

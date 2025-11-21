@@ -1,19 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAlert } from '../context/CTX_Alert';
-import { useUserStore } from '../context/CTX_UserStore';
 
 const CONTINUE_LABEL = 'Continue';
 
 function COM_FormRegister() {
-  const utStore = useUserStore();
   const [searchParams] = useSearchParams();
   const prefillEmail = useMemo(
     () => (searchParams.get('prefill_email') ?? '').trim(),
     [searchParams]
   );
   const [stEmail, setStEmail] = useState('');
-  const [stUsername, setStUsername] = useState('');
   const { handleAlertOpen } = useAlert();
   const navigate = useNavigate();
 
@@ -23,39 +20,30 @@ function COM_FormRegister() {
     }
   }, [prefillEmail]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const email = stEmail.trim();
-    const username = stUsername.trim();
 
-    if (!email || !username) {
-      handleAlertOpen(
-        'Missing details',
-        'Please provide both email and username to continue.',
-        'f'
-      );
+    if (!email) {
+      handleAlertOpen('Missing email', 'Please provide an email to continue.', 'f');
       return;
     }
-    const utValid = await utStore.post('ActionRegistrationCheck', {
-      email: email,
-      username: username,
-    });
-    if (utValid) {
-      const params = new URLSearchParams({ email, username });
-      navigate(`/users/register/password?${params.toString()}`);
-    } else {
-      handleAlertOpen(
-        'An error occurred',
-        utStore.getError('ActionRegistrationCheck') as string,
-        'f'
-      );
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      handleAlertOpen('Invalid email', 'Please enter a valid email address.', 'f');
+      return;
     }
+
+    const params = new URLSearchParams({ email });
+    navigate(`/users/register/password?${params.toString()}`);
   };
 
   return (
     <>
-      <h1 className="look-text-x4">Sign Up</h1>
+      <h1 className="look-text-x4">Create your free account</h1>
+      <p className="look-text-x1 look-priority-low mod-align-center">
+        30-second signup - Get instant access to million-dollar insights
+      </p>
       <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
@@ -63,13 +51,6 @@ function COM_FormRegister() {
             value={stEmail}
             onChange={(e) => setStEmail(e.target.value)}
             placeholder="Email"
-            className="look-input-auth"
-          />
-          <input
-            type="text"
-            value={stUsername}
-            onChange={(e) => setStUsername(e.target.value)}
-            placeholder="Username"
             className="look-input-auth"
           />
           <button className="look-button-secondary look-button-auth">{CONTINUE_LABEL}</button>

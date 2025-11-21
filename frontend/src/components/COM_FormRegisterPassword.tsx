@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
@@ -6,12 +6,16 @@ import { REGISTRATION_PASSWORD_STORAGE_KEY } from '../constants';
 
 interface ITF_FormRegisterPasswordProps {
   prEmail: string;
-  prUsername: string;
+  prPrefillUsername?: string;
 }
 
 const CONTINUE_LABEL = 'Create Account';
 
-function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPasswordProps) {
+function COM_FormRegisterPassword({
+  prEmail,
+  prPrefillUsername = '',
+}: ITF_FormRegisterPasswordProps) {
+  const [stUsername, setStUsername] = useState(prPrefillUsername);
   const [stPassword, setPassword] = useState('');
   const [stPasswordConfirm, setPasswordConfirm] = useState('');
   const [stConsentsNewsletter, setStConsentsNewsletter] = useState(false);
@@ -23,8 +27,19 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
   const { handleAlertOpen } = useAlert();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setStUsername(prPrefillUsername);
+  }, [prPrefillUsername]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const username = stUsername.trim();
+
+    if (!username) {
+      handleAlertOpen('Missing username', 'Please choose a username to continue.', 'f');
+      return;
+    }
+
     if (stPassword !== stPasswordConfirm) {
       handleAlertOpen('Check passwords', 'Passwords do not match.', 'f');
       return;
@@ -46,9 +61,22 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
 
     setStLoading(true);
     try {
+      const utCheck = await utStore.post('ActionRegistrationCheck', {
+        email: prEmail,
+        username: username,
+      });
+
+      if (!utCheck) {
+        const utError = utStore.getError('ActionRegistrationCheck') as string;
+        handleAlertOpen('Check your details', utError || 'Please try a different username.', 'f', {
+          timeout: 5000,
+        });
+        return;
+      }
+
       const utRes = await utStore.post('ActionRegistration', {
         email: prEmail,
-        username: prUsername,
+        username: username,
         password: stPassword,
         consents: {
           consents_newsletter: stConsentsNewsletter,
@@ -92,7 +120,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
       const params = new URLSearchParams({
         uid: utTokenRes.uid,
         email: prEmail,
-        username: prUsername,
+        username: username,
       });
       navigate(`/users/verification?${params.toString()}`);
     } finally {
@@ -102,9 +130,19 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
 
   return (
     <>
-      <h1 className="look-text-x4">Sign Up</h1>
+      <h1 className="look-text-x4">Secure your account</h1>
+      <p className="look-text-x1 look-priority-low mod-align-center">
+        Step 2: Choose a username and password.
+      </p>
       <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
+          <input
+            type="text"
+            value={stUsername}
+            onChange={(e) => setStUsername(e.target.value)}
+            placeholder="Username"
+            className="look-input-auth"
+          />
           <input
             type="password"
             value={stPassword}
@@ -116,7 +154,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
             type="password"
             value={stPasswordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
-            placeholder="Repeat Password"
+            placeholder="Repeat password"
             className="look-input-auth"
           />
           <label
@@ -163,7 +201,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
               checked={stConsentsNewsletter}
               onChange={(e) => setStConsentsNewsletter(e.target.checked)}
             />
-            Get stockz.ai newsletter for product updates & special offers (can be canceled at any
+            Get stockz.ai newsletter for product updates and special offers (can be canceled at any
             time)
           </label>
           <button
@@ -175,7 +213,7 @@ function COM_FormRegisterPassword({ prEmail, prUsername }: ITF_FormRegisterPassw
         </form>
         <div className="area-form-auth-links">
           <a href="/users/register" className="look-button-subtle">
-            Change email or username
+            Change email
           </a>
         </div>
       </div>
