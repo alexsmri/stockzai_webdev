@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_START_DATE = date(2024, 1, 3)
 DEFAULT_END_DATE = date(2025, 10, 3)
-SYMBOLS_PER_CYCLE = 3
-DEFAULT_INITIAL_CAPITAL = 300.0
+SYMBOLS_PER_CYCLE = 10
+DEFAULT_INITIAL_CAPITAL = 100
 
 
 def _normalize_weight(value: float) -> float:

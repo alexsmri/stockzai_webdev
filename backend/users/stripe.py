@@ -15,6 +15,7 @@ from stockzAI import settings
 from stockzAI.common.response import api_json_response
 from django.utils.dateparse import parse_datetime
 from .models import Pricing, Product, Purchase, Subscription, User
+from .meta_capi import send_purchase_event
 
 STRIPE_API_KEY = settings.STRIPE_API_KEY or ""
 STRIPE_ENDPOINT_SECRET = settings.STRIPE_ENDPOINT_SECRET or ""
@@ -239,7 +240,7 @@ def _ensure_product_and_pricing(price: dict[str, Any]) -> tuple[Product, Pricing
     return product, pricing
 
 
-def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
+def webhook_checkout_session_completed(session: dict[str, Any], request=None) -> bool:
     customer_id = session.get("customer")
     session_id = session.get("id")
     if not customer_id:
@@ -263,6 +264,7 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
     except stripe.StripeError as exc:
         logger.exception("Failed to list Stripe Checkout line items for %s: %s", session_id, exc)
         return False
+    event_source_url = session.get("success_url") or session.get("cancel_url")
 
     for item in line_items:
         price_data = item.get("price")
@@ -316,6 +318,15 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
                 subscription.is_active = True
                 subscription.cancel_at_period_end = False
                 subscription.save()
+            send_purchase_event(
+                request=request,
+                user=user,
+                value=pricing.unit_amount if pricing else None,
+                currency=pricing.currency if pricing else None,
+                subscription=subscription,
+                event_source_url=event_source_url,
+                subscription_period_start=(subscription_obj or {}).get("current_period_start") if subscription_obj else None,
+            )
 
         elif session_mode == "payment":
             payment_reference = session.get("payment_intent") or session_id
@@ -327,11 +338,20 @@ def webhook_checkout_session_completed(session: dict[str, Any]) -> bool:
                     "provider_transaction_id": payment_reference or "",
                 },
             )
+            send_purchase_event(
+                request=request,
+                user=user,
+                value=pricing.unit_amount if pricing else None,
+                currency=pricing.currency if pricing else None,
+                subscription=None,
+                event_source_url=event_source_url,
+                payment_reference=str(payment_reference or session_id),
+            )
         handled_item = True
 
     return handled_item
 
-def webhook_subscription_created_or_updated(subscription_obj: dict[str, Any]) -> bool:
+def webhook_subscription_created_or_updated(subscription_obj: dict[str, Any], request=None) -> bool:
     subscription_id = subscription_obj.get("id")
     customer_id = subscription_obj.get("customer")
     if not subscription_id or not customer_id:
@@ -383,6 +403,14 @@ def webhook_subscription_created_or_updated(subscription_obj: dict[str, Any]) ->
             subscription.expires_at = expires_at
 
         subscription.save()
+        send_purchase_event(
+            request=request,
+            user=user,
+            value=pricing.unit_amount if pricing else None,
+            currency=pricing.currency if pricing else None,
+            subscription=subscription,
+            subscription_period_start=subscription_obj.get("current_period_start"),
+        )
         handled = True
 
     return handled
@@ -505,12 +533,12 @@ def stripe_webhook(request):
         out = False
         event_handlers = {
             "customer.created": webhook_customer_created,
-            "checkout.session.completed": webhook_checkout_session_completed,
+            "checkout.session.completed": lambda payload: webhook_checkout_session_completed(payload, request=request),
             "checkout.session.async_payment_failed": webhook_checkout_session_failed,
-            "checkout.session.async_payment_succeeded": webhook_checkout_session_completed,
+            "checkout.session.async_payment_succeeded": lambda payload: webhook_checkout_session_completed(payload, request=request),
             "checkout.session.expired": webhook_checkout_session_expired,
-            "customer.subscription.created": webhook_subscription_created_or_updated,
-            "customer.subscription.updated": webhook_subscription_created_or_updated,
+            "customer.subscription.created": lambda payload: webhook_subscription_created_or_updated(payload, request=request),
+            "customer.subscription.updated": lambda payload: webhook_subscription_created_or_updated(payload, request=request),
             "customer.subscription.deleted": webhook_subscription_deleted,
             "product.created": webhook_product_created_or_updated,
             "product.updated": webhook_product_created_or_updated,

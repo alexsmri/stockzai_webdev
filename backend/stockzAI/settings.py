@@ -47,6 +47,10 @@ X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN")
 X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET")
 X_API_POST_URL = os.getenv("X_API_POST_URL", "https://api.x.com/2/tweets")
 X_DEFAULT_COMMUNITY_ID = os.getenv("X_DEFAULT_COMMUNITY_ID")
+META_PIXEL_ID = os.getenv("META_PIXEL_ID")
+META_CAPI_ACCESS_TOKEN = os.getenv("META_CAPI_ACCESS_TOKEN")
+META_TEST_EVENT_CODE = os.getenv("META_TEST_EVENT_CODE")
+META_CAPI_ENABLED = env_flag("META_CAPI_ENABLED", default=False)
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 PAYWALL_ENABLED = env_flag("PAYWALL_ENABLED", default=True)

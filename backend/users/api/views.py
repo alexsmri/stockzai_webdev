@@ -15,6 +15,7 @@ from users.models import (
     Product,
     PermissionCode,
 )
+from users.meta_capi import send_registration_event
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
@@ -61,6 +62,7 @@ class RegisterUserView(generics.CreateAPIView):
             if field in consents_data
         }
         UserConsents.objects.create(user=user, **sanitized)
+        transaction.on_commit(lambda: send_registration_event(self.request, user))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
