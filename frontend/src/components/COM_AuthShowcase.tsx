@@ -4,14 +4,14 @@ import { TABLET_BREAKPOINT } from '../constants';
 import { scale } from '../utils/functions';
 
 const WRAPPER_CLASSES = {
-  mobile: 'area-flex-col mod-wh-full mod-gap-xl',
-  desktop: 'area-flex-row mod-wh-full mod-gap-xl',
+  mobile: 'area-flex-col mod-wh-full mod-gap-xl mod-space-around',
+  desktop: 'area-flex-row mod-align-center mod-wh-full mod-gap-xl mod-space-around',
 };
 
 const IMAGE_WIDTH_CONSTANT = 30;
 const IMAGE_WIDTHS = {
   mobile: scale(IMAGE_WIDTH_CONSTANT),
-  desktop: `clamp(${scale(IMAGE_WIDTH_CONSTANT)}, 100%, ${scale(2 * IMAGE_WIDTH_CONSTANT)})`,
+  desktop: `clamp(${scale(IMAGE_WIDTH_CONSTANT)}, 80%, ${scale(2 * IMAGE_WIDTH_CONSTANT)})`,
 };
 interface ITF_AuthShowcaseProps {
   children: ReactNode;
@@ -27,10 +27,10 @@ function COM_AuthShowcase({
   const { width } = useWindowDimensions();
   const isMobile = width <= TABLET_BREAKPOINT;
   const wrapperClass = isMobile ? WRAPPER_CLASSES.mobile : WRAPPER_CLASSES.desktop;
-  const imgWidth = isMobile ? IMAGE_WIDTHS.mobile : IMAGE_WIDTHS.desktop;
+  const imgWidth = isMobile ? IMAGE_WIDTHS.desktop : IMAGE_WIDTHS.desktop;
   return (
     <div className={wrapperClass}>
-      <div className="area-flex-col mod-align-stretch">{children}</div>
+      {!isMobile && <div className="area-flex-col mod-align-stretch">{children}</div>}
       <div
         style={{
           width: imgWidth,
@@ -43,9 +43,10 @@ function COM_AuthShowcase({
         <img
           src={prScreenshotSrc}
           alt={prScreenshotAlt}
-          style={{ width: imgWidth, height: 'auto' }}
+          style={{ minWidth: '100%', height: 'auto' }}
         />
       </div>
+      {isMobile && <div className="area-flex-col mod-align-stretch">{children}</div>}
     </div>
   );
 }
