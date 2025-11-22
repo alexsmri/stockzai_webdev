@@ -1,7 +1,7 @@
 import COM_FormRegister from '../components/COM_FormRegister';
 import COM_FooterAuth from '../components/COM_FooterAuth';
 import COM_AuthShowcase from '../components/COM_AuthShowcase';
-import IMG_ApplicationDemo from '../assets/media/IMG_ApplicationDemo.png';
+import IMG_ApplicationDemo from '../assets/media/IMG_ApplicationDemo.webp';
 
 function PAG_Register() {
   return (
