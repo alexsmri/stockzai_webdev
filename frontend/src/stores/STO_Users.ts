@@ -24,7 +24,10 @@ const ROUTE_CONFIG = {
   ActionResumeSubscription: "/api/users/subscriptions/resume/",
   ActionTrackOnboardingChooseTicker: "/api/users/tracking/onboarding/choose-ticker/",
   StateEditing: "",
-  PropertyNewUser: ""
+  PropertyNewUser: "",
+  ActionSocialGoogle: "/api/users/social/google/",
+  ActionSocialComplete: "/api/users/social/complete/",
+  ActionSocialLinkVerify: "/api/users/social/link/verify/",
 } as const;
 
 export type ValidKeys = keyof typeof ROUTE_CONFIG;

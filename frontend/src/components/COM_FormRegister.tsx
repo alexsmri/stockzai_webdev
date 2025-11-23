@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAlert } from '../context/CTX_Alert';
+import COM_SocialButtons from './COM_SocialButtons';
 
 const CONTINUE_LABEL = 'Continue';
 
@@ -55,6 +56,7 @@ function COM_FormRegister() {
           />
           <button className="look-button-secondary look-button-auth">{CONTINUE_LABEL}</button>
         </form>
+        <COM_SocialButtons prRedirect="/users/plans/select" />
       </div>
       <div className="area-form-auth-links">
         <a href="/users/login" className="look-button-subtle">

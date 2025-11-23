@@ -14,9 +14,12 @@ from users.models import (
     Subscription,
     Product,
     PermissionCode,
+    SocialAccount,
+    SocialProvider,
 )
 from users.meta_capi import send_registration_event
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -32,15 +35,253 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from stockzAI.common.response import api_json_response
-from users.tokens import make_otp, password_reset_token
+from users.tokens import (
+    password_reset_token,
+    make_session_token,
+    parse_session_token,
+    hash_otp,
+    create_verification_token,
+    create_newsletter_token,
+    create_password_reset_token
+)
 from users.utils.tracking import track_event
 from rest_framework.decorators import permission_classes, api_view
 import json
 import logging
 import uuid
+from google.oauth2 import id_token as google_id_token
+from google.auth.transport import requests as google_requests
+from datetime import timedelta
+from django.db import IntegrityError
+from hashlib import sha256
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 VERIFICATION_OTP_DIGITS = 6
+SESSION_INTENT_SIGNUP = "signup"
+SESSION_INTENT_LINK = "link"
+
+
+def issue_tokens(user: User) -> dict[str, str]:
+    refresh = RefreshToken.for_user(user)
+    return {"access": str(refresh.access_token), "refresh": str(refresh)}
+
+
+def _normalize_email(value: str | None) -> str | None:
+    if not isinstance(value, str):
+        return None
+    cleaned = value.strip().lower()
+    return cleaned or None
+
+
+def _canonicalize_email_for_provider(provider: str | None, email: str | None) -> str | None:
+    base = _normalize_email(email)
+    if not base:
+        return None
+    try:
+        local, domain = base.split("@", 1)
+    except ValueError:
+        return None
+
+    if provider == SocialProvider.GOOGLE and domain in {"gmail.com", "googlemail.com"}:
+        local = local.split("+", 1)[0]
+        local = local.replace(".", "")
+    return f"{local}@{domain}"
+
+@transaction.atomic
+def _create_social_user(provider, sub, canonical_email):
+    try:
+        user = User.objects.create_user(email=canonical_email, password=None, is_active=True)
+    except IntegrityError:
+        return User.objects.get(email__iexact=canonical_email)
+
+    try:
+        SocialAccount.objects.create(
+            user=user,
+            provider=provider,
+            provider_user_id=sub,
+            email=canonical_email,
+        )
+    except IntegrityError:
+        return SocialAccount.objects.get(provider=provider, provider_user_id=sub).user
+
+    return user
+
+def _ensure_user_consents(user: User, consents_payload: dict, allow_missing: bool = False):
+    consents, _ = UserConsents.objects.get_or_create(user=user)
+    required_tos = bool(consents_payload.get("consents_tos"))
+    required_info_only = bool(consents_payload.get("consents_information_only"))
+    if not allow_missing and (not required_tos or not required_info_only):
+        raise ValidationError(
+            {"consents_information_only": ["Informational consent is required."]},
+        )
+
+    consents.consents_tos = required_tos or consents.consents_tos
+    consents.consents_information_only = required_info_only or consents.consents_information_only
+    consents.consents_newsletter = bool(consents_payload.get("consents_newsletter")) or consents.consents_newsletter
+    consents.save()
+    return consents
+
+
+def _get_binding_claims(request) -> dict:
+    ua = (request.META.get("HTTP_USER_AGENT") or "")[:256]
+    fp = (request.META.get("HTTP_X_CLIENT_FINGERPRINT") or "")[:256]
+    ip = (request.META.get("REMOTE_ADDR") or "")[:64]
+    def _hash(val: str) -> str:
+        return sha256(val.encode("utf-8")).hexdigest() if val else ""
+    return {
+        "ua": _hash(ua),
+        "fp": _hash(fp),
+        "ip": _hash(ip),
+    }
+
+
+def _make_session_token(payload: dict, request) -> str:
+    binding = _get_binding_claims(request)
+    token_payload = {**payload, **{"binding": binding}}
+    return make_session_token(
+        token_payload,
+        lifetime=getattr(settings, "SESSION_TOKEN_LIFETIME", timedelta(minutes=15)),
+    )
+
+
+def _binding_matches(token, request) -> bool:
+    binding = token.get("binding") or {}
+    current = _get_binding_claims(request)
+    return (
+        binding.get("ua") == current.get("ua")
+        and binding.get("fp") == current.get("fp")
+        and binding.get("ip") == current.get("ip")
+    )
+
+
+def _parse_bound_session_token(request, raw_token: str):
+    parsed = parse_session_token(raw_token)
+    if not parsed:
+        return None
+    if not _binding_matches(parsed, request):
+        return None
+    return parsed
+
+
+def _has_required_profile(user: User) -> bool:
+    if not (user.username or "").strip():
+        return False
+    consents = getattr(user, "consents", None)
+    if not consents:
+        return False
+    return bool(consents.consents_tos and consents.consents_information_only)
+
+
+@dataclass
+class SocialLoginContext:
+    provider: str
+    sub: str | None
+    email: str | None
+    email_verified: bool
+    canonical_email: str | None
+
+
+def _verify_google_id_token(raw_token: str) -> dict | None:
+    client_id = getattr(settings, "GOOGLE_CLIENT_ID", None)
+    if not client_id:
+        logger.error("GOOGLE_CLIENT_ID missing in settings")
+        return None
+    try:
+        claims = google_id_token.verify_oauth2_token(raw_token, google_requests.Request(), client_id)
+        return claims
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Google token verification failed: %s", exc)
+        return None
+
+
+def _username_is_taken(username: str, exclude_user_id: int | None = None) -> bool:
+    qs = User.objects.filter(username__iexact=username)
+    if exclude_user_id:
+        qs = qs.exclude(pk=exclude_user_id)
+    return qs.exists()
+    
+
+def _social_login_state_machine(request, ctx: SocialLoginContext):
+    if not ctx.sub:
+        return api_json_response(error="Invalid provider response.", status=200)
+    if not ctx.email_verified:
+        return api_json_response(error="Email must be verified by provider.", status=200)
+
+    canonical_email = ctx.canonical_email
+    if not canonical_email:
+        return api_json_response(error="Email is required from provider.", status=200)
+
+    existing_social = (
+        SocialAccount.objects.filter(provider=ctx.provider, provider_user_id=ctx.sub)
+        .select_related("user")
+        .first()
+    )
+    if existing_social:
+        user = existing_social.user
+        if not _has_required_profile(user):
+            session_token = _make_session_token(
+                {
+                    "intent": SESSION_INTENT_SIGNUP,
+                    "provider": ctx.provider,
+                    "sub": ctx.sub,
+                    "email": canonical_email,
+                    "user_id": user.id,
+                },
+                request,
+            )
+            return api_json_response(
+                msg={
+                    "needs_profile": True,
+                    "session_token": session_token,
+                    "email": canonical_email,
+                }
+            )
+        if not user.is_active:
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+        return api_json_response(msg=issue_tokens(user))
+
+    existing_user = User.objects.filter(email__iexact=canonical_email).first()
+    if existing_user:
+        uid = create_verification_token(existing_user, VERIFICATION_OTP_DIGITS)
+        session_payload = {
+            "intent": SESSION_INTENT_LINK,
+            "provider": ctx.provider,
+            "sub": ctx.sub,
+            "email": canonical_email,
+            "user_id": existing_user.id,
+        }
+        session_token = _make_session_token(session_payload, request)
+        return api_json_response(
+            msg={
+                "needs_verification": True,
+                "uid": uid,
+                "email": canonical_email,
+                "provider": ctx.provider,
+                "session_token": session_token,
+            }
+        )
+    
+    user = _create_social_user(ctx.provider, ctx.sub, canonical_email)
+
+    session_token = _make_session_token(
+        {
+            "intent": SESSION_INTENT_SIGNUP,
+            "provider": ctx.provider,
+            "sub": ctx.sub,
+            "email": canonical_email,
+            "user_id": user.id,
+        },
+        request,
+    )
+    return api_json_response(
+        msg={
+            "needs_profile": True,
+            "session_token": session_token,
+            "email": canonical_email,
+        }
+    )
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -142,10 +383,7 @@ def view_verification_token(request):
         return api_json_response(msg={"uid": dummy_uid})
 
     try:
-        token = make_otp(VERIFICATION_OTP_DIGITS)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        TokenVerification.objects.filter(user=user).delete()
-        TokenVerification.objects.create(user=user, token=token, uid=uid)
+        uid = create_verification_token(user, VERIFICATION_OTP_DIGITS)
         return api_json_response(msg={"uid": uid})
     except Exception as e:
         logger.exception("Failed to create verification token", exc_info=e)
@@ -166,7 +404,7 @@ def view_verify(request):
         return api_json_response(error="Token and uid are required.", status=200)
 
     try:
-        token_obj = TokenVerification.objects.get(token=token, uid=uid)
+        token_obj = TokenVerification.objects.get(token_hash=hash_otp(token), uid=uid)
     except TokenVerification.DoesNotExist:
         return api_json_response(error="Code Invalid.", status=200)
 
@@ -202,11 +440,8 @@ def view_password_reset_token(request):
         return api_json_response(msg=True)
 
     try:
-        token = password_reset_token.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        TokenPasswordReset.objects.filter(user=user).delete()
-        TokenPasswordReset.objects.create(user=user, token=token, uid=uid)
-        return api_json_response(msg=True)
+        uid = create_password_reset_token(user, VERIFICATION_OTP_DIGITS)
+        return api_json_response(msg={"uid": uid})
     except Exception as e:
         logger.exception("Failed to create password reset token", exc_info=e)
         return api_json_response(error="Something went wrong", status=500)
@@ -224,9 +459,8 @@ def view_validate_password_reset_token(request):
     if not token or not uid:
         return api_json_response(error="Token and uid are required.", status=200)
 
-    try:
-        token_obj = TokenPasswordReset.objects.get(token=token, uid=uid)
-    except TokenPasswordReset.DoesNotExist:
+    token_obj = TokenPasswordReset.objects.filter(uid=uid, token_hash=hash_otp(token)).first()
+    if not token_obj:
         return api_json_response(error="Reset token invalid.", status=200)
 
     if token_obj.is_expired():
@@ -250,9 +484,8 @@ def view_reset_password(request):
     if not all([token, uid, password]):
         return api_json_response(error="Token, uid and password are required.", status=200)
 
-    try:
-        token_obj = TokenPasswordReset.objects.get(token=token, uid=uid)
-    except TokenPasswordReset.DoesNotExist:
+    token_obj = TokenPasswordReset.objects.filter(uid=uid, token_hash=hash_otp(token)).first()
+    if not token_obj:
         return api_json_response(error="Reset token invalid.", status=200)
 
     if token_obj.is_expired():
@@ -276,10 +509,7 @@ def view_subscribe_newsletter_token(request):
     if consents.consents_newsletter:
         return api_json_response(error="You are already subscribed to the newsletter.", status=200)
 
-    token = make_otp(VERIFICATION_OTP_DIGITS)
-    uid = urlsafe_base64_encode(force_bytes(request.user.pk))
-    TokenNewsletter.objects.filter(user=request.user).delete()
-    TokenNewsletter.objects.create(user=request.user, token=token, uid=uid)
+    uid = create_newsletter_token(request.user, VERIFICATION_OTP_DIGITS)
 
     return api_json_response(msg={"uid": uid})
 
@@ -299,7 +529,7 @@ def view_subscribe_newsletter_verify(request):
         return api_json_response(error="Token and uid are required.", status=200)
 
     try:
-        token_obj = TokenNewsletter.objects.get(token=token, uid=uid)
+        token_obj = TokenNewsletter.objects.get(token_hash=hash_otp(token), uid=uid)
     except TokenNewsletter.DoesNotExist:
         return api_json_response(error="Verification code invalid.", status=200)
 
@@ -578,12 +808,162 @@ def view_capture_email(request):
     _, created = Email.objects.get_or_create(email=normalized_email)
     return api_json_response(msg=created)
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_social_google(request):
+    try:
+        body = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return api_json_response(error="Invalid payload.", status=400)
+
+    raw_token = body.get("id_token")
+    if not raw_token:
+        return api_json_response(error="id_token required.", status=200)
+
+    claims = _verify_google_id_token(raw_token)
+    if not claims:
+        return api_json_response(error="Unable to verify Google token.", status=200)
+
+    sub = claims.get("sub")
+    email = claims.get("email")
+    email_verified = bool(claims.get("email_verified"))
+
+    ctx = SocialLoginContext(
+        provider=SocialProvider.GOOGLE,
+        sub=sub,
+        email=email,
+        email_verified=email_verified,
+        canonical_email=_canonicalize_email_for_provider(SocialProvider.GOOGLE, email),
+    )
+    return _social_login_state_machine(request, ctx)
 
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_social_complete(request):
+    body = request.data if isinstance(request.data, dict) else {}
+    session_token = body.get("session_token")
+    username = (body.get("username") or "").strip()
+    consents_payload = body.get("consents") or {}
+    newsletter = body.get("newsletter")
+    if newsletter is not None:
+        consents_payload["consents_newsletter"] = bool(newsletter)
+
+    if not session_token:
+        return api_json_response(error="Session token required.", status=200)
+
+    claims = _parse_bound_session_token(request, session_token)
+    if not claims:
+        return api_json_response(error="Invalid or expired session.", status=200)
+
+    intent = claims.get("intent")
+    provider = claims.get("provider")
+    sub = claims.get("sub")
+    email = claims.get("email")
+    user_id = claims.get("user_id")
+
+    if intent not in {SESSION_INTENT_SIGNUP, SESSION_INTENT_LINK} or not provider or not sub or not user_id:
+        return api_json_response(error="Invalid session details.", status=200)
+
+    user = User.objects.filter(pk=user_id).first()
+    if not user:
+        return api_json_response(error="User not found for session.", status=200)
+
+    if not username:
+        return api_json_response(error="Username is required.", status=200)
+    if _username_is_taken(username, exclude_user_id=user.id):
+        return api_json_response(error="Username already taken.", status=200)
+
+    try:
+        _ensure_user_consents(user, consents_payload)
+    except ValidationError as exc:
+        error = ""
+        for _, errs in exc.detail.items():
+            for err in errs:
+                error += f"{str(err)} "
+        return api_json_response(error=error or "Consents required.", status=200)
+
+    user.username = username
+    if not user.is_active:
+        user.is_active = True
+    user.save(update_fields=["username", "is_active"])
+
+    if not SocialAccount.objects.filter(provider=provider, provider_user_id=sub, user=user).exists():
+        try:
+            SocialAccount.objects.create(
+                user=user, provider=provider, provider_user_id=sub, email=email or user.email
+            )
+        except IntegrityError:
+            logger.exception("Failed to link social account on completion")
+
+    return api_json_response(msg=issue_tokens(user))
 
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def view_social_link_verify(request):
+    body = request.data if isinstance(request.data, dict) else {}
+    token_value = body.get("token")
+    uid = body.get("uid")
+    session_token = body.get("session_token")
 
+    if not token_value or not uid or not session_token:
+        return api_json_response(error="Token, uid and session_token are required.", status=200)
 
+    claims = _parse_bound_session_token(request, session_token)
+    if not claims or claims.get("intent") != SESSION_INTENT_LINK:
+        return api_json_response(error="Invalid or expired session.", status=200)
 
+    provider = claims.get("provider")
+    sub = claims.get("sub")
+    email = claims.get("email")
+    user_id = claims.get("user_id")
 
+    try:
+        token_obj = TokenVerification.objects.get(token_hash=hash_otp(token_value), uid=uid)
+    except TokenVerification.DoesNotExist:
+        return api_json_response(error="Code Invalid.", status=200)
 
+    if token_obj.is_expired():
+        return api_json_response(error="Code Expired.", status=200)
+    if token_obj.is_used:
+        return api_json_response(error="Code Invalid.", status=200)
+
+    if user_id and token_obj.user_id != user_id:
+        return api_json_response(error="Verification code invalid for this user.", status=200)
+
+    user = token_obj.user
+    token_obj.is_used = True
+    token_obj.save(update_fields=["is_used"])
+
+    existing_social = SocialAccount.objects.filter(
+        provider=provider, provider_user_id=sub, user=user
+    ).exists()
+
+    if _has_required_profile(user) and existing_social:
+        return api_json_response(msg=issue_tokens(user))
+
+    if _has_required_profile(user):
+        try:
+            SocialAccount.objects.get_or_create(
+                provider=provider, provider_user_id=sub, defaults={"user": user, "email": email or user.email}
+            )
+        except IntegrityError:
+            logger.exception("Failed to link social account after verification")
+        return api_json_response(msg=issue_tokens(user))
+
+    session_payload = {
+        "intent": SESSION_INTENT_LINK,
+        "provider": provider,
+        "sub": sub,
+        "email": email or user.email,
+        "user_id": user.id,
+    }
+    next_session = _make_session_token(session_payload, request)
+    return api_json_response(
+        msg={
+            "needs_profile": True,
+            "session_token": next_session,
+            "email": email or user.email,
+        }
+    )

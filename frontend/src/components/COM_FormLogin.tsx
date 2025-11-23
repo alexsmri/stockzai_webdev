@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useAlert } from '../context/CTX_Alert';
+import COM_SocialButtons from './COM_SocialButtons';
 
 function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   const [email, setEmail] = useState('');
@@ -78,6 +79,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             {stLoading ? 'Logging In...' : 'Continue'}
           </button>
         </form>
+        <COM_SocialButtons prRedirect={prRedirect} />
       </div>
       <div className="area-form-auth-links">
         <a href="/users/password-reset/token/request" className="look-button-subtle">

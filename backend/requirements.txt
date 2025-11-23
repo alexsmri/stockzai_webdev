@@ -18,3 +18,5 @@ yfinance
 openai
 requests
 requests_oauthlib
+google-auth
+PyJWT

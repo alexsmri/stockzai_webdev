@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+from django.db.models.functions import Lower
 
 from .managers import UserManager
 from django.conf import settings
@@ -48,6 +49,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         permissions = [
             ('is_og', 'Eligible for OG treatment'),
             ('is_paid', 'Owns a subscription'),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                Lower("username"),
+                condition=~models.Q(username=""),
+                name="unique_username_nonempty_ci",
+            )
         ]
 
     @cached_property
@@ -112,7 +120,7 @@ class Email(models.Model):
 class TokenPasswordReset(models.Model):
     uid = models.CharField(max_length=256, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset_token')
-    token = models.CharField(max_length=64, editable=False)
+    token_hash = models.CharField(max_length=64, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
@@ -123,7 +131,7 @@ class TokenPasswordReset(models.Model):
 class TokenVerification(models.Model):
     uid = models.CharField(max_length=256, unique=True, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='verification_token')
-    token = models.CharField(max_length=6, editable=False)
+    token_hash = models.CharField(max_length=64, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
@@ -134,7 +142,7 @@ class TokenVerification(models.Model):
 class TokenNewsletter(models.Model):
     uid = models.CharField(max_length=256, unique=True, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='newsletter_token')
-    token = models.CharField(max_length=6, editable=False)
+    token_hash = models.CharField(max_length=64, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 
@@ -157,6 +165,28 @@ class UserStatus(models.Model):
 
     def __str__(self):
         return f"Status<{self.user_id}>"
+
+
+class SocialProvider(models.TextChoices):
+    GOOGLE = "google", "Google"
+
+
+class SocialAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="social_accounts")
+    provider = models.CharField(max_length=32, choices=SocialProvider.choices)
+    provider_user_id = models.CharField(max_length=255)
+    email = models.EmailField(_('email address'), blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    linked_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('provider', 'provider_user_id')
+        indexes = [
+            models.Index(fields=["provider", "provider_user_id"]),
+        ]
+
+    def __str__(self):
+        return f"{self.provider}:{self.provider_user_id}"
 
 class Product(models.Model):
     name = models.CharField(max_length=128, unique=True)

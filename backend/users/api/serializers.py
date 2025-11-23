@@ -14,13 +14,21 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "id": {"read_only": True},
             "password": {"write_only": True},
-            "username": {"required": False, "allow_blank": True},
+            "username": {"required": True, "allow_blank": False},
         }
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email is already in use.")
         return value
+
+    def validate_username(self, value):
+        username = (value or "").strip()
+        if not username:
+            raise serializers.ValidationError("Username is required.")
+        if User.objects.filter(username__iexact=username).exists():
+            raise serializers.ValidationError("Username is already taken.")
+        return username
     
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import COM_FormCode from '../components/COM_FormCode';
+import COM_FormCodeSubscribe from '../components/COM_FormCodeSubscribe';
 import COM_Hero from '../components/COM_Hero';
 import { useUserStore } from '../context/CTX_UserStore';
 import COM_FooterAuth from '../components/COM_FooterAuth';
@@ -49,11 +49,10 @@ export default function PAG_SubscribeVerify() {
   return (
     <>
       <COM_Hero prFlex={true}>
-        <COM_FormCode
+        <COM_FormCodeSubscribe
           prUid={uid}
           prEmail={resolvedEmail}
           prUsername={resolvedUsername}
-          prMode="newsletter"
           prRedirect="/"
         />
       </COM_Hero>

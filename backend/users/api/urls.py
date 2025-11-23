@@ -21,6 +21,9 @@ from .views import (
     view_track_onboarding_choose_ticker,
     view_status,
     view_capture_email,
+    view_social_google,
+    view_social_complete,
+    view_social_link_verify,
 )
 from ..stripe import stripe_webhook, view_cancel_plan, view_resume_plan
 
@@ -67,4 +70,7 @@ urlpatterns = [
     ),
     path("emails/", view_capture_email, name="emails"),
     path("payments/webhook/", stripe_webhook, name="stripe_webhook"),
+    path("social/google/", view_social_google, name="social_google"),
+    path("social/complete/", view_social_complete, name="social_complete"),
+    path("social/link/verify/", view_social_link_verify, name="social_link_verify"),
 ]
