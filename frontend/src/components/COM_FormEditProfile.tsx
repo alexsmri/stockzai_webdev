@@ -7,13 +7,11 @@ import COM_Loading from './COM_Loading';
 interface EditProfileResponse {
   email: string;
   username: string;
-  consents?:
-    | {
-        consents_newsletter?: boolean;
-        consents_tos?: boolean;
-        consents_information_only?: boolean;
-      }
-    | null;
+  consents?: {
+    consents_newsletter?: boolean;
+    consents_tos?: boolean;
+    consents_information_only?: boolean;
+  } | null;
 }
 
 function COM_FormEditProfile() {
@@ -22,6 +20,9 @@ function COM_FormEditProfile() {
   const [stCredentials, setStCredentials] = useState<Record<string, any> | null>(
     utStore.read('PropertyCredentials') ?? null
   );
+  const [stConsents, setStConsents] = useState<Record<string, any> | null>(
+    utStore.read('PropertyConsents') ?? null
+  );
   const [, setStLoading] = useState(false);
   const [stSuccess, setStSuccess] = useState(false);
   const [stUsername, setStUsername] = useState<string>('');
@@ -29,6 +30,7 @@ function COM_FormEditProfile() {
   const { handleAlertOpen, handleAlertClose } = useAlert();
 
   useUserStoreSync(utStore, 'PropertyCredentials', setStCredentials, { autoFetch: true });
+  useUserStoreSync(utStore, 'PropertyConsents', setStConsents, { autoFetch: true });
 
   useEffect(() => {
     void utStore.get('PropertyConsents');
@@ -84,7 +86,7 @@ function COM_FormEditProfile() {
     }
   }, [stCredentials]);
 
-  const hasNewsletterConsent = Boolean(stCredentials?.consents?.consents_newsletter);
+  const hasNewsletterConsent = Boolean(stConsents?.consents_newsletter);
   const newsletterHref = hasNewsletterConsent
     ? '/users/unsubscribe-newsletter'
     : '/users/subscribe-newsletter';

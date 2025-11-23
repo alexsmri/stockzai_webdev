@@ -37,13 +37,60 @@ interface ITF_SocialButtonsProps {
   prRedirect?: string;
 }
 
+type GoogleIdentitySdk = {
+  accounts: {
+    id: {
+      initialize: (config: {
+        client_id: string;
+        callback: (resp: { credential?: string | null }) => void;
+      }) => void;
+      prompt: (
+        handler?: (notification: {
+          isNotDisplayed: () => boolean;
+          isSkippedMoment: () => boolean;
+        }) => void
+      ) => void;
+    };
+  };
+};
+
 declare global {
   interface Window {
-    stockzSocial?: {
-      getIdToken?: (provider: 'google') => Promise<string | null> | string | null;
-    };
+    google?: GoogleIdentitySdk;
   }
 }
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
+
+const loadGoogleSdk = (): Promise<GoogleIdentitySdk> =>
+  new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) {
+      resolve(window.google);
+      return;
+    }
+    const existing = document.querySelector(
+      `script[src="${GOOGLE_SCRIPT_SRC}"]`
+    ) as HTMLScriptElement | null;
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.google!));
+      existing.addEventListener('error', () => reject(new Error('Failed to load Google SDK')));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = GOOGLE_SCRIPT_SRC;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google?.accounts?.id) {
+        resolve(window.google);
+      } else {
+        reject(new Error('Google SDK unavailable after load'));
+      }
+    };
+    script.onerror = () => reject(new Error('Failed to load Google SDK'));
+    document.head.appendChild(script);
+  });
 
 export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButtonsProps) {
   const utStore = useUserStore();
@@ -52,16 +99,32 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
   const [stBusy, setStBusy] = useState(false);
 
   const resolveIdToken = async () => {
-    try {
-      if (window.stockzSocial?.getIdToken) {
-        const token = await window.stockzSocial.getIdToken('google');
-        if (token) return token;
-      }
-    } catch (err) {
-      console.error('Failed to read provider token', err);
+    if (!GOOGLE_CLIENT_ID) {
+      handleAlertOpen('Configuration error', 'Google client ID is missing.', 'f');
+      return null;
     }
-    const fallback = window.prompt('Paste the Google ID token to continue:');
-    return fallback ? fallback.trim() : null;
+
+    try {
+      const googleSdk = await loadGoogleSdk();
+      return await new Promise<string | null>((resolve, reject) => {
+        try {
+          googleSdk.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: (resp) => resolve(resp.credential ?? null),
+          });
+          googleSdk.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              reject(new Error('Google prompt was not displayed or skipped.'));
+            }
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to load Google SDK or get credential', err);
+      return null;
+    }
   };
 
   const handleProvider = async () => {

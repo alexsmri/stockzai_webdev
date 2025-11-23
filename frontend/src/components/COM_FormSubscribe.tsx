@@ -71,7 +71,7 @@ export default function COM_FormSubscribe() {
       <div className="area-flex-col look-div-subtle mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <p className="look-text-subtle look-text-x0">
-            We will send a one-time code to confirm your subscription to{' '}
+            We will send a one-time code to confirm your subscription for{' '}
             {stEmail || 'your account email'}.
           </p>
           <button className="look-button-secondary look-button-auth" disabled={stLoading}>
