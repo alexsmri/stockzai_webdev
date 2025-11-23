@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import COM_FormRegisterPassword from '../components/COM_FormRegisterPassword';
-import COM_FooterAuth from '../components/COM_FooterAuth';
-import COM_Hero from '../components/COM_Hero';
+import COM_AuthShowcase from '../components/COM_AuthShowcase';
+import IMG_ApplicationDemo from '../assets/media/IMG_ApplicationDemo.webp';
 
 function PAG_RegisterPassword() {
   const [searchParams] = useSearchParams();
@@ -23,10 +23,9 @@ function PAG_RegisterPassword() {
 
   return (
     <>
-      <COM_Hero prFlex={true}>
+      <COM_AuthShowcase prScreenshotSrc={IMG_ApplicationDemo}>
         <COM_FormRegisterPassword prEmail={email} prPrefillUsername={prefillUsername} />
-      </COM_Hero>
-      <COM_FooterAuth />
+      </COM_AuthShowcase>
     </>
   );
 }
