@@ -3,7 +3,7 @@ import secrets
 import string
 from datetime import timedelta
 from django.conf import settings
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import Token
 from rest_framework_simplejwt.exceptions import TokenError
 from hashlib import sha256
 from django.utils.http import urlsafe_base64_encode
@@ -66,24 +66,31 @@ def _session_lifetime() -> timedelta:
     return getattr(settings, "SESSION_TOKEN_LIFETIME", timedelta(minutes=15))
 
 
+class SessionToken(Token):
+    """
+    SimpleJWT-backed token dedicated to short-lived session flows.
+    """
+
+    token_type = "session"
+    lifetime = _session_lifetime()
+
+
 def make_session_token(payload: dict, lifetime: timedelta | None = None) -> str:
-    token = AccessToken()
-    token.set_exp(lifetime or _session_lifetime())
-    token["token_type"] = "session"
+    token = SessionToken()
+    if lifetime is not None:
+        token.set_exp(lifetime=lifetime)
+    token["token_type"] = SessionToken.token_type
     for key, value in payload.items():
-        # JWT requires string-ish keys; guard against accidental non-string keys.
-        if not isinstance(key, (str, int, float, bool)) or not key is None:
+        safe_key = str(key) if not isinstance(key, str) else key
+        if safe_key != key:
             logger.warning("Coercing non-string session token claim key %r (%s)", key, type(key))
-            safe_key = str(key)
-        else:
-            safe_key = key
         token[safe_key] = value
     return str(token)
 
 
 def parse_session_token(raw_token: str):
     try:
-        token = AccessToken(raw_token)
+        token = SessionToken(raw_token)
     except TokenError:
         return None
     if token.get("token_type") != "session":
