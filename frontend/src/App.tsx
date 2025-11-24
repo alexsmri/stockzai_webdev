@@ -25,6 +25,7 @@ import PAG_VericationCode from './pages/PAG_VerificationCode';
 import PAG_404 from './pages/PAG_404';
 import PAG_Debug from './pages/PAG_Debug';
 import PAG_SocialComplete from './pages/PAG_SocialComplete';
+import PAG_SocialLinkConfirmation from './pages/PAG_SocialLinkConfirmation';
 import PAG_TopStocks from './pages/PAG_TopStocks';
 import PAG_Alerts from './pages/PAG_Alerts';
 import COM_PremiumRoute from './components/COM_PremiumRoute';
@@ -128,6 +129,7 @@ function App() {
                   <Route path="/users/register/password" element={<CreatePasswordAndLogout />} />
                   <Route path="/users/verification" element={<PAG_VericationCode />} />
                   <Route path="/users/social/complete" element={<PAG_SocialComplete />} />
+                  <Route path="/users/social/link/confirmation" element={<PAG_SocialLinkConfirmation />} />
                   <Route
                     path="/users/plans/select"
                     element={

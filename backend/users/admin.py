@@ -13,6 +13,7 @@ from .models import (
     User,
     UserConsents,
     UserStatus,
+    SocialAccount
 )
 
 
@@ -87,4 +88,5 @@ admin.site.register(UserStatus)
 admin.site.register(Email)
 admin.site.register(TrackingEvent)
 admin.site.register(Purchase)
+admin.site.register(SocialAccount)
 

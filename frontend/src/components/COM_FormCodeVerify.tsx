@@ -16,6 +16,8 @@ interface ITF_FormCodeVerifyProps {
   prResendKey?: ValidKeys;
   prExtraPayload?: Record<string, any>;
   prOnSuccess?: (result: any, codeValue: string) => Promise<void> | void;
+  prHeadingOverride?: string;
+  prInstructionsOverride?: string;
 }
 
 const DEFAULT_REDIRECT = '/users/plans/select';
@@ -37,6 +39,8 @@ export default function COM_FormCodeVerify({
   prResendKey = 'TokenVerificationRequest',
   prExtraPayload,
   prOnSuccess,
+  prHeadingOverride,
+  prInstructionsOverride,
 }: ITF_FormCodeVerifyProps) {
   const utStore = useUserStore();
   const navigate = useNavigate();
@@ -132,8 +136,10 @@ export default function COM_FormCodeVerify({
     return false;
   };
 
-  const heading = 'Verify Email';
-  const instructions = `An email with a six-digit code has just been sent to ${utCensoredEmail}. Enter the code below.`;
+  const heading = prHeadingOverride || 'Verify Email';
+  const instructions =
+    prInstructionsOverride ||
+    `An email with a six-digit code has just been sent to ${utCensoredEmail}. Enter the code below.`;
 
   return (
     <DCOM_FormCode

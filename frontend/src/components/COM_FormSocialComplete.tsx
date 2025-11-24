@@ -51,7 +51,7 @@ export default function COM_FormSocialComplete({
 
     setStLoading(true);
     try {
-      const utRes = await utStore.post('ActionSocialComplete', {
+      const utRes = (await utStore.post('ActionSocialComplete', {
         session_token: prSessionToken,
         username,
         consents: {
@@ -60,7 +60,7 @@ export default function COM_FormSocialComplete({
           consents_information_only: stConsentsInformationOnly,
         },
         newsletter: stConsentsNewsletter,
-      });
+      })) as null | Record<string, any>;
 
       if (!utRes) {
         const utError =
@@ -70,6 +70,9 @@ export default function COM_FormSocialComplete({
         return;
       }
 
+      if (utRes.access && utRes.refresh) {
+        utStore.set('ActionLogin', { access: utRes.access, refresh: utRes.refresh });
+      }
       await utStore.get('PropertyCredentials');
       handleAlertOpen('Welcome', `Welcome to stockz.ai, ${username}!`, 's');
       navigate(prRedirect);

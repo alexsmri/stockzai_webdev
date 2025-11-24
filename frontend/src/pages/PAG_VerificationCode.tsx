@@ -43,10 +43,18 @@ export default function PAG_VericationCode() {
       return;
     }
 
+    if (result?.access && result?.refresh) {
+      utStore.set('ActionLogin', { access: result.access, refresh: result.refresh });
+    }
     await utStore.get('PropertyCredentials');
     handleAlertOpen('Welcome back', username ? `Welcome, ${username}` : 'Welcome!', 's');
-    navigate(redirectParam || '/');
+    navigate('/users/social/link/confirmation');
   };
+
+  const headingOverride = isSocialLink ? 'Verify Email to link account' : undefined;
+  const instructionsOverride = isSocialLink
+    ? `We have sent an email to ${email ? email.replace(/(.{2}).+(@.+)/, '$1***$2') : 'your email'} to confirm it's you. After verification, your stockz.ai account will be linked to your Google sign in.`
+    : undefined;
 
   return (
     <>
@@ -60,6 +68,8 @@ export default function PAG_VericationCode() {
           prResendKey="TokenVerificationRequest"
           prExtraPayload={sessionToken ? { session_token: sessionToken } : undefined}
           prOnSuccess={isSocialLink ? handleSocialLinkSuccess : undefined}
+          prHeadingOverride={headingOverride}
+          prInstructionsOverride={instructionsOverride}
         />
       </COM_Hero>
       <COM_FooterAuth />

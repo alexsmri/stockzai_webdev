@@ -66,6 +66,7 @@ declare global {
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
+let pendingGoogleCredential: Promise<string | null> | null = null;
 
 const loadGoogleSdk = (): Promise<GoogleIdentitySdk> =>
   new Promise((resolve, reject) => {
@@ -103,8 +104,9 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
   const [stBusy, setStBusy] = useState(false);
 
   const resolveIdToken = async () => {
-    console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
-    console.log(import.meta.env.VITE_PAYWALL_ENABLED);
+    if (pendingGoogleCredential) {
+      return pendingGoogleCredential;
+    }
     if (!GOOGLE_CLIENT_ID) {
       console.error('Google client ID is missing. Check VITE_GOOGLE_CLIENT_ID.');
       handleAlertOpen('Configuration error', 'Google client ID is missing.', 'f');
@@ -114,7 +116,7 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
     try {
       const googleSdk = await loadGoogleSdk();
 
-      return await new Promise<string | null>((resolve) => {
+      pendingGoogleCredential = new Promise<string | null>((resolve) => {
         let settled = false;
 
         const finishResolve = (value: string | null) => {
@@ -147,20 +149,25 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
           }
         });
       });
+      return await pendingGoogleCredential;
     } catch (err) {
       console.error('Failed to load Google SDK or get credential', err);
       return null;
+    } finally {
+      pendingGoogleCredential = null;
     }
   };
 
   const handleProvider = async () => {
+    if (stBusy) return;
+    setStBusy(true);
     const actionKey: ValidKeys = 'ActionSocialGoogle';
     const idToken = await resolveIdToken();
     if (!idToken) {
+      setStBusy(false);
       handleAlertOpen('Action required', 'A valid provider token is required to continue.', 'f');
       return;
     }
-    setStBusy(true);
     try {
       const utRes = (await utStore.post(actionKey, { id_token: idToken }, true)) as
         | TYP_GoogleAuthResponse
@@ -192,6 +199,10 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
         });
         navigate(`/users/social/complete?${params.toString()}`);
         return;
+      }
+
+      if (utRes.access && utRes.refresh) {
+        utStore.set('ActionLogin', { access: utRes.access, refresh: utRes.refresh });
       }
 
       await utStore.get('PropertyCredentials');
