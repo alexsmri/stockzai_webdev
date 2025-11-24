@@ -10,6 +10,9 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from users.models import TokenVerification, TokenNewsletter, TokenPasswordReset
 from users.tasks import send_verification_email, send_newsletter_email, send_password_reset_email
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PasswordResetTokenGenerator(PWRGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -68,7 +71,13 @@ def make_session_token(payload: dict, lifetime: timedelta | None = None) -> str:
     token.set_exp(lifetime or _session_lifetime())
     token["token_type"] = "session"
     for key, value in payload.items():
-        token[key] = value
+        # JWT requires string-ish keys; guard against accidental non-string keys.
+        if not isinstance(key, (str, int, float, bool)) or not key is None:
+            logger.warning("Coercing non-string session token claim key %r (%s)", key, type(key))
+            safe_key = str(key)
+        else:
+            safe_key = key
+        token[safe_key] = value
     return str(token)
 
 

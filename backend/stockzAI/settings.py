@@ -51,6 +51,7 @@ META_PIXEL_ID = os.getenv("META_PIXEL_ID")
 META_CAPI_ACCESS_TOKEN = os.getenv("META_CAPI_ACCESS_TOKEN")
 META_TEST_EVENT_CODE = os.getenv("META_TEST_EVENT_CODE")
 META_CAPI_ENABLED = env_flag("META_CAPI_ENABLED", default=False)
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 PAYWALL_ENABLED = env_flag("PAYWALL_ENABLED", default=True)

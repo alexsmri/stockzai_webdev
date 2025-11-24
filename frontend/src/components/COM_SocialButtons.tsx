@@ -42,12 +42,16 @@ type GoogleIdentitySdk = {
     id: {
       initialize: (config: {
         client_id: string;
+        ux_mode?: 'popup' | 'redirect';
+        use_fedcm_for_prompt?: boolean;
         callback: (resp: { credential?: string | null }) => void;
       }) => void;
       prompt: (
         handler?: (notification: {
           isNotDisplayed: () => boolean;
           isSkippedMoment: () => boolean;
+          getNotDisplayedReason?: () => string | null;
+          getSkippedReason?: () => string | null;
         }) => void
       ) => void;
     };
@@ -99,27 +103,49 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
   const [stBusy, setStBusy] = useState(false);
 
   const resolveIdToken = async () => {
+    console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+    console.log(import.meta.env.VITE_PAYWALL_ENABLED);
     if (!GOOGLE_CLIENT_ID) {
+      console.error('Google client ID is missing. Check VITE_GOOGLE_CLIENT_ID.');
       handleAlertOpen('Configuration error', 'Google client ID is missing.', 'f');
       return null;
     }
 
     try {
       const googleSdk = await loadGoogleSdk();
-      return await new Promise<string | null>((resolve, reject) => {
-        try {
-          googleSdk.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: (resp) => resolve(resp.credential ?? null),
-          });
-          googleSdk.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              reject(new Error('Google prompt was not displayed or skipped.'));
-            }
-          });
-        } catch (err) {
-          reject(err);
-        }
+
+      return await new Promise<string | null>((resolve) => {
+        let settled = false;
+
+        const finishResolve = (value: string | null) => {
+          if (!settled) {
+            settled = true;
+            resolve(value);
+          }
+        };
+
+        googleSdk.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          ux_mode: 'popup',
+          use_fedcm_for_prompt: true,
+          callback: (resp) => finishResolve(resp.credential ?? null),
+        });
+
+        googleSdk.accounts.id.prompt((notification) => {
+          const skipped = notification.isSkippedMoment();
+          const notDisplayed = notification.isNotDisplayed();
+          if (skipped || notDisplayed) {
+            const skippedReason = notification.getSkippedReason?.();
+            const notDisplayedReason = notification.getNotDisplayedReason?.();
+            console.warn('Google prompt did not return credential', {
+              skipped,
+              skippedReason,
+              notDisplayed,
+              notDisplayedReason,
+            });
+            finishResolve(null);
+          }
+        });
       });
     } catch (err) {
       console.error('Failed to load Google SDK or get credential', err);
