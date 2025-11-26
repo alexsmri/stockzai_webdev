@@ -49,6 +49,7 @@ from rest_framework.decorators import permission_classes, api_view
 import json
 import logging
 import uuid
+import requests
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from datetime import timedelta
@@ -189,6 +190,10 @@ def _verify_google_id_token(raw_token: str) -> dict | None:
         return None
     try:
         claims = google_id_token.verify_oauth2_token(raw_token, google_requests.Request(), client_id)
+        issuer = claims.get("iss")
+        if issuer not in {"https://accounts.google.com", "accounts.google.com"}:
+            logger.warning("Invalid Google token issuer: %s", issuer)
+            return None
         return claims
     except Exception as exc:  # noqa: BLE001
         logger.warning("Google token verification failed: %s", exc)
@@ -817,6 +822,73 @@ def view_social_google(request):
         return api_json_response(error="Invalid payload.", status=400)
 
     raw_token = body.get("id_token")
+    auth_code = body.get("code")
+    state = body.get("state")
+    code_verifier = body.get("code_verifier")
+    redirect_uri = getattr(settings, "GOOGLE_OAUTH_REDIRECT_URI", None)
+
+    logger.warning(
+        "Social Google start"),
+    logger.warning({
+            "has_id_token": bool(raw_token),
+            "has_code": bool(auth_code),
+            "state_present": bool(state),
+            "redirect_uri_set": bool(redirect_uri),
+        },
+    )
+
+    if not raw_token and auth_code:
+        client_id = getattr(settings, "GOOGLE_CLIENT_ID", None)
+        client_secret = getattr(settings, "GOOGLE_CLIENT_SECRET", None)
+        if not client_id or not client_secret:
+            return api_json_response(error="Google OAuth client configuration missing.", status=200)
+        if not redirect_uri:
+            return api_json_response(error="redirect_uri required for OAuth exchange.", status=200)
+        cookie_state = request.COOKIES.get("google_oauth_state")
+        if not cookie_state or not state or cookie_state != state:
+            logger.warning(
+                "Social Google state mismatch"),
+            logger.warning({"cookie_state": bool(cookie_state), "state_present": bool(state)},
+            )
+            return api_json_response(error="State mismatch.", status=200)
+
+        logger.warning(
+            "Exchanging Google auth code"),
+        logger.warning({
+                "has_code_verifier": bool(code_verifier),
+                "redirect_uri": redirect_uri,
+            },
+        )
+        token_resp = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": auth_code,
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "redirect_uri": redirect_uri,
+                "grant_type": "authorization_code",
+                **({"code_verifier": code_verifier} if code_verifier else {}),
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=10,
+        )
+        try:
+            token_payload = token_resp.json()
+        except Exception:  # pragma: no cover - defensive
+            token_payload = {}
+        raw_token = token_payload.get("id_token")
+        if not raw_token:
+            logger.warning(
+                "Google token exchange failed"),
+            logger.warning({
+                    "status": token_resp.status_code,
+                    "text": token_resp.text[:500],
+                    "error": token_payload.get("error"),
+                },
+            )
+            error_msg = token_payload.get("error_description") or token_payload.get("error") or "Unable to exchange code."
+            return api_json_response(error=error_msg, status=200)
+
     if not raw_token:
         return api_json_response(error="id_token required.", status=200)
 
@@ -827,6 +899,11 @@ def view_social_google(request):
     sub = claims.get("sub")
     email = claims.get("email")
     email_verified = bool(claims.get("email_verified"))
+
+    logger.warning(
+        "Google token verified"),
+    logger.warning({"email": email, "sub_present": bool(sub), "email_verified": email_verified},
+    )
 
     ctx = SocialLoginContext(
         provider=SocialProvider.GOOGLE,

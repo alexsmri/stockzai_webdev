@@ -97,8 +97,12 @@ export default function COM_FormCodeVerify({
 
       clearTemporaryPassword();
       await utStore.get('PropertyCredentials');
+      const status = (await utStore.get('PropertyStatus')) as
+        | { completed_onboarding?: boolean }
+        | null;
+      const target = status?.completed_onboarding ? prRedirect : '/onboarding/choose-ticker';
       handleAlertOpen('Welcome', `Welcome to stockz.ai, ${prUsername || 'there'}!`, 's');
-      navigate(prRedirect);
+      navigate(target);
     } finally {
       setStBusy(false);
     }

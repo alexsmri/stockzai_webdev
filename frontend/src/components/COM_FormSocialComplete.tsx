@@ -74,8 +74,12 @@ export default function COM_FormSocialComplete({
         utStore.set('ActionLogin', { access: utRes.access, refresh: utRes.refresh });
       }
       await utStore.get('PropertyCredentials');
+      const status = (await utStore.get('PropertyStatus')) as
+        | { completed_onboarding?: boolean }
+        | null;
+      const target = status?.completed_onboarding ? prRedirect : '/onboarding/choose-ticker';
       handleAlertOpen('Welcome', `Welcome to stockz.ai, ${username}!`, 's');
-      navigate(prRedirect);
+      navigate(target);
     } finally {
       setStLoading(false);
     }
