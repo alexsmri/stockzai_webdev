@@ -144,7 +144,7 @@ export default function COM_FormSocialComplete({
             time)
           </label>
           <button
-            className="look-button-secondary look-button-auth"
+            className="look-button-secondary mod-button-auth"
             disabled={stLoading || !stConsentsTos || !stConsentsInformationOnly}
           >
             {stLoading ? 'Completing...' : CONTINUE_LABEL}

@@ -75,7 +75,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
             placeholder="Password"
             className="look-input-auth"
           />
-          <button className="look-button-secondary look-button-auth">
+          <button className="look-button-secondary mod-button-auth">
             {stLoading ? 'Logging In...' : 'Continue'}
           </button>
         </form>

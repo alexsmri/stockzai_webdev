@@ -205,7 +205,7 @@ function COM_FormRegisterPassword({
             time)
           </label>
           <button
-            className="look-button-secondary look-button-auth"
+            className="look-button-secondary mod-button-auth"
             disabled={stLoading || !stConsentsTos || !stConsentsInformationOnly}
           >
             {stLoading ? 'Creating Account...' : CONTINUE_LABEL}

@@ -122,7 +122,7 @@ export default function COM_FormUnsubscribe() {
               formatReason(reason, idx === DEFAULT_REASONS.length - 1)
             )}
           </div>
-          <button className="look-button-secondary look-button-auth">Confirm</button>
+          <button className="look-button-secondary mod-button-auth">Confirm</button>
         </form>
       </div>
     </>

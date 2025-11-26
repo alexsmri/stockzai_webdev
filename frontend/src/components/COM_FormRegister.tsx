@@ -54,7 +54,7 @@ function COM_FormRegister() {
             placeholder="Email"
             className="look-input-auth"
           />
-          <button className="look-button-secondary look-button-auth">{CONTINUE_LABEL}</button>
+          <button className="look-button-secondary mod-button-auth">{CONTINUE_LABEL}</button>
         </form>
         <COM_SocialButtons prRedirect="/users/plans/select" />
       </div>

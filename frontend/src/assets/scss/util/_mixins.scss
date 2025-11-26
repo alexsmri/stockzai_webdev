@@ -118,6 +118,7 @@
   $shadow-size: f.scale-gap(0.5);
   $outline-size: f.scale-gap(0.125);
   $active-offset: f.scale-gap(0.05);
+  font-weight: 500;
   background-color: #{$color};
   color: #{$text-color};
   border: 0;

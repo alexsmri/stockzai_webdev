@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import type { ValidKeys } from '../stores/STO_Users';
+import LOGO_Google from '@/assets/media/LOGO_Google.svg?react';
+import { scale } from '../utils/functions';
 
 type TYP_GoogleAuthResponse =
   | {
@@ -217,10 +219,11 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
     <div className="area-flex-col mod-gap-s">
       <button
         type="button"
-        className="look-button-ghost look-button-auth"
+        className="area-flex-row look-button-tertiary mod-button-auth"
         onClick={handleProvider}
         disabled={stBusy}
       >
+        <LOGO_Google aria-hidden="true" style={{ width: scale(2), color: 'currentColor' }} />
         {stBusy ? 'Connecting to Google...' : 'Continue with Google'}
       </button>
     </div>
