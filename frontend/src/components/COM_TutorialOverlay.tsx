@@ -58,6 +58,12 @@ export default function COM_TutorialOverlay({
     setStepIndex((current) => Math.min(current, Math.max(prSteps.length - 1, 0)));
   }, [prSteps.length]);
 
+  const markOnboardingCompleted = useCallback(() => {
+    const utPayload = { completed_onboarding: true };
+    userStore.set('PropertyStatus', utPayload);
+    userStore.post('PropertyStatus', utPayload);
+  }, [userStore]);
+
   const updateRect = useCallback(() => {
     if (!activeStep || !activeStep.ref?.current || showCompletion) {
       setRect(null);
@@ -111,11 +117,12 @@ export default function COM_TutorialOverlay({
       if (current < prSteps.length - 1) {
         return current + 1;
       }
+      markOnboardingCompleted();
       setShowCompletion(true);
       setRect(null);
       return current;
     });
-  }, [activeStep, prSteps.length]);
+  }, [activeStep, markOnboardingCompleted, prSteps.length]);
 
   useEffect(() => {
     if (!activeStep?.continueClickObject || showCompletion) {
@@ -180,9 +187,7 @@ export default function COM_TutorialOverlay({
   }, [activeStep, showCompletion]);
 
   const handleClose = () => {
-    const utPayload = { onboarding_completed: true };
-    userStore.set('PropertyStatus', utPayload);
-    userStore.post('PropertyStatus', utPayload);
+    markOnboardingCompleted();
     setShowCompletion(false);
     setRect(null);
     onFinish?.();

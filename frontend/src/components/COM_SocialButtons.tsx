@@ -208,27 +208,37 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
       }
 
       await utStore.get('PropertyCredentials');
+      const status = (await utStore.get('PropertyStatus')) as {
+        completed_onboarding?: boolean;
+      } | null;
+      const target =
+        (status && status.completed_onboarding && '/companies/search') || prRedirect || '/';
       handleAlertOpen('Success', 'You are now signed in.', 's');
-      navigate(prRedirect);
+      navigate(target);
     } finally {
       setStBusy(false);
     }
   };
 
   return (
-    <div className="area-flex-col mod-padding-none mod-align-stretch mod-gap-s">
-      <button
-        type="button"
-        className="area-flex-row mod-align-center look-button-tertiary mod-button-auth"
-        style={{ justifyContent: 'center' }}
-        onClick={handleProvider}
-        disabled={stBusy}
-      >
-        <span aria-hidden="true" style={{ display: 'inline-flex' }}>
-          <LOGO_Google style={{ width: scale(2), height: 'auto' }} />
-        </span>
-        {stBusy ? 'Connecting to Google...' : 'Continue with Google'}
-      </button>
-    </div>
+    <>
+      <p className="look-text-x0 look-priority-low mod-centersides" style={{ marginTop: scale(1) }}>
+        OR
+      </p>
+      <div className="area-flex-col mod-padding-none mod-align-stretch mod-gap-s">
+        <button
+          type="button"
+          className="area-flex-row mod-align-center look-button-tertiary mod-button-auth"
+          style={{ justifyContent: 'center' }}
+          onClick={handleProvider}
+          disabled={stBusy}
+        >
+          <span aria-hidden="true" style={{ display: 'inline-flex' }}>
+            <LOGO_Google style={{ width: scale(2), height: 'auto' }} />
+          </span>
+          {stBusy ? 'Connecting to Google...' : 'Continue with Google'}
+        </button>
+      </div>
+    </>
   );
 }
