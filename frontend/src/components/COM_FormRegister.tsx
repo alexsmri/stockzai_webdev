@@ -40,12 +40,12 @@ function COM_FormRegister() {
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">Create your free account</h1>
       <p className="look-text-x1 look-priority-low mod-align-center">
         30-second signup - Get instant access to million-dollar insights
       </p>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="email"
@@ -64,7 +64,7 @@ function COM_FormRegister() {
           <span className="look-priority-high">Log In</span>
         </a>
       </div>
-    </>
+    </div>
   );
 }
 

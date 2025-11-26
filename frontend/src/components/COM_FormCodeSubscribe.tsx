@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DCOM_FormCode from './DCOM_FormCode';
+import DCOM_FormCode from './dumb/DCOM_FormCode';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import { censorEmail } from '../utils/formats';
@@ -56,9 +56,10 @@ export default function COM_FormCodeSubscribe({
   };
 
   const handleResend = async () => {
-    const utTokenRes = (await utStore.post('ActionSubscribeNewsletterRequest', {}, true)) as
-      | Record<string, any>
-      | null;
+    const utTokenRes = (await utStore.post('ActionSubscribeNewsletterRequest', {}, true)) as Record<
+      string,
+      any
+    > | null;
     if (utTokenRes?.uid) {
       handleAlertOpen('Code sent', 'A new confirmation code has been sent.', 's');
       return true;

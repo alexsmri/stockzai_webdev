@@ -57,9 +57,11 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">{name}</h1>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
+        {' '}
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="text"
@@ -90,7 +92,7 @@ function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
           <span className="look-priority-high">Sign Up</span>
         </a>
       </div>
-    </>
+    </div>
   );
 }
 

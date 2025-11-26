@@ -43,9 +43,9 @@ export default function COM_FormPasswordResetRequest() {
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">Reset Password</h1>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="email"
@@ -57,6 +57,6 @@ export default function COM_FormPasswordResetRequest() {
           <button className="look-button-secondary mod-button-auth">Submit</button>
         </form>
       </div>
-    </>
+    </div>
   );
 }

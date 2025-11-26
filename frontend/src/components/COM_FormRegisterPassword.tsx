@@ -129,12 +129,12 @@ function COM_FormRegisterPassword({
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">Secure your account</h1>
       <p className="look-text-x1 look-priority-low mod-align-center">
         Step 2: Choose a username and password.
       </p>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="text"
@@ -211,13 +211,13 @@ function COM_FormRegisterPassword({
             {stLoading ? 'Creating Account...' : CONTINUE_LABEL}
           </button>
         </form>
-        <div className="area-form-auth-links">
-          <a href="/users/register" className="look-button-subtle">
-            Change email
-          </a>
-        </div>
       </div>
-    </>
+      <div className="area-form-auth-links">
+        <a href="/users/register" className="look-button-subtle">
+          Change email
+        </a>
+      </div>
+    </div>
   );
 }
 

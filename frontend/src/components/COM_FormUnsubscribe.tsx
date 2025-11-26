@@ -110,9 +110,9 @@ export default function COM_FormUnsubscribe() {
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">Unsubscribe</h1>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <p className="look-text-subtle">
             Why do you wish to unsubscribe from stockz.ai newsletter? Please provide a reason
@@ -125,6 +125,6 @@ export default function COM_FormUnsubscribe() {
           <button className="look-button-secondary mod-button-auth">Confirm</button>
         </form>
       </div>
-    </>
+    </div>
   );
 }

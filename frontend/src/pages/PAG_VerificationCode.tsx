@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import COM_Hero from '../components/COM_Hero';
 import COM_FormCodeVerify from '../components/COM_FormCodeVerify';
 import COM_FooterAuth from '../components/COM_FooterAuth';
 import { useUserStore } from '../context/CTX_UserStore';
@@ -58,20 +57,18 @@ export default function PAG_VericationCode() {
 
   return (
     <>
-      <COM_Hero prFlex={true}>
-        <COM_FormCodeVerify
-          prUid={uid}
-          prEmail={email}
-          prUsername={username || undefined}
-          prRedirect={redirectParam}
-          prSubmitKey={isSocialLink ? 'ActionSocialLinkVerify' : 'ActionVerification'}
-          prResendKey="TokenVerificationRequest"
-          prExtraPayload={sessionToken ? { session_token: sessionToken } : undefined}
-          prOnSuccess={isSocialLink ? handleSocialLinkSuccess : undefined}
-          prHeadingOverride={headingOverride}
-          prInstructionsOverride={instructionsOverride}
-        />
-      </COM_Hero>
+      <COM_FormCodeVerify
+        prUid={uid}
+        prEmail={email}
+        prUsername={username || undefined}
+        prRedirect={redirectParam}
+        prSubmitKey={isSocialLink ? 'ActionSocialLinkVerify' : 'ActionVerification'}
+        prResendKey="TokenVerificationRequest"
+        prExtraPayload={sessionToken ? { session_token: sessionToken } : undefined}
+        prOnSuccess={isSocialLink ? handleSocialLinkSuccess : undefined}
+        prHeadingOverride={headingOverride}
+        prInstructionsOverride={instructionsOverride}
+      />
       <COM_FooterAuth />
     </>
   );

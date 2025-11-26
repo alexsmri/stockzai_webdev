@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import COM_Hero from '../components/COM_Hero';
 import COM_FooterAuth from '../components/COM_FooterAuth';
 import COM_FormSocialComplete from '../components/COM_FormSocialComplete';
 
@@ -27,14 +26,12 @@ export default function PAG_SocialComplete() {
 
   return (
     <>
-      <COM_Hero prFlex={true}>
-        <COM_FormSocialComplete
-          prEmail={resolvedEmail}
-          prSessionToken={sessionToken}
-          prPrefillUsername={username}
-          prRedirect={redirectParam}
-        />
-      </COM_Hero>
+      <COM_FormSocialComplete
+        prEmail={resolvedEmail}
+        prSessionToken={sessionToken}
+        prPrefillUsername={username}
+        prRedirect={redirectParam}
+      />
       <COM_FooterAuth />
     </>
   );

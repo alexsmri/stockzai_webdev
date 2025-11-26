@@ -82,12 +82,12 @@ export default function COM_FormSocialComplete({
   };
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">Finish setting up</h1>
       <p className="look-text-x1 look-priority-low mod-align-center">
         Choose a username and accept the required terms to continue with {prEmail}.
       </p>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form onSubmit={handleSubmit} className="look-form-auth">
           <input
             type="text"
@@ -151,6 +151,6 @@ export default function COM_FormSocialComplete({
           </button>
         </form>
       </div>
-    </>
+    </div>
   );
 }

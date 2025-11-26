@@ -60,34 +60,37 @@ export default function COM_FormPasswordReset() {
     }
   }, [success]);
 
+  if (valid === null) {
+    return <COM_Loading />;
+  }
+
+  if (valid === false) {
+    handleAlertOpen('Error', 'Password Reset Token invalid', 'f');
+    return;
+  }
+
   return (
-    <>
-      {valid === null && <COM_Loading />}
-      {valid === false && <div className="look-text-x2">Token Invalid.</div>}
-      {valid === true && (
-        <>
-          <h1 className="look-text-x4">Set New Password</h1>
-          <div className="area-flex-col look-div-subtle mod-padding-xl">
-            <form onSubmit={handleSubmit} className="look-form-auth">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="look-input-auth"
-              />
-              <input
-                type="password"
-                value={password2}
-                onChange={(e) => setPassword2(e.target.value)}
-                placeholder="Repeat Password"
-                className="look-input-auth"
-              />
-              <button className="look-button-secondary mod-button-auth">Submit</button>
-            </form>
-          </div>
-        </>
-      )}
-    </>
+    <div className="area-auth ">
+      <h1 className="look-text-x4">Set New Password</h1>
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
+        <form onSubmit={handleSubmit} className="look-form-auth">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="look-input-auth"
+          />
+          <input
+            type="password"
+            value={password2}
+            onChange={(e) => setPassword2(e.target.value)}
+            placeholder="Repeat Password"
+            className="look-input-auth"
+          />
+          <button className="look-button-secondary mod-button-auth">Submit</button>
+        </form>
+      </div>
+    </div>
   );
 }

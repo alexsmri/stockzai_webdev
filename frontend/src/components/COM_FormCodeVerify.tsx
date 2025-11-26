@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DCOM_FormCode from './DCOM_FormCode';
+import DCOM_FormCode from './dumb/DCOM_FormCode';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import { REGISTRATION_PASSWORD_STORAGE_KEY } from '../constants';

@@ -240,9 +240,9 @@ export default function COM_FormCode({
       : `An email with a six-digit code has just been sent to ${utCensoredEmail}. Enter the code below.`;
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">{heading}</h1>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form className="look-form-auth" onSubmit={handleSubmit}>
           <p className="look-text-subtle look-text-x0">{instructions}</p>
           <div className="area-flex-row mod-gap-s">
@@ -289,6 +289,6 @@ export default function COM_FormCode({
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createRef, useEffect, useMemo, useRef, useState } from 'react';
-import { REGISTRATION_RESEND_COOLDOWN_SECONDS } from '../constants';
-import { scale } from '../utils/functions';
+import { REGISTRATION_RESEND_COOLDOWN_SECONDS } from '../../constants';
+import { scale } from '../../utils/functions';
 
 interface ITF_FormCodeProps {
   prHeading: string;
@@ -135,9 +135,9 @@ export default function DCOM_FormCode({
   })();
 
   return (
-    <>
+    <div className="area-auth">
       <h1 className="look-text-x4">{prHeading}</h1>
-      <div className="area-flex-col look-div-subtle mod-padding-xl">
+      <div className="area-flex-col look-div-subtle mod-align-stretch mod-padding-xl">
         <form className="look-form-auth" onSubmit={handleSubmit}>
           <p className="look-text-subtle look-text-x0">{prInstructions}</p>
           <div className="area-flex-row mod-gap-s">
@@ -186,6 +186,6 @@ export default function DCOM_FormCode({
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }

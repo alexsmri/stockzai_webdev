@@ -216,14 +216,17 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
   };
 
   return (
-    <div className="area-flex-col mod-gap-s">
+    <div className="area-flex-col mod-padding-none mod-align-stretch mod-gap-s">
       <button
         type="button"
-        className="area-flex-row look-button-tertiary mod-button-auth"
+        className="area-flex-row mod-align-center look-button-tertiary mod-button-auth"
+        style={{ justifyContent: 'center' }}
         onClick={handleProvider}
         disabled={stBusy}
       >
-        <LOGO_Google aria-hidden="true" style={{ width: scale(2), color: 'currentColor' }} />
+        <span aria-hidden="true" style={{ display: 'inline-flex' }}>
+          <LOGO_Google style={{ width: scale(2), height: 'auto' }} />
+        </span>
         {stBusy ? 'Connecting to Google...' : 'Continue with Google'}
       </button>
     </div>

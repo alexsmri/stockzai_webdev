@@ -36,6 +36,13 @@
     align-items: center;
 }
 
+.area-auth {
+    @extend .area-flex-col;
+    width: clamp(var(--width-form-auth), 92vw, 28rem);
+    margin-inline: auto;
+    margin: auto;
+}
+
 .area-image-card {
     position: relative;
     display: flex;
