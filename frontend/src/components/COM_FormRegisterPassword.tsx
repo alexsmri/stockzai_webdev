@@ -169,7 +169,7 @@ function COM_FormRegisterPassword({
             <span>
               I accept the privacy policy and{' '}
               <a
-                href="https://stockz.ai/terms-conditions"
+                href="/terms-conditions"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(event) => event.stopPropagation()}

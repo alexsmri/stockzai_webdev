@@ -1,0 +1,237 @@
+// Styles for the text pages (backtest report, legal pages), rendered by COM_LandDocLayout.
+// Same isolation rules as landing.scss: everything under `.lp`, every class prefixed `lp-`.
+// landing.scss is imported alongside this file by the layout component (navbar, buttons, base).
+@use '../util/functions' as f;
+
+$lp-doc-width: 120rem;
+$lp-toc-width: 11rem;
+
+.lp {
+    // Color of the table-of-contents entry the reader is currently at (blue, sampled from the Framer page).
+    --lp-toc-active: hsl(229, 79%, 60%);
+
+    .lp-sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    // ---------- Hero (optional, above the document) ----------
+    .lp-doc-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: f.scale-gap(1.2);
+        padding: f.scale-padding(8) f.scale-padding(1.5) f.scale-padding(12);
+        text-align: center;
+    }
+
+    // ---------- Layout: table of contents left, article right ----------
+    .lp-doc {
+        display: grid;
+        grid-template-columns: $lp-toc-width minmax(0, 1fr);
+        gap: f.scale-gap(4.5);
+        align-items: start;
+        width: 100%;
+        max-width: $lp-doc-width;
+        margin: 0 auto;
+        padding: f.scale-padding(6) f.scale-padding(3.5) f.scale-padding(5) f.scale-padding(1.3);
+    }
+
+    // pages without a hero need room for the fixed navbar
+    .lp-navbar + .lp-doc {
+        padding-top: f.scale-padding(7);
+    }
+
+    // ---------- Article typography ----------
+    .lp-doc-body {
+        min-width: 0;
+        font-size: f.scale-font(0);
+        line-height: 1.6;
+        color: var(--color-secondary-a60);
+        text-align: justify;
+        hyphens: auto;
+
+        h1, h2, h3, h4 {
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            color: var(--color-secondary-a80);
+            scroll-margin-top: f.scale-gap(6);
+        }
+
+        .lp-doc-title {
+            font-size: f.scale-font(4);
+            margin-bottom: f.scale-gap(2);
+        }
+
+        h2 {
+            font-size: f.scale-font(3.5);
+            line-height: 1.2;
+            margin: f.scale-gap(4) 0 f.scale-gap(1);
+
+            &:first-of-type { margin-top: 0; }
+        }
+
+        h3 {
+            font-size: f.scale-font(1.5);
+            line-height: 1.3;
+            margin: f.scale-gap(2) 0 f.scale-gap(0.6);
+        }
+
+        // sub-sections inside an h3; not listed in the table of contents
+        h4 {
+            font-size: f.scale-font(0.5);
+            line-height: 1.4;
+            margin: f.scale-gap(1.6) 0 f.scale-gap(0.5);
+        }
+
+        p {
+            margin: 0 0 f.scale-gap(1);
+        }
+
+        strong { color: var(--color-secondary-a80); }
+
+        a {
+            color: var(--color-secondary-a80);
+            text-decoration: underline;
+            text-underline-offset: 0.15em;
+            overflow-wrap: anywhere;
+
+            &:hover { color: var(--color-secondary); }
+        }
+
+        ul, ol {
+            margin: 0 0 f.scale-gap(1);
+            padding-inline-start: f.scale-gap(1.5);
+
+            li {
+                margin-bottom: f.scale-gap(0.5);
+                padding-inline-start: f.scale-gap(0.4);
+            }
+        }
+
+        // formulas and code snippets
+        .lp-doc-code {
+            margin: 0 0 f.scale-gap(1);
+            padding: f.scale-padding(0.9) f.scale-padding(1.2);
+            border-radius: f.scale-gap(0.6);
+            background-color: var(--color-secondary-a5);
+            overflow-x: auto;
+            text-align: left;
+
+            code {
+                padding: 0;
+                background: none;
+                font-size: f.scale-font(-0.5);
+                white-space: pre;
+            }
+        }
+
+        // nested lists (legal clauses) read as (a), (b)
+        ol ol {
+            margin: f.scale-gap(0.5) 0 0;
+            list-style-type: lower-alpha;
+        }
+
+        code {
+            padding: 0.1em 0.4em;
+            border-radius: f.scale-gap(0.3);
+            background-color: var(--color-secondary-a10);
+            color: var(--color-secondary-a80);
+            font-size: 0.9em;
+        }
+    }
+
+    // ---------- Results table ----------
+    .lp-doc-table-wrap {
+        overflow-x: auto;
+        margin: f.scale-gap(1) 0 f.scale-gap(1.5);
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: f.scale-font(-1);
+            text-align: left;
+        }
+
+        th, td {
+            padding: f.scale-padding(0.7) f.scale-padding(1);
+            border-bottom: 1px solid var(--color-secondary-a10);
+            text-align: left;
+        }
+
+        thead th {
+            font-weight: 600;
+            color: var(--color-secondary-a80);
+        }
+
+        tbody th {
+            font-weight: 500;
+            color: var(--color-secondary-a80);
+        }
+    }
+
+    // ---------- Table of contents ----------
+    // No inner scrollbar: the list is only pinned while the viewport is tall enough to show all of it.
+    .lp-toc {
+        @media (min-height: 820px) {
+            position: sticky;
+            top: f.scale-gap(6);
+        }
+
+        ul {
+            display: flex;
+            flex-direction: column;
+            gap: f.scale-gap(0.8);
+        }
+    }
+
+    .lp-toc-title {
+        margin-bottom: f.scale-gap(1.2);
+        font-size: f.scale-font(0);
+        font-weight: 600;
+        color: var(--color-secondary-a80);
+    }
+
+    .lp-toc-item {
+        display: block;
+        font-size: f.scale-font(-0.5);
+        font-weight: 500;
+        line-height: 1.4;
+        color: var(--color-secondary-a60);
+        transition: color 0.2s ease-in-out;
+
+        &:hover { color: var(--color-secondary); }
+    }
+
+    .lp-toc-item-sub {
+        padding-inline-start: f.scale-gap(1);
+    }
+
+    .lp-toc-item-active,
+    .lp-toc-item-active:hover {
+        color: var(--lp-toc-active);
+    }
+
+    // ---------- Responsive ----------
+    // The table of contents stays on desktop and tablet and disappears on phones.
+    @media (max-width: 600px) {
+        .lp-doc,
+        .lp-navbar + .lp-doc {
+            grid-template-columns: minmax(0, 1fr);
+            padding: f.scale-padding(5) f.scale-padding(1) f.scale-padding(3);
+        }
+
+        .lp-doc-hero { padding: f.scale-padding(6) f.scale-padding(1) f.scale-padding(4); }
+
+        .lp-toc { display: none; }
+        .lp-doc-body { text-align: left; }
+    }
+}

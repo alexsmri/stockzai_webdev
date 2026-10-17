@@ -47,3 +47,6 @@ export const RISK_TOLERANCE_OPTIONS = {
 } as const;
 
 export type RiskToleranceKey = keyof typeof RISK_TOLERANCE_OPTIONS;
+
+// Where logged-in users land. "/" is the marketing landing page, so app flows must not navigate there.
+export const APP_HOME_PATH = "/companies/search";

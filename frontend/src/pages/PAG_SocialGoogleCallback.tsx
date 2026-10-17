@@ -4,6 +4,7 @@ import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import COM_Loading from '../components/COM_Loading';
 import type { ValidKeys } from '../stores/STO_Users';
+import { APP_HOME_PATH } from '../constants';
 
 const GOOGLE_REDIRECT_URI =
   (import.meta.env.VITE_GOOGLE_REDIRECT_URI as string | undefined) ||
@@ -21,7 +22,7 @@ export default function PAG_SocialGoogleCallback() {
   const error = searchParams.get('error');
 
   const storedState = useMemo(() => sessionStorage.getItem('google_oauth_state') || '', []);
-  const storedRedirect = useMemo(() => sessionStorage.getItem('google_oauth_redirect') || '/', []);
+  const storedRedirect = useMemo(() => sessionStorage.getItem('google_oauth_redirect') || APP_HOME_PATH, []);
   const codeVerifier = useMemo(
     () => sessionStorage.getItem('google_oauth_code_verifier') || '',
     []
@@ -83,7 +84,7 @@ export default function PAG_SocialGoogleCallback() {
           email: utRes.email,
           provider: 'google',
           session_token: utRes.session_token || '',
-          redirect: storedRedirect || '/',
+          redirect: storedRedirect || APP_HOME_PATH,
         });
         sessionStorage.removeItem('google_oauth_state');
         sessionStorage.removeItem('google_oauth_redirect');
@@ -96,7 +97,7 @@ export default function PAG_SocialGoogleCallback() {
         const params = new URLSearchParams({
           session_token: utRes.session_token,
           email: utRes.email,
-          redirect: storedRedirect || '/',
+          redirect: storedRedirect || APP_HOME_PATH,
         });
         sessionStorage.removeItem('google_oauth_state');
         sessionStorage.removeItem('google_oauth_redirect');
@@ -114,7 +115,7 @@ export default function PAG_SocialGoogleCallback() {
         | { completed_onboarding?: boolean }
         | null;
       const target = status?.completed_onboarding
-        ? storedRedirect || '/'
+        ? storedRedirect || APP_HOME_PATH
         : '/onboarding/choose-ticker';
       handleAlertOpen('Success', 'You are now signed in.', 's');
       sessionStorage.removeItem('google_oauth_state');

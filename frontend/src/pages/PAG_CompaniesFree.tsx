@@ -146,7 +146,7 @@ function PAG_CompaniesFreeContent({
         financial advice or investment recommendations. View our{' '}
         <a
           className="look-text-clickable mod-padding-none"
-          href="https://stockz.ai/scores"
+          href="/scores"
           target="_blank"
           rel="noopener noreferrer"
         >

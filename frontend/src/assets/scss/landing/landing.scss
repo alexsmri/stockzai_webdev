@@ -1,0 +1,680 @@
+// Landing page styles (stockz.ai home).
+//
+// Isolation rules:
+//  - Everything lives under the `.lp` root, so nothing here can touch the platform.
+//  - Every class is prefixed `lp-`.
+//  - Only tokens (CSS variables from global/_colors + _variables) and the util
+//    mixins/functions are reused. `global` and `util/keyframes` are NOT imported
+//    again, so no global CSS is emitted twice.
+@use '../util/functions' as f;
+@use '../util/mixins' as m;
+
+$lp-max-width: 72rem;
+$lp-narrow-width: 44rem;
+$lp-card-radius: 1.5rem;
+$lp-mobile: 768px;
+
+.lp {
+    background-color: var(--color-shadow);
+    color: var(--color-secondary-a60);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+
+    main {
+        flex: 1;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    h1, h2, h3, p, figure, blockquote {
+        margin: 0;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        & > * {
+            margin-bottom: 0;
+        }
+    }
+
+    // ---------- Typography ----------
+    .lp-bright {
+        color: var(--color-secondary-a80);
+    }
+
+    .lp-dim {
+        color: var(--color-secondary-a40);
+    }
+
+    // Heroes use the 60% tone for their muted text, 40% is reserved for the rest of the page.
+    .lp-hero .lp-dim,
+    .lp-doc-hero .lp-dim {
+        color: var(--color-secondary-a60);
+    }
+
+    .lp-eyebrow {
+        font-size: f.scale-font(-1);
+        color: var(--color-secondary-a60);
+        text-align: center;
+    }
+
+    .lp-title {
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1.15;
+        text-align: center;
+    }
+
+    .lp-title-xl { font-size: f.scale-font(6); }
+    .lp-title-l { font-size: f.scale-font(3); }
+    .lp-title-m { font-size: f.scale-font(2); }
+    .lp-title-s { font-size: f.scale-font(1); text-align: left; }
+
+    .lp-lead {
+        font-size: f.scale-font(0);
+        font-weight: 500;
+        line-height: 1.6;
+        text-align: center;
+        color: var(--color-secondary-a80);
+    }
+
+    // ---------- Scroll reveal ----------
+    // Elements with .lp-reveal fade in while drifting down a few pixels, once, when they first scroll
+    // into view (useRevealOnScroll adds .lp-reveal-in). The individual `translate` property is used so
+    // it never fights the 3D `transform` tilts. -d1 ... -d6 stagger elements that appear together.
+    .lp-reveal {
+        opacity: 0;
+        translate: 0 f.scale-gap(-1);
+        transition:
+            opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--lp-reveal-delay, 0s),
+            translate 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--lp-reveal-delay, 0s);
+    }
+
+    .lp-reveal-in {
+        opacity: 1;
+        translate: 0 0;
+    }
+
+    .lp-reveal-d1 { --lp-reveal-delay: 0.1s; }
+    .lp-reveal-d2 { --lp-reveal-delay: 0.2s; }
+    .lp-reveal-d3 { --lp-reveal-delay: 0.3s; }
+    .lp-reveal-d4 { --lp-reveal-delay: 0.4s; }
+    .lp-reveal-d5 { --lp-reveal-delay: 0.5s; }
+    .lp-reveal-d6 { --lp-reveal-delay: 0.6s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .lp-reveal {
+            opacity: 1;
+            translate: none;
+            transition: none;
+        }
+    }
+
+    // ---------- Buttons ----------
+    .lp-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: f.scale-gap(0.5);
+        padding: f.scale-padding(0.4) f.scale-padding(0.9);
+        border-radius: f.scale-gap(0.6);
+        font-size: f.scale-font(-1);
+        font-weight: 500;
+        text-wrap: nowrap;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+
+        &:active { transform: translateY(f.scale-gap(0.05)); }
+    }
+
+    .lp-button-light {
+        background-color: var(--color-secondary);
+        color: var(--color-primary);
+
+        &:hover { background-color: color-mix(in srgb, var(--color-secondary) 85%, black 15%); }
+    }
+
+    .lp-button-ghost {
+        background-color: var(--color-secondary-a10);
+        color: var(--color-secondary-a80);
+
+        &:hover { background-color: var(--color-secondary-a20); }
+    }
+
+    .lp-button-accent {
+        background-color: var(--color-tertiary);
+        color: var(--color-primary);
+
+        &:hover { background-color: color-mix(in srgb, var(--color-tertiary) 85%, white 15%); }
+    }
+
+    .lp-button-lg {
+        border-radius: f.scale-gap(6);
+        padding: f.scale-padding(0.5) f.scale-padding(1.2);
+        font-size: f.scale-font(0);
+    }
+
+    .lp-button-block {
+        width: 100%;
+        border-radius: f.scale-gap(0.5);
+    }
+
+    // ---------- Navbar ----------
+    .lp-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: f.scale-gap(1.5);
+        padding: f.scale-padding(0.6) f.scale-padding(1.5);
+        background: linear-gradient(to bottom, var(--color-shadow), var(--color-transparent));
+    }
+
+    .lp-navbar-logo {
+        height: f.scale-gap(2);
+        width: auto;
+    }
+
+    // Holds links and buttons. Inline on desktop, a dropdown panel behind the hamburger on mobile.
+    .lp-navbar-menu {
+        display: flex;
+        align-items: center;
+        gap: f.scale-gap(1.5);
+        margin-left: auto;
+    }
+
+    .lp-navbar-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: none;
+        color: var(--color-secondary);
+        cursor: pointer;
+
+        svg {
+            width: f.scale-gap(2.4);
+            height: f.scale-gap(2.4);
+            color: inherit;
+
+            path { fill: currentColor; }
+        }
+    }
+
+    .lp-navbar-links {
+        display: flex;
+        gap: f.scale-gap(2);
+
+        a {
+            font-size: f.scale-font(-1);
+            color: var(--color-secondary-a60);
+            transition: color 0.2s ease-in-out;
+
+            &:hover { color: var(--color-secondary); }
+        }
+    }
+
+    .lp-navbar-actions {
+        display: flex;
+        gap: f.scale-gap(0.6);
+    }
+
+    // ---------- Sections ----------
+    .lp-section {
+        width: 100%;
+        max-width: $lp-max-width;
+        margin: 0 auto;
+        padding: f.scale-padding(5) f.scale-padding(1.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: f.scale-gap(1.5);
+        scroll-margin-top: f.scale-gap(3);
+    }
+
+    // ---------- Hero ----------
+    .lp-hero {
+        padding-top: f.scale-padding(7);
+        text-align: center;
+    }
+
+    .lp-hero-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 78%;
+        margin: f.scale-gap(3) 0;
+    }
+
+    // The hero cards share one vanishing point, so the side cards turn towards the center card.
+    .lp-hero-visual {
+        perspective: 1400px;
+    }
+
+    .lp-hero-card {
+        width: 36%;
+        height: auto;
+    }
+
+    .lp-hero-card-left {
+        transform: rotateY(24deg);
+        transform-origin: right center;
+        margin-right: -4%;
+    }
+
+    .lp-hero-card-center {
+        width: 33%;
+        z-index: 1;
+    }
+
+    .lp-hero-card-right {
+        transform: rotateY(-24deg);
+        transform-origin: left center;
+        margin-left: -4%;
+    }
+
+    // ---------- 3D tilt + shadow (images are flat, the look is applied here) ----------
+    .lp-shadow {
+        filter: drop-shadow(0 f.scale-gap(1.2) f.scale-gap(1.5) rgba(0, 0, 0, 0.55));
+    }
+
+    // Positive rotateX tilts the top edge away from the viewer ("tilted backwards").
+    .lp-tilt-dashboard {
+        transform: perspective(1600px) rotateX(14deg);
+    }
+
+    // Top cards: standing upright, turned towards each other. Horizontal turn only, no vertical tilt.
+    .lp-tilt-scores {
+        transform: perspective(900px) rotateY(16deg);
+    }
+
+    .lp-tilt-kpi {
+        transform: perspective(900px) rotateY(-16deg);
+    }
+
+    .lp-tilt-leaderboard {
+        transform: perspective(1100px) rotateX(16deg);
+    }
+
+    .lp-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: f.scale-gap(3);
+        margin-top: f.scale-gap(2);
+        font-size: f.scale-font(2);
+        font-weight: 600;
+        letter-spacing: -0.04em;
+    }
+
+    // ---------- Understand ----------
+    .lp-understand {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: f.scale-gap(3);
+
+        .lp-understand-text {
+            flex: 1 1 40%;
+            display: flex;
+            flex-direction: column;
+
+            .lp-title { text-align: left; font-size: f.scale-font(1); line-height: 1.5; }
+        }
+
+        .lp-understand-image {
+            flex: 1 1 60%;
+            min-width: 0;
+            height: auto;
+        }
+    }
+
+    // ---------- Cards / bento ----------
+    .lp-bento {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: f.scale-gap(0.8);
+        width: 100%;
+    }
+
+    .lp-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: f.scale-gap(0.8);
+        padding: f.scale-padding(1.5);
+        border-radius: $lp-card-radius;
+        background-color: var(--color-primary-subtle);
+        overflow: hidden;
+    }
+
+    .lp-card-wide {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .lp-card-tag {
+        display: flex;
+        align-items: center;
+        gap: f.scale-gap(0.5);
+        font-size: f.scale-font(-1);
+        font-weight: 500;
+        color: var(--color-secondary-a60);
+
+        svg {
+            width: f.scale-gap(1);
+            height: f.scale-gap(1);
+            flex: none;
+            // the svg files carry their own color attribute, so inherit the text color explicitly
+            color: inherit;
+
+            path { fill: currentColor; }
+        }
+    }
+
+    .lp-card-image {
+        width: 100%;
+        height: auto;
+        margin-top: auto;
+    }
+
+    // Image placement inside cards: centered with room around it, or bleeding off the right edge.
+    .lp-card-image-inset {
+        width: 62.4%; // 20% smaller than the previous 78%
+        align-self: center;
+        margin-block: f.scale-gap(1.2);
+    }
+
+    .lp-card-image-bleed {
+        width: 72%; // 20% smaller than the previous 90%
+        align-self: flex-end;
+        margin-right: -6.4%;
+        margin-top: f.scale-gap(1.5);
+    }
+
+    .lp-card-link {
+        font-size: f.scale-font(1);
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        color: var(--color-secondary-a40);
+        transition: color 0.2s ease-in-out;
+
+        &:hover { color: var(--color-secondary); }
+    }
+
+    // ---------- Backtest ----------
+    .lp-quote {
+        padding-bottom: f.scale-padding(2);
+    }
+
+    .lp-backtest .lp-card {
+        padding: f.scale-padding(2.25); // 50% more than the default card padding
+
+        .lp-title-s { margin-bottom: f.scale-gap(-0.4); }
+    }
+
+    // ---------- Backtest chart ----------
+    .lp-chart {
+        width: 90%;
+        height: auto;
+        align-self: center;
+        overflow: visible;
+        margin-top: f.scale-gap(1);
+    }
+
+    .lp-chart-line {
+        fill: none;
+        stroke-linecap: round;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+    }
+
+    .lp-chart-line-benchmark {
+        stroke: var(--color-secondary-a40);
+        stroke-width: 2;
+    }
+
+    .lp-chart-line-stockz {
+        stroke: var(--color-tertiary);
+        stroke-width: 3;
+    }
+
+    .lp-chart-dot {
+        fill: var(--color-tertiary);
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    // overrides the global `text` rule from boilerplate; sizes are SVG user units
+    .lp-chart-label {
+        font-size: 9.8px; // 30% smaller than the 14px of the Framer original
+        fill: var(--color-secondary-a60);
+    }
+
+    .lp-chart-label-stockz { fill: var(--color-tertiary); }
+    .lp-chart-label-axis { fill: var(--color-secondary-a40); }
+
+    // draw-on-scroll: lines are drawn once when the chart first enters the viewport
+    .lp-chart-visible {
+        .lp-chart-line {
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 3.2s ease-in-out;
+        }
+
+        .lp-chart-line-stockz { transition-delay: 0.3s; }
+
+        .lp-chart-dot {
+            animation: lp-dot-pulse 1s ease-in-out 3.5s infinite alternate both;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .lp-chart-line { stroke-dashoffset: 0; transition: none; }
+        .lp-chart-dot { opacity: 1; animation: none; }
+    }
+
+    // ---------- Pricing ----------
+    .lp-plans {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: f.scale-gap(1);
+        width: 100%;
+        max-width: $lp-narrow-width;
+    }
+
+    .lp-plan {
+        gap: f.scale-gap(1.2);
+        padding: f.scale-padding(2);
+        // 5% white, the same base as the pro card's gradient
+        background-color: var(--color-secondary-a5);
+
+        .lp-button { margin-top: auto; }
+    }
+
+    .lp-plan-pro {
+        // transparent so the gradient is not layered on top of the 5% base from .lp-plan
+        background-color: transparent;
+        // rgba(0, 209, 108, 0.28) is --color-tertiary at 28%
+        background-image: linear-gradient(
+            42deg,
+            color-mix(in srgb, var(--color-tertiary) 28%, transparent) 0%,
+            var(--color-secondary-a5) 57%,
+            var(--color-secondary-a5) 108%
+        );
+    }
+
+    .lp-plan-title {
+        display: flex;
+        align-items: center;
+        gap: f.scale-gap(0.6);
+        font-size: f.scale-font(1);
+        font-weight: 600;
+        text-align: left;
+        color: var(--color-secondary-a80);
+    }
+
+    .lp-badge {
+        padding: f.scale-padding(0.1) f.scale-padding(0.5);
+        border-radius: f.scale-gap(6);
+        background-color: var(--color-tertiary);
+        color: var(--color-primary);
+        font-size: f.scale-font(-2);
+        font-weight: 500;
+    }
+
+    .lp-plan-features {
+        display: flex;
+        flex-direction: column;
+        gap: f.scale-gap(0.6);
+        margin-bottom: f.scale-gap(1.5);
+        font-size: f.scale-font(-1);
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: f.scale-gap(0.6);
+        }
+
+        svg {
+            width: f.scale-gap(0.9);
+            height: f.scale-gap(0.9);
+            flex: none;
+        }
+    }
+
+    // ---------- FAQ ----------
+    .lp-faq {
+        max-width: $lp-narrow-width;
+        padding-bottom: f.scale-padding(6);
+    }
+
+    .lp-faq-title {
+        margin-top: f.scale-gap(5);
+        color: var(--color-secondary-a80);
+    }
+
+    .lp-faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: f.scale-gap(0.4);
+        width: 100%;
+    }
+
+    .lp-faq-item {
+        border-radius: f.scale-gap(0.8);
+        background-color: var(--color-primary-subtle);
+    }
+
+    .lp-faq-question {
+        display: flex;
+        align-items: center;
+        gap: f.scale-gap(0.8);
+        width: 100%;
+        padding: f.scale-padding(0.7) f.scale-padding(1);
+        background: none;
+        color: var(--color-secondary-a80);
+        font-size: f.scale-font(-1);
+        font-weight: 500;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    // plus icon drawn with two bars; the vertical one collapses when open
+    .lp-faq-icon {
+        position: relative;
+        flex: none;
+        width: f.scale-gap(0.9);
+        height: f.scale-gap(0.9);
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            background-color: currentColor;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        &::before { left: 0; right: 0; top: 50%; height: 1px; }
+        &::after { top: 0; bottom: 0; left: 50%; width: 1px; }
+    }
+
+    .lp-faq-item-open .lp-faq-icon::after {
+        transform: scaleY(0);
+    }
+
+    .lp-faq-answer {
+        padding: 0 f.scale-padding(1) f.scale-padding(0.9) f.scale-padding(2.7);
+        font-size: f.scale-font(-1);
+        line-height: 1.6;
+    }
+
+    // ---------- Responsive ----------
+    @media (max-width: $lp-mobile) {
+        .lp-navbar-toggle { display: flex; margin-left: auto; }
+
+        .lp-navbar-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: f.scale-gap(1.5);
+            padding: f.scale-padding(1.5);
+            background-color: color-mix(in srgb, var(--color-shadow) 92%, transparent);
+            backdrop-filter: blur(f.scale-gap(1));
+            border-bottom: 1px solid var(--color-secondary-a10);
+        }
+
+        .lp-navbar-menu-open { display: flex; }
+
+        .lp-navbar-links {
+            flex-direction: column;
+            gap: f.scale-gap(1.2);
+
+            a { font-size: f.scale-font(1); }
+        }
+
+        .lp-navbar-actions .lp-button { flex: 1; }
+
+        .lp-section { padding: f.scale-padding(3) f.scale-padding(1); }
+        .lp-hero { padding-top: f.scale-padding(5); }
+
+        // Headings scale with the viewport instead of the (small) mobile base font size,
+        // so they keep reading as headings on phones.
+        .lp-title-xl { font-size: clamp(30px, 8.6vw, 56px); }
+        .lp-title-l { font-size: clamp(24px, 6.5vw, 40px); }
+        .lp-title-m { font-size: clamp(20px, 5.2vw, 32px); }
+        .lp-lead br { display: none; }
+
+        .lp-hero-visual { width: 100%; }
+
+        .lp-stats { flex-direction: column; align-items: center; gap: f.scale-gap(1); font-size: f.scale-font(1); }
+
+        .lp-understand { flex-direction: column; }
+        .lp-understand .lp-understand-text .lp-title { text-align: center; }
+
+        .lp-bento,
+        .lp-plans { grid-template-columns: minmax(0, 1fr); }
+    }
+}
+
+// Keyframes are global by nature, hence the lp- prefix.
+@keyframes lp-dot-pulse {
+    from { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1.2); }
+    to { opacity: 1; transform: scale(1); }
+}

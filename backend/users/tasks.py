@@ -7,8 +7,8 @@ from django.conf import settings
 
 @shared_task
 def send_verification_email(email: str, username: str | None, uid: str, token: str):
-    base_url = settings.FRONTEND_URL
-    link = f"{base_url}users/verification/?uid={uid}&email={email}&username={username or ''}"
+    base_url = settings.FRONTEND_URL.rstrip("/")
+    link = f"{base_url}/users/verification?uid={uid}&email={email}&username={username or ''}"
 
     context = {
         "username": username,
@@ -31,8 +31,8 @@ def send_verification_email(email: str, username: str | None, uid: str, token: s
 
 @shared_task
 def send_newsletter_email(email: str, username: str | None, uid: str, token: str):
-    base_url = settings.FRONTEND_URL
-    link = f"{base_url}users/subscribe-newsletter/verify?uid={uid}&email={email}"
+    base_url = settings.FRONTEND_URL.rstrip("/")
+    link = f"{base_url}/users/subscribe-newsletter/verify?uid={uid}&email={email}"
 
     context = {
         "username": username,
@@ -54,8 +54,8 @@ def send_newsletter_email(email: str, username: str | None, uid: str, token: str
 
 @shared_task
 def send_password_reset_email(email: str, username: str | None, uid: str, token: str):
-    base_url = settings.FRONTEND_URL
-    link = f"{base_url}users/password-reset/?uid={uid}&token={token}"
+    base_url = settings.FRONTEND_URL.rstrip("/")
+    link = f"{base_url}/users/password-reset?uid={uid}&token={token}"
 
     context = {
         'username': username,

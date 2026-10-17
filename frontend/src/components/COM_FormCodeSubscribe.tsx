@@ -4,6 +4,7 @@ import DCOM_FormCode from './dumb/DCOM_FormCode';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import { censorEmail } from '../utils/formats';
+import { APP_HOME_PATH } from '../constants';
 
 interface ITF_FormCodeSubscribeProps {
   prUid: string;
@@ -12,7 +13,7 @@ interface ITF_FormCodeSubscribeProps {
   prRedirect?: string;
 }
 
-const DEFAULT_REDIRECT = '/';
+const DEFAULT_REDIRECT = APP_HOME_PATH;
 
 export default function COM_FormCodeSubscribe({
   prUid,

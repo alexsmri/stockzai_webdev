@@ -4,8 +4,9 @@ import { useUserStore } from '../context/CTX_UserStore';
 import { useUserStoreSync } from '../hooks/hooks';
 import { useAlert } from '../context/CTX_Alert';
 import COM_SocialButtons from './COM_SocialButtons';
+import { APP_HOME_PATH } from '../constants';
 
-function COM_FormLogin({ prRedirect = '/' }: { prRedirect?: string }) {
+function COM_FormLogin({ prRedirect = APP_HOME_PATH }: { prRedirect?: string }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const utStore = useUserStore();

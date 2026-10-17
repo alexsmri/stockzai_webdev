@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '../context/CTX_Alert';
 import { useUserStore } from '../context/CTX_UserStore';
+import { APP_HOME_PATH } from '../constants';
 
 interface ITF_FormSocialCompleteProps {
   prEmail: string;
@@ -16,7 +17,7 @@ export default function COM_FormSocialComplete({
   prEmail,
   prSessionToken,
   prPrefillUsername = '',
-  prRedirect = '/',
+  prRedirect = APP_HOME_PATH,
 }: ITF_FormSocialCompleteProps) {
   const [stUsername, setStUsername] = useState(prPrefillUsername);
   const [stConsentsNewsletter, setStConsentsNewsletter] = useState(false);
@@ -112,7 +113,7 @@ export default function COM_FormSocialComplete({
             <span>
               I accept the privacy policy and{' '}
               <a
-                href="https://stockz.ai/terms-conditions"
+                href="/terms-conditions"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(event) => event.stopPropagation()}

@@ -122,3 +122,134 @@ export function useStickyObserver(
     return () => observer.disconnect();
   }, [ref, stickingClass, sentinelID]);
 }
+
+// Flips to true the first time the referenced element scrolls into view (and stays true).
+export function useInViewOnce(ref: RefObject<Element | null>, threshold = 0.3) {
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || inView) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref, threshold, inView]);
+
+  return inView;
+}
+
+export interface ITF_TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Builds a table of contents from the headings inside `ref` (ids are generated where missing)
+// and tracks which heading the reader is currently at. Re-runs when `contentKey` changes.
+export function useDocToc(
+  ref: RefObject<HTMLElement | null>,
+  contentKey: string,
+  selector = 'h2, h3',
+  offset = 140
+) {
+  const [items, setItems] = useState<ITF_TocItem[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+
+    const headings = Array.from(root.querySelectorAll<HTMLElement>(selector));
+    const usedIds = new Set<string>();
+    const nextItems = headings.map((heading) => {
+      const text = heading.textContent?.trim() ?? '';
+      const base = slugify(text) || 'section';
+      let id = heading.id || base;
+      let counter = 2;
+      while (usedIds.has(id)) {
+        id = `${base}-${counter++}`;
+      }
+      usedIds.add(id);
+      heading.id = id;
+      return { id, text, level: Number(heading.tagName.slice(1)) };
+    });
+    setItems(nextItems);
+    if (headings.length === 0) return;
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      let current = headings[0].id;
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top <= offset) current = heading.id;
+        else break;
+      }
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      setActiveId(atBottom ? headings[headings.length - 1].id : current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [ref, contentKey, selector, offset]);
+
+  return { items, activeId };
+}
+
+// Adds `revealedClass` to every element matching `selector` inside `ref` the first time it
+// scrolls into view (scroll-triggered entrance animations; the animation itself lives in CSS).
+export function useRevealOnScroll(
+  ref: RefObject<HTMLElement | null>,
+  selector = '.lp-reveal',
+  revealedClass = 'lp-reveal-in'
+) {
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(selector));
+    if (typeof IntersectionObserver === 'undefined') {
+      targets.forEach((target) => target.classList.add(revealedClass));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add(revealedClass);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
+    );
+
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, [ref, selector, revealedClass]);
+}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import LOGO_Google from '@/assets/media/LOGO_Google.svg?react';
 import { scale } from '../utils/functions';
 
+import { APP_HOME_PATH } from '../constants';
 interface ITF_SocialButtonsProps {
   prRedirect?: string;
 }
@@ -11,7 +12,7 @@ const GOOGLE_REDIRECT_URI =
   (import.meta.env.VITE_GOOGLE_REDIRECT_URI as string | undefined) ||
   `${window.location.origin}/users/social/google/callback`;
 
-export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButtonsProps) {
+export default function COM_SocialButtons({ prRedirect = APP_HOME_PATH }: ITF_SocialButtonsProps) {
   const [stBusy, setStBusy] = useState(false);
 
   const generateRandomString = (length: number) => {
@@ -37,7 +38,7 @@ export default function COM_SocialButtons({ prRedirect = '/' }: ITF_SocialButton
     const codeChallenge = await sha256base64Url(codeVerifier);
 
     sessionStorage.setItem('google_oauth_state', state);
-    sessionStorage.setItem('google_oauth_redirect', prRedirect || '/');
+    sessionStorage.setItem('google_oauth_redirect', prRedirect || APP_HOME_PATH);
     sessionStorage.setItem('google_oauth_code_verifier', codeVerifier);
 
     document.cookie = `google_oauth_state=${state}; path=/; SameSite=Lax${

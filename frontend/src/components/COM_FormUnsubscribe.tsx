@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { APP_HOME_PATH } from '../constants';
 
 const DEFAULT_REASONS = [
   'I signed up by mistake',
@@ -12,7 +13,7 @@ const DEFAULT_REASONS = [
 
 export default function COM_FormUnsubscribe() {
   const [searchParams] = useSearchParams();
-  const utNext = searchParams.get('next') || '/';
+  const utNext = searchParams.get('next') || APP_HOME_PATH;
   const [stReason, setStReason] = useState<string>('');
   const [stOtherChecked, setStOtherChecked] = useState(false);
 

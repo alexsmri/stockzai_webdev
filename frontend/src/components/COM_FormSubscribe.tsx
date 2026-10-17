@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/CTX_UserStore';
 import { useAlert } from '../context/CTX_Alert';
+import { APP_HOME_PATH } from '../constants';
 
 export default function COM_FormSubscribe() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function COM_FormSubscribe() {
       ])) as Record<string, any>[];
 
       if (consents?.consents_newsletter) {
-        navigate('/', { replace: true });
+        navigate(APP_HOME_PATH, { replace: true });
         return;
       }
 

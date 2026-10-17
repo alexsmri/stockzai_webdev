@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import PAG_Companies from './pages/PAG_Companies';
 import PAG_CompaniesFree from './pages/PAG_CompaniesFree';
 import PAG_Login from './pages/PAG_Login';
@@ -35,6 +35,17 @@ import STR_UserManagement from './structures/STR_UserManagement';
 import type { ValidKeys as UserStoreKeys } from './stores/STO_Users';
 import type { ValidKeys as CompanyStoreKeys } from './stores/STO_Companies';
 import { REGISTRATION_PASSWORD_STORAGE_KEY } from './constants';
+
+// Lazy so the landing/doc pages' CSS and images are only fetched when one of them is opened.
+const PAG_Landing = lazy(() => import('./pages/PAG_Landing'));
+const PAG_Backtest = lazy(() => import('./pages/PAG_Backtest'));
+const PAG_RefundPolicy = lazy(() => import('./pages/PAG_RefundPolicy'));
+const PAG_TermsConditions = lazy(() => import('./pages/PAG_TermsConditions'));
+const PAG_PaymentDispatch = lazy(() => import('./pages/PAG_PaymentDispatch'));
+const PAG_DataProtection = lazy(() => import('./pages/PAG_DataProtection'));
+const PAG_Disclaimer = lazy(() => import('./pages/PAG_Disclaimer'));
+const PAG_Contact = lazy(() => import('./pages/PAG_Contact'));
+const PAG_Scores = lazy(() => import('./pages/PAG_Scores'));
 
 function usePerformLogout() {
   const userStore = useUserStore();
@@ -90,7 +101,7 @@ function Logout() {
 
   useEffect(() => {
     if (isReady) {
-      navigate('/users/login/', { replace: true });
+      navigate('/users/login', { replace: true });
     }
   }, [isReady, navigate]);
 
@@ -123,7 +134,78 @@ function App() {
               <BrowserRouter>
                 <STR_UserManagement />
                 <Routes>
-                  <Route path="/" element={<Navigate to="/companies/search" replace />} />
+                  <Route
+                    path="/"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_Landing />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/scores"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_Scores />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/backtest"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_Backtest />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/refund-policy"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_RefundPolicy />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/terms-conditions"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_TermsConditions />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/payment-dispatch"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_PaymentDispatch />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/data-protection"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_DataProtection />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/disclaimer"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_Disclaimer />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/contact"
+                    element={
+                      <Suspense fallback={<COM_Loading />}>
+                        <PAG_Contact />
+                      </Suspense>
+                    }
+                  />
                   <Route path="/users/login" element={<PAG_Login />} />
                   <Route path="/users/logout" element={<Logout />} />
                   <Route path="/users/register" element={<CreateAndLogout />} />

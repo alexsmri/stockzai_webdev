@@ -1,11 +1,13 @@
+import { Link } from 'react-router-dom';
+
 export default function COM_Footer() {
   const legalLinks = [
-    { href: 'https://stockz.ai/contact', label: 'Contact' },
-    { href: 'https://stockz.ai/refund-policy', label: 'Refund Policy' },
-    { href: 'https://stockz.ai/terms-conditions', label: 'Terms & Conditions' },
-    { href: 'https://stockz.ai/payment-dispatch', label: 'Payment & Dispatch' },
-    { href: 'https://stockz.ai/data-protection', label: 'Data Protection' },
-    { href: 'https://stockz.ai/disclaimer', label: 'Disclaimer' },
+    { href: '/contact', label: 'Contact' },
+    { href: '/refund-policy', label: 'Refund Policy' },
+    { href: '/terms-conditions', label: 'Terms & Conditions' },
+    { href: '/payment-dispatch', label: 'Payment & Dispatch' },
+    { href: '/data-protection', label: 'Data Protection' },
+    { href: '/disclaimer', label: 'Disclaimer' },
   ];
 
   return (
@@ -16,15 +18,9 @@ export default function COM_Footer() {
           Search
         </a>
         {legalLinks.map(({ href, label }) => (
-          <a
-            key={href}
-            href={href}
-            className="look-button-subtle"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link key={href} to={href} className="look-button-subtle">
             {label}
-          </a>
+          </Link>
         ))}
       </div>
     </div>

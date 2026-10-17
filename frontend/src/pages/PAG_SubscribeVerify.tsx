@@ -4,6 +4,7 @@ import COM_FormCodeSubscribe from '../components/COM_FormCodeSubscribe';
 import { useUserStore } from '../context/CTX_UserStore';
 import COM_FooterAuth from '../components/COM_FooterAuth';
 
+import { APP_HOME_PATH } from '../constants';
 export default function PAG_SubscribeVerify() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export default function PAG_SubscribeVerify() {
         prUid={uid}
         prEmail={resolvedEmail}
         prUsername={resolvedUsername}
-        prRedirect="/"
+        prRedirect={APP_HOME_PATH}
       />
       <COM_FooterAuth />
     </>

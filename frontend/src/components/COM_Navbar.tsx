@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWindowDimensions } from '../hooks/hooks';
 import { MOBILE_BREAKPOINT } from '../constants';
+import { APP_HOME_PATH } from '../constants';
 
 const MENU_CLASS_NAMES = {
   open: 'area-menu-mobile mod-z-3',
@@ -100,7 +101,7 @@ export default function COM_Navbar() {
           <Logo
             className="img-logo mod-cursor-pointer"
             onClick={() => {
-              navigate('/');
+              navigate(APP_HOME_PATH);
             }}
           />
           {stIsOpen ? (

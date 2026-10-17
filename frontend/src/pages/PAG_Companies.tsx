@@ -81,7 +81,7 @@ function PAG_CompaniesContent({ symbol }: { symbol: string }) {
         financial advice or investment recommendations. View our{' '}
         <a
           className="look-text-clickable mod-padding-none"
-          href="https://stockz.ai/scores"
+          href="/scores"
           target="_blank"
           rel="noopener noreferrer"
         >
