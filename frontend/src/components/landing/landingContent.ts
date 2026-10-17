@@ -52,22 +52,23 @@ export const LANDING_PRICING = {
   },
 };
 
-// TODO: replace the placeholder answers with the final copy from Framer.
 export const LANDING_FAQ = [
   {
     question: 'Why not use TradingView instead?',
-    answer: '[Placeholder] Paste the answer from the Framer site here.',
+    answer:
+      "stockz.ai isn't trying to be in competition with professional-grade tools like TradingView or Bloomberg. It's about condensing tons of data into a few simple numbers. Because that's what most investors really need.",
   },
   {
     question: 'Where does stockz.ai get its data?',
-    answer: '[Placeholder] Paste the answer from the Framer site here.',
+    answer: 'stockz.ai is currently using the public API from Yahoo Finance to ensure high-quality data',
   },
   {
     question: 'How do the scores work?',
-    answer: '[Placeholder] Paste the answer from the Framer site here.',
+    answer:
+      'To calculate fundamental scores, stockz.ai compares key financial & valuation ratios of a stock with all the other stocks from its sector. Depending on how good it is there, the score is given.',
   },
   {
     question: 'How often is the data refreshed?',
-    answer: 'Data is refreshed every ~7 days.',
+    answer: 'stockz.ai refreshes its data every ~7 days. For the future, daily refreshes are planned.',
   },
 ];
