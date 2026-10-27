@@ -161,6 +161,14 @@ $lp-mobile: 768px;
         font-size: f.scale-font(0);
     }
 
+    // icons inside buttons (e.g. the arrow) follow the button's text color and size
+    .lp-button svg {
+        width: 1.2em;
+        height: 1.2em;
+        flex: none;
+        color: inherit;
+    }
+
     .lp-button-block {
         width: 100%;
         border-radius: f.scale-gap(0.5);

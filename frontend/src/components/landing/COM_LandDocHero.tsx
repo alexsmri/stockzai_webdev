@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import ICON_ArrowUpRight from '@/assets/media/ICON_ArrowUpRight.svg?react';
 import { LANDING_ROUTES } from './landingContent';
 
 interface LandDocHeroProps {
@@ -16,7 +17,7 @@ function COM_LandDocHero({ prDimTitle, prBrightTitle, prSubtitle }: LandDocHeroP
       </h1>
       <p className="lp-lead">{prSubtitle}</p>
       <Link className="lp-button lp-button-light lp-button-lg" to={LANDING_ROUTES.register}>
-        Get stockz.ai for free <span aria-hidden="true">↗</span>
+        Get stockz.ai for free <ICON_ArrowUpRight aria-hidden="true" />
       </Link>
     </header>
   );
